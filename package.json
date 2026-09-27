@@ -1,0 +1,35 @@
+{
+  "name": "rtc-benchmark",
+  "type": "module",
+  "packageManager": "yarn@4.18.0",
+  "dependencies": {
+    "@fails-components/webtransport": "^1.6.8",
+    "@fails-components/webtransport-transport-http3-quiche": "1.6.8",
+    "chart.js": "^4.5.1",
+    "node-datachannel": "^0.33.4"
+  },
+  "dependenciesMeta": {
+    "@fails-components/webtransport-transport-http3-quiche": {
+      "built": true
+    }
+  },
+  "devDependencies": {
+    "@types/dom-mediacapture-transform": "^0.1.12",
+    "@types/node": "^26.6.2",
+    "esbuild": "^0.28.2",
+    "puppeteer-core": "^24.0.0",
+    "tsx": "^4.23.15",
+    "typescript": "5.9"
+  },
+  "scripts": {
+    "build": "esbuild src/client/main.ts --bundle --format=esm --target=es2022 --minify --sourcemap --outfile=public/app.js",
+    "start": "yarn build && tsx src/server/index.ts",
+    "dev": "yarn build && tsx watch src/server/index.ts",
+    "typecheck": "tsc --noEmit",
+    "cert": "node scripts/gen-cert.mjs",
+    "test": "yarn test:rtc && yarn test:wt",
+    "test:rtc": "node scripts/test-rtc-echo.mjs",
+    "test:wt": "node scripts/test-wt-echo.mjs",
+    "e2e": "node scripts/e2e.mjs"
+  }
+}
