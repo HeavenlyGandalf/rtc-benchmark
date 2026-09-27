@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WebRTC vs WebTransport — экспериментальный стенд</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Сравнение WebRTC и WebTransport</h1>
+    <p class="subtitle">Экспериментальный стенд к НИР «Сравнительный анализ технологий WebRTC и WebTransport для передачи данных в реальном времени в веб-приложениях»</p>
+    <p id="support" class="support"></p>
+  </header>
+
+  <main>
+    <section>
+      <h2>Сценарий 1 — время установления соединения</h2>
+      <p class="hint">WebTransport: <code>new WebTransport()</code> → <code>ready</code> (HTTP/3-рукопожатие, 1-RTT).
+        WebRTC: offer → сигналинг (HTTP) → ICE → DTLS → открытие DataChannel.</p>
+      <div class="controls">
+        <label>Повторов <input id="setup-reps" type="number" value="10" min="1" max="100" /></label>
+        <button id="btn-setup">Запустить</button>
+        <span id="setup-progress" class="progress"></span>
+      </div>
+      <div class="kv">
+        <div>WebTransport: <b id="setup-wt">—</b></div>
+        <div>WebRTC: <b id="setup-rtc">—</b></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Сценарий 2 — задержка (RTT) и джиттер</h2>
+      <p class="hint">Ping-pong через echo-сервер по четырём каналам: WT-поток, WT-дейтаграммы, DataChannel надёжный и ненадёжный (unordered, maxRetransmits=0). Дейтаграммы ограничены ~1200 Б (MTU QUIC).</p>
+      <div class="controls">
+        <label>Сообщений <input id="rtt-count" type="number" value="200" min="10" /></label>
+        <label>Размер, Б <input id="rtt-size" type="number" value="512" min="12" /></label>
+        <label>Интервал, мс <input id="rtt-interval" type="number" value="20" min="0" /></label>
+        <button id="btn-rtt">Запустить</button>
+        <span id="rtt-progress" class="progress"></span>
+      </div>
+      <div class="charts">
+        <div class="chart-box"><canvas id="rtt-chart"></canvas></div>
+        <div class="chart-box"><canvas id="rtt-bar-chart"></canvas></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Сценарий 3 — пропускная способность</h2>
+      <p class="hint">Непрерывная отправка с учётом backpressure в течение заданного времени; считается echo-goodput (объём данных, вернувшихся от сервера). Для ненадёжных каналов фиксируются потери.</p>
+      <div class="controls">
+        <label>Длительность, с <input id="tp-duration" type="number" value="5" min="1" max="60" /></label>
+        <label>Размер сообщения, Б <input id="tp-size" type="number" value="16384" min="100" /></label>
+        <button id="btn-tp">Запустить</button>
+        <span id="tp-progress" class="progress"></span>
+      </div>
+      <div class="chart-box wide"><canvas id="tp-chart"></canvas></div>
+    </section>
+
+    <section>
+      <h2>Сценарий 4 — видеостриминг (loopback через сервер)</h2>
+      <p class="hint">WebRTC: встроенный медиастек (SDP-согласование кодека, SRTP, адаптация битрейта GCC), сервер возвращает RTP-пакеты.
+        WebTransport: медиастек приложения — WebCodecs (VP8) поверх надёжного QUIC-потока. Сравниваются glass-to-glass задержка, FPS, битрейт.</p>
+      <div class="video-grid">
+        <div class="video-col">
+          <h3>WebRTC (встроенные медиа)</h3>
+          <div class="videos">
+            <figure><video id="rtc-local" autoplay muted playsinline></video><figcaption>камера</figcaption></figure>
+            <figure><video id="rtc-remote" autoplay muted playsinline></video><figcaption>после эха</figcaption></figure>
+          </div>
+          <button id="btn-video-rtc">Старт WebRTC-видео</button>
+          <p id="rtc-video-stats" class="video-stats">—</p>
+        </div>
+        <div class="video-col">
+          <h3>WebTransport + WebCodecs</h3>
+          <div class="videos">
+            <figure><video id="wt-local" autoplay muted playsinline></video><figcaption>камера</figcaption></figure>
+            <figure><canvas id="wt-canvas"></canvas><figcaption>после эха</figcaption></figure>
+          </div>
+          <button id="btn-video-wt">Старт WebTransport-видео</button>
+          <p id="wt-video-stats" class="video-stats">—</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Результаты</h2>
+      <div class="controls"><button id="btn-csv">Экспорт CSV</button></div>
+      <table class="results">
+        <thead><tr><th>Сценарий</th><th>Транспорт</th><th>Параметры</th><th>Метрики</th></tr></thead>
+        <tbody id="results-body"></tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Журнал</h2>
+      <pre id="log"></pre>
+    </section>
+  </main>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
