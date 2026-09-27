@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>WebRTC vs WebTransport — экспериментальный стенд</title>
+  <title>WebRTC и WebTransport — экспериментальный стенд</title>
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
@@ -17,7 +17,7 @@
     <section>
       <h2>Сценарий 1 — время установления соединения</h2>
       <p class="hint">WebTransport: <code>new WebTransport()</code> → <code>ready</code> (HTTP/3-рукопожатие, 1-RTT).
-        WebRTC: offer → сигналинг (HTTP) → ICE → DTLS → открытие DataChannel.</p>
+        WebRTC: SDP-предложение → сбор кандидатов ICE → сигналинг (HTTP) → DTLS → открытие канала данных.</p>
       <div class="controls">
         <label>Повторов <input id="setup-reps" type="number" value="10" min="1" max="100" /></label>
         <button id="btn-setup">Запустить</button>
@@ -30,8 +30,8 @@
     </section>
 
     <section>
-      <h2>Сценарий 2 — задержка (RTT) и джиттер</h2>
-      <p class="hint">Ping-pong через echo-сервер по четырём каналам: WT-поток, WT-дейтаграммы, DataChannel надёжный и ненадёжный (unordered, maxRetransmits=0). Дейтаграммы ограничены ~1200 Б (MTU QUIC).</p>
+      <h2>Сценарий 2 — задержка обмена (RTT) и её разброс</h2>
+      <p class="hint">Поочерёдный обмен через эхо-сервер по четырём каналам: надёжный поток и дейтаграммы WebTransport, надёжный и ненадёжный каналы данных WebRTC (без упорядочивания и повторной передачи). Дейтаграммы ограничены примерно 1200 Б (MTU QUIC).</p>
       <div class="controls">
         <label>Сообщений <input id="rtt-count" type="number" value="200" min="10" /></label>
         <label>Размер, Б <input id="rtt-size" type="number" value="512" min="12" /></label>
@@ -47,7 +47,7 @@
 
     <section>
       <h2>Сценарий 3 — пропускная способность</h2>
-      <p class="hint">Непрерывная отправка с учётом backpressure в течение заданного времени; считается echo-goodput (объём данных, вернувшихся от сервера). Для ненадёжных каналов фиксируются потери.</p>
+      <p class="hint">Непрерывная отправка с учётом обратного давления в течение заданного времени; измеряется скорость приёма эха — объём данных, вернувшихся от сервера, в единицу времени. Для ненадёжных каналов фиксируются потери.</p>
       <div class="controls">
         <label>Длительность, с <input id="tp-duration" type="number" value="5" min="1" max="60" /></label>
         <label>Размер сообщения, Б <input id="tp-size" type="number" value="16384" min="100" /></label>
@@ -58,12 +58,12 @@
     </section>
 
     <section>
-      <h2>Сценарий 4 — видеостриминг (loopback через сервер)</h2>
-      <p class="hint">WebRTC: встроенный медиастек (SDP-согласование кодека, SRTP, адаптация битрейта GCC), сервер возвращает RTP-пакеты.
-        WebTransport: медиастек приложения — WebCodecs (VP8) поверх надёжного QUIC-потока. Сравниваются glass-to-glass задержка, FPS, битрейт.</p>
+      <h2>Сценарий 4 — видеотрансляция (передача через сервер обратно в браузер)</h2>
+      <p class="hint">WebRTC: встроенная медиасреда браузера (согласование кодека через SDP, SRTP, подстройка скорости передачи средствами GCC), сервер возвращает RTP-пакеты.
+        WebTransport: медиасреда приложения — WebCodecs (VP8) поверх надёжного потока QUIC. Сравниваются сквозная задержка, частота кадров и скорость передачи.</p>
       <div class="video-grid">
         <div class="video-col">
-          <h3>WebRTC (встроенные медиа)</h3>
+          <h3>WebRTC (встроенная медиасреда)</h3>
           <div class="videos">
             <figure><video id="rtc-local" autoplay muted playsinline></video><figcaption>камера</figcaption></figure>
             <figure><video id="rtc-remote" autoplay muted playsinline></video><figcaption>после эха</figcaption></figure>

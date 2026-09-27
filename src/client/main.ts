@@ -100,7 +100,7 @@ function ensureRttBarChart(): Chart {
 function ensureTpChart(): Chart {
   tpChart ??= new Chart($('tp-chart') as HTMLCanvasElement, {
     type: 'bar',
-    data: { labels: [], datasets: [{ label: 'Мбит/с (echo-goodput)', data: [], backgroundColor: [] }] },
+    data: { labels: [], datasets: [{ label: 'Мбит/с (скорость приёма эха)', data: [], backgroundColor: [] }] },
     options: {
       animation: false,
       indexAxis: 'y',
@@ -188,7 +188,7 @@ async function onRttTest(): Promise<void> {
           'медиана, мс': fmt(stats.median),
           'p95, мс': fmt(stats.p95),
           'p99, мс': fmt(stats.p99),
-          'джиттер (RFC3550), мс': fmt(stats.jitter),
+          'разброс задержки (RFC 3550), мс': fmt(stats.jitter),
           'σ, мс': fmt(stats.stddev),
           'потери, %': fmt(stats.lossPct),
         },
@@ -261,10 +261,10 @@ let wtVideoSession: VideoSession | null = null;
 
 function renderVideoStats(el: HTMLElement, s: VideoStats): void {
   el.innerHTML = [
-    `задержка (glass-to-glass): <b>${s.e2eMs != null ? fmt(s.e2eMs, 1) + ' мс' : '—'}</b>`,
-    `FPS: <b>${s.fps != null ? fmt(s.fps, 0) : '—'}</b>`,
-    `битрейт: <b>${s.bitrateKbps != null ? fmt(s.bitrateKbps, 0) + ' кбит/с' : '—'}</b>`,
-    `джиттер: <b>${s.jitterMs != null ? fmt(s.jitterMs, 2) + ' мс' : '—'}</b>`,
+    `сквозная задержка: <b>${s.e2eMs != null ? fmt(s.e2eMs, 1) + ' мс' : '—'}</b>`,
+    `кадров/с: <b>${s.fps != null ? fmt(s.fps, 0) : '—'}</b>`,
+    `скорость приёма: <b>${s.bitrateKbps != null ? fmt(s.bitrateKbps, 0) + ' кбит/с' : '—'}</b>`,
+    `разброс задержки: <b>${s.jitterMs != null ? fmt(s.jitterMs, 2) + ' мс' : '—'}</b>`,
     `RTT: <b>${s.rttMs != null ? fmt(s.rttMs, 1) + ' мс' : '—'}</b>`,
     `потери пакетов: <b>${s.packetsLost ?? '—'}</b>`,
   ].join(' · ');
@@ -286,7 +286,7 @@ async function toggleRtcVideo(): Promise<void> {
       (s) => renderVideoStats($('rtc-video-stats'), s),
     );
     btn.textContent = 'Стоп WebRTC-видео';
-    log('Видео WebRTC: камера -> echo-сервер (RTP loopback) -> экран');
+    log('Видео WebRTC: камера → эхо-сервер (RTP туда и обратно) → экран');
   } catch (err) {
     log(`Ошибка видео WebRTC: ${err}`);
   } finally {
@@ -310,7 +310,7 @@ async function toggleWtVideo(): Promise<void> {
       (s) => renderVideoStats($('wt-video-stats'), s),
     );
     btn.textContent = 'Стоп WebTransport-видео';
-    log('Видео WebTransport: камера -> WebCodecs VP8 -> QUIC-поток -> echo -> декодер');
+    log('Видео WebTransport: камера → WebCodecs VP8 → поток QUIC → эхо-сервер → декодер');
   } catch (err) {
     log(`Ошибка видео WebTransport: ${err}`);
   } finally {
@@ -335,4 +335,4 @@ $('btn-video-rtc').addEventListener('click', toggleRtcVideo);
 $('btn-video-wt').addEventListener('click', toggleWtVideo);
 $('btn-csv').addEventListener('click', exportCsv);
 checkSupport();
-log('Стенд готов. Запустите сценарии 1–3 и видеотесты.');
+log('Стенд готов. Запустите сценарии 1–3 и проверки видео.');

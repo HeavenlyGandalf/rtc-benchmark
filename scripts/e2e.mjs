@@ -83,7 +83,7 @@ console.log('Сценарий 3: готово');
 await page.click('#btn-video-rtc');
 await page.waitForFunction(
   () => document.getElementById('rtc-video-stats').textContent.includes('мс') ||
-        document.getElementById('rtc-video-stats').textContent.includes('FPS'),
+        document.getElementById('rtc-video-stats').textContent.includes('кадров/с'),
   { timeout: 30_000 },
 );
 await new Promise((r) => setTimeout(r, 4000));

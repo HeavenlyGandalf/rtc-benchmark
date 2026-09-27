@@ -7,8 +7,8 @@ export type ChannelMode = 'wt-stream' | 'wt-datagram' | 'rtc-reliable' | 'rtc-un
 export const MODE_LABELS: Record<ChannelMode, string> = {
   'wt-stream': 'WebTransport / надёжный поток',
   'wt-datagram': 'WebTransport / дейтаграммы',
-  'rtc-reliable': 'WebRTC DataChannel / надёжный',
-  'rtc-unreliable': 'WebRTC DataChannel / ненадёжный',
+  'rtc-reliable': 'WebRTC / надёжный канал данных',
+  'rtc-unreliable': 'WebRTC / ненадёжный канал данных',
 };
 
 export interface BenchChannel {
