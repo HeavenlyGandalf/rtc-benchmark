@@ -21,3 +21,18 @@ certs/
 
 # Артефакты e2e-прогона
 results/*.png
+
+# Сборка сайта документации (MkDocs)
+site/
+
+# Локальное окружение Python для сборки сайта
+.venv-docs/
+
+# Кэш байт-кода Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# Служебные файлы macOS
+.DS_Store
