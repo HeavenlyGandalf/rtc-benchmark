@@ -1,0 +1,77 @@
+# Публикация сайта документации на GitHub Pages.
+#
+# Официальная связка: upload-pages-artifact + deploy-pages.
+# Сборка site/ уезжает в окружение Pages, вторая ветка gh-pages не нужна.
+#
+# Обязательное ручное действие: Settings → Pages → Source = GitHub Actions.
+# Без него workflow соберёт сайт, но публикация не произойдёт.
+#
+# Права: pages: write — загрузка и публикация, id-token: write — получение
+# токена для API Pages, contents: read — чтение репозитория.
+
+name: Deploy site to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # Позволяет запустить workflow вручную из интерфейса. Нужно сразу после
+  # добавления файла: до следующего push в main workflow сам не стартует.
+  workflow_dispatch:
+
+# Не отменять текущий деплой: два одновременных деплоя конкурируют за одно
+# окружение Pages, и более ранний может остаться опубликованным.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    name: Сборка сайта
+    runs-on: ubuntu-latest
+    steps:
+      - name: Получить исходники
+        uses: actions/checkout@v7
+
+      - name: Настроить GitHub Pages
+        uses: actions/configure-pages@v6
+
+      - name: Установить Python
+        uses: actions/setup-python@v7
+        with:
+          # Та же версия, на которой сайт проверен локально: requirements.txt
+          # зафиксирован по набору пакетов, установленных в 3.14.
+          python-version: '3.14'
+
+      - name: Установить зависимости
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Собрать сайт в строгом режиме
+        # python -m mkdocs, а не `mkdocs`: не зависит от того, попал ли каталог
+        # со скриптами в PATH.
+        # --strict превращает битые ссылки и предупреждения в ошибку сборки.
+        # Это осознанно: молча сломанная ссылка на сайте хуже красного workflow.
+        run: python -m mkdocs build --strict
+
+      - name: Сохранить артефакт сборки
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+  deploy:
+    name: Публикация
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Опубликовать в GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
