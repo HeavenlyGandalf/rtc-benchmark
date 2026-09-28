@@ -349,6 +349,12 @@ python3 -m venv .venv-docs                 # один раз: окружение
 `.github/workflows/deploy.yml` собирает сайт и выкладывает его в GitHub Pages
 официальной связкой `upload-pages-artifact` + `deploy-pages`.
 
+Строгая сборка идёт по трём поводам: пуш в `main`, открытый pull request и
+ручной запуск. Публикуется только `main` — pull request и ручной запуск из
+другой ветки проверяют ссылки, но не трогают production, поэтому битая ссылка
+обнаруживается до merge. Пуши в остальные ветки workflow не запускают вовсе.
+Ограничение задано условием `if` у job `deploy`.
+
 Разовая обязательная настройка в репозитории:
 **Settings → Pages → Source = GitHub Actions**.
 

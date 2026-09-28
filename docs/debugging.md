@@ -110,9 +110,11 @@ theme:
 |---|---|---|
 | На GitHub попал стенд без сайта | `docs/`, `mkdocs.yml`, `requirements.txt` не были закоммичены | Закоммитить их **до** настройки Actions, иначе первый деплой соберёт пустой сайт |
 | Сайт открывается на Pages, но ломается в подкаталоге другого хостинга | В `site_url` указан домен с чужим подкаталогом либо в тему добавлены абсолютные пути | Собирать с относительными путями. При `use_directory_urls: true` ссылки вида `../about/` строятся относительными и подходят любому хостингу |
-| Деплой падает с `Error: Get "https://api.github.com/...": Not Found` | У `GITHUB_TOKEN` нет прав на Pages | Выдать workflow права `pages: write` и `id-token: write` |
+| Деплой падает с `Error: Get "https://api.github.com/...": Not Found` | У `GITHUB_TOKEN` нет прав на Pages | Выдать job `deploy` права `pages: write` и `id-token: write` в блоке `jobs.deploy.permissions`. На уровне workflow эти права не нужны и выдавать их не следует: job `build` исполняет код из pull request |
 | Сайт не появляется по адресу репозитория | В настройках репозитория `Settings → Pages → Source` выбрано не `GitHub Actions` | Переключить Source на `GitHub Actions` — обязательный шаг для связки `upload-pages-artifact` + `deploy-pages` |
 | Публикация не запускается сама | Workflow добавлен после последнего пуша и ни разу не запускался | `Actions → Deploy site to GitHub Pages → Run workflow` |
+| Job «Публикация» серый (skipped) при ручном запуске | Выбрана не ветка `main` либо упала сборка (`needs: build`) | Условие `if` у `deploy` пропускает любой ref, кроме `refs/heads/main`. Выбрать в поле запуска ветку `main` и убедиться, что «Сборка сайта» зелёная |
+| Job «Публикация» серый (skipped) на pull request | Так и задумано | Публикуется только `main`. Серый job — норма для pull request, а не сбой; смотрите на зелёную «Сборка сайта» |
 
 ### Два подхода к публикации
 
