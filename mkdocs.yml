@@ -1,0 +1,103 @@
+site_name: "rtc-benchmark: WebRTC и WebTransport"
+site_description: >-
+  Документация и результаты экспериментального стенда по сравнению
+  WebRTC и WebTransport для передачи данных в реальном времени
+  в веб-приложениях.
+site_author: rtc-benchmark
+
+# Базовый URL публикации. В MkDocs 1.6 отдельной опции верхнего уровня
+# `base_url` НЕТ: она приводит к ошибке "Unrecognised configuration name"
+# и роняет сборку в режиме --strict. Базовый путь выводится из site_url,
+# поэтому здесь указывается полный адрес с висящей косой чертой.
+# Правка этого поля — единственное, что нужно при смене хостинга.
+site_url: "https://heavygendalf.github.io/rtc-benchmark/"
+
+# Ссылки репозитория: кнопка в шапке сайта.
+repo_url: "https://github.com/heavygendalf/rtc-benchmark"
+repo_name: "heavygendalf/rtc-benchmark"
+edit_uri: "edit/main/docs/"
+
+# Каталог-URLы (about/index.html вместо about.html) — так MkDocs строит
+# относительные ссылки вида ../about/, из-за чего сайт переносится в
+# подкаталог другого хостинга без правок.
+use_directory_urls: true
+
+docs_dir: docs
+site_dir: site
+
+# Плашку в подвале. Внимание: значение выводится как есть, markdown в нём
+# НЕ обрабатывается, а относительные ссылки не переписываются, поэтому
+# здесь только текст. Разбор лицензий — на странице «Лицензия».
+copyright: "Материалы сайта — CC BY 4.0 · код стенда — MIT · © 2026 heavygendalf"
+
+theme:
+  name: material
+  language: ru
+  # Шрифты Google подключаются с внешнего CDN. Отключение нужно для
+  # публикации на закрытом хостинге: theme.font: false убирает <link>
+  # на fonts.googleapis.com целиком. Варианты font.text: false и
+  # font.code: false НЕ убирают подключение — проверяется только
+  # целочисленное font: false. Применяется системный шрифт.
+  font: false
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Переключить на тёмную тему
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Переключить на светлую тему
+
+nav:
+  - Главная: index.md
+  - О проекте: about.md
+  - Методика эксперимента: methodology.md
+  - WebRTC: webrtc.md
+  - WebTransport: webtransport.md
+  - Сценарии экспериментов: scenarios.md
+  - Результаты: results.md
+  - Ограничения: limitations.md
+  - Как запустить стенд: running.md
+  - Отчёт об отладке: debugging.md
+  - Лицензия: license.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/heavygendalf/rtc-benchmark
+      name: Репозиторий проекта на GitHub
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+
+# Ссылка на файл документации, не попавший в nav, прерывает сборку
+# --strict. Это осознанно: молча потерянная страница хуже явной ошибки.
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
