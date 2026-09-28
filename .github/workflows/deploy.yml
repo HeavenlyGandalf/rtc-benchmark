@@ -6,39 +6,50 @@
 # Обязательное ручное действие: Settings → Pages → Source = GitHub Actions.
 # Без него workflow соберёт сайт, но публикация не произойдёт.
 #
-# Права: pages: write — загрузка и публикация, id-token: write — получение
-# токена для API Pages, contents: read — чтение репозитория.
+# Права: contents: read — чтение репозитория, pages: write и id-token: write —
+# публикация и токен для API Pages. Последние две выданы только job deploy.
+#
+# Публикует только main. Строгая сборка при этом идёт по трём поводам: пуш в
+# main, pull request и ручной запуск — пуши в остальные ветки workflow не
+# запускают вовсе. Ограничение задано не только списком веток в триггере, но и
+# условием `if` у job deploy: без него ручной запуск из feature-ветки
+# опубликовал бы её как production.
 
 name: Deploy site to GitHub Pages
 
 on:
   push:
     branches: [main]
+  # Строгая сборка на pull request: битая ссылка или страница вне nav
+  # обнаруживается до merge, а не после. Публикации нет — deploy пропускается.
+  pull_request:
   # Позволяет запустить workflow вручную из интерфейса. Нужно сразу после
   # добавления файла: до следующего push в main workflow сам не стартует.
+  # Ветку выбирать main — запуск из другой ветки соберёт сайт, но не опубликует.
   workflow_dispatch:
 
 # Не отменять текущий деплой: два одновременных деплоя конкурируют за одно
 # окружение Pages, и более ранний может остаться опубликованным.
+# Группа привязана к ветке, поэтому проверки pull request не встают в очередь
+# к рабочему деплою. Для main группа всегда одна — «pages-refs/heads/main».
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: false
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 jobs:
   build:
     name: Сборка сайта
     runs-on: ubuntu-latest
+    # Намеренно без configure-pages: MkDocs выводит базовый путь из site_url,
+    # а сам configure-pages падает, если Pages ещё не включён. Оставив его в
+    # этой job, мы заставили бы каждый pull request падать на проверке Pages
+    # до строгой сборки. Проверка настроек вынесена в job deploy.
     steps:
       - name: Получить исходники
         uses: actions/checkout@v7
-
-      - name: Настроить GitHub Pages
-        uses: actions/configure-pages@v6
 
       - name: Установить Python
         uses: actions/setup-python@v7
@@ -67,11 +78,29 @@ jobs:
   deploy:
     name: Публикация
     needs: build
+    # Публикуется только main. Основное условие — ref: у pull request он
+    # всегда refs/pull/N/merge, то есть не главная ветка. Проверка event_name
+    # оставлена как страховка на случай смены формата ref.
+    # Проверка `build` выполняется раньше этой job, поэтому несостоявшийся PR
+    # не публикуется даже «с прошлой удачной сборки».
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    # Права выданы только этой job. У build их нет намеренно: она
+    # выполняет код из pull request, и токен с pages: write в её руках —
+    # лишний риск. На fork-PR права и так урезаются GitHub.
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Настроить GitHub Pages
+        # Последний рубеж перед публикацией: падает, если в Settings → Pages
+        # не выбран источник GitHub Actions, и называет причину.
+        uses: actions/configure-pages@v6
+
       - name: Опубликовать в GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
