@@ -6,8 +6,8 @@
 
 | Что | Лицензия | Файл |
 |---|---|---|
-| Исходный код стенда | MIT | [`LICENSE`](https://github.com/heavygendalf/rtc-benchmark/blob/main/LICENSE) |
-| Текст и графические материалы сайта | CC BY 4.0 | [`LICENSE-CONTENT.md`](https://github.com/heavygendalf/rtc-benchmark/blob/main/LICENSE-CONTENT.md) |
+| Исходный код стенда | MIT | [`LICENSE`](https://github.com/HeavenlyGandalf/rtc-benchmark/blob/main/LICENSE) |
+| Текст и графические материалы сайта | CC BY 4.0 | [`LICENSE-CONTENT.md`](https://github.com/HeavenlyGandalf/rtc-benchmark/blob/main/LICENSE-CONTENT.md) |
 
 ## Исходный код — MIT
 

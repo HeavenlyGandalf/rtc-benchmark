@@ -484,5 +484,5 @@ ssh-keyscan -p 2222 helios.cs.ifmo.ru
 
 При использовании материалов сайта необходимо указать авторство. Зависимости
 лицензируются отдельно, собственными лицензиями авторов. Разбор — на странице
-[«Лицензия»](https://heavygendalf.github.io/rtc-benchmark/license/).
+[«Лицензия»](https://heavenlygandalf.github.io/rtc-benchmark/license/).
 

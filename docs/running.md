@@ -193,7 +193,7 @@ production. Поэтому в поле выбора ветки при ручно
 Адрес публикации задаётся единственным полем в `mkdocs.yml`:
 
 ```yaml
-site_url: "https://heavygendalf.github.io/rtc-benchmark/"
+site_url: "https://heavenlygandalf.github.io/rtc-benchmark/"
 ```
 
 Отдельного поля `base_url` в MkDocs 1.6 нет — его попытка задать приводит к
@@ -216,10 +216,10 @@ site_url: "https://heavygendalf.github.io/rtc-benchmark/"
 
 ```bash
 curl -sS -o /dev/null -w "главная → HTTP %{http_code}\n" \
-  https://heavygendalf.github.io/rtc-benchmark/
-curl -sS https://heavygendalf.github.io/rtc-benchmark/ | grep -c 'Сравнительный анализ'
+  https://heavenlygandalf.github.io/rtc-benchmark/
+curl -sS https://heavenlygandalf.github.io/rtc-benchmark/ | grep -c 'Сравнительный анализ'
 curl -sS -o /dev/null -w "поиск → HTTP %{http_code}\n" \
-  https://heavygendalf.github.io/rtc-benchmark/search_index.json
+  https://heavenlygandalf.github.io/rtc-benchmark/search_index.json
 ```
 
 Полный разбор ошибок публикации — в [Отчёте об отладке](debugging.md).

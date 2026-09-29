@@ -10,11 +10,11 @@ site_author: rtc-benchmark
 # и роняет сборку в режиме --strict. Базовый путь выводится из site_url,
 # поэтому здесь указывается полный адрес с висящей косой чертой.
 # Правка этого поля — единственное, что нужно при смене хостинга.
-site_url: "https://heavygendalf.github.io/rtc-benchmark/"
+site_url: "https://heavenlygandalf.github.io/rtc-benchmark/"
 
 # Ссылки репозитория: кнопка в шапке сайта.
-repo_url: "https://github.com/heavygendalf/rtc-benchmark"
-repo_name: "heavygendalf/rtc-benchmark"
+repo_url: "https://github.com/HeavenlyGandalf/rtc-benchmark"
+repo_name: "HeavenlyGandalf/rtc-benchmark"
 edit_uri: "edit/main/docs/"
 
 # Каталог-URLы (about/index.html вместо about.html) — так MkDocs строит
@@ -79,7 +79,7 @@ nav:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/heavygendalf/rtc-benchmark
+      link: https://github.com/HeavenlyGandalf/rtc-benchmark
       name: Репозиторий проекта на GitHub
 
 markdown_extensions:

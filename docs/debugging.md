@@ -55,7 +55,7 @@ Aborted with 1 configuration warnings in 'strict' mode!
 Устранение: задать полный адрес с висящей косой чертой и больше ничего:
 
 ```yaml
-site_url: "https://heavygendalf.github.io/rtc-benchmark/"
+site_url: "https://heavenlygandalf.github.io/rtc-benchmark/"
 ```
 
 ### `sitemap.xml` собирается пустым
