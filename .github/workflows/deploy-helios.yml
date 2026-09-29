@@ -1,0 +1,441 @@
+# Публикация сайта документации на Helios ИТМО.
+#
+# Helios — вторая площадка рядом с GitHub Pages, а не замена ему: workflow
+# deploy.yml продолжает публиковать сайт на Pages без изменений.
+#
+# Способ доставки взят из инструкции по лабораторной работе
+# (web/docs/deploy-1lab.md в репозитории Roggired/ITMO): Nginx на Helios
+# настроен администраторами и студентом не управляется, файлы кладутся в
+# ~/public_html и раздаются по https://se.ifmo.ru/~<логин>/. Передача — SSH/SCP
+# на порту 2222. Ни Docker, ни FTP, ни rsync, ни внешние хранилища: для этой
+# инфраструктуры они не требуются.
+#
+# В корень public_html сайт НЕ кладётся: корень занят другими работами студента
+# (свой index.html и т.п.), и перезапись снесла бы их. Сайт живёт в отдельном
+# подкаталоге public_html/<HELIOS_SITE_SUBDIR> и доступен по
+# https://se.ifmo.ru/~<логин>/<HELIOS_SITE_SUBDIR>/ — тот же механизм, что
+# описан в инструкции («создать директорию lab1 внутри public_html»).
+#
+# Сайт переносится в подкаталог без правок конфигурации MkDocs: use_directory_urls
+# и site_url дают относительные ссылки, поэтому один и тот же артефакт сборки
+# уходит и на Pages, и на Helios. См. README, раздел «Публикация на Helios».
+#
+# Обязательные секреты репозитория (Settings → Secrets and variables → Actions):
+#   HELIOS_USER               — логин на Helios (в примере инструкции sXXXXXX)
+#   HELIOS_SSH_PRIVATE_KEY    — приватный ключ без парольной фразы (OpenSSH)
+#   HELIOS_SSH_KNOWN_HOSTS    — строка(и) host key Helios из ssh-keyscan
+# Необязательная переменная (Variable), имя подкаталога публикации:
+#   HELIOS_SITE_SUBDIR        — по умолчанию rtc-benchmark
+# Ни логина, ни ключа, ни пароля в репозитории нет и быть не должно.
+
+name: Deploy site to Helios
+
+on:
+  push:
+    branches: [main]
+  # Строгая сборка на pull request: битая ссылка обнаруживается до merge.
+  # Публикации нет — job deploy пропускается, секреты не нужны.
+  pull_request:
+  # Ручной запуск из интерфейса. Ветку выбирать main: запуск из другой ветки
+  # соберёт и проверит сайт, но ничего не опубликует.
+  workflow_dispatch:
+
+# Не отменять текущий деплой: два одновременных SCP в один подкаталог
+# публикации перетирают друг друга, и на сервере может остаться смесь файлов
+# от разных коммитов. Группа привязана к ветке, поэтому проверки pull request
+# не встают в очередь к рабочему деплою.
+concurrency:
+  group: helios-${{ github.ref }}
+  cancel-in-progress: false
+
+# Токену workflow не нужно ничего, кроме чтения репозитория. Секреты Helios
+# подставляются в env отдельных шагов и в репозиторий не попадают.
+permissions:
+  contents: read
+
+env:
+  HELIOS_HOST: helios.cs.ifmo.ru
+  HELIOS_PORT: '2222'
+  # Домашняя директория студента на Helios по инструкции: /home/studs/<логин>.
+  HELIOS_HOME_ROOT: /home/studs
+  # Каталог, который отдаёт Nginx. Права 755 — требование инструкции.
+  HELIOS_PUBLIC_DIR: public_html
+  # Подкаталог, в котором живёт сайт. Это repo Variable (не секрет): имя
+  # попадает в публичный URL и ничем конфиденциальным не является. Переопределить
+  # без правки workflow можно в Settings → Variables. Пустое/незаданное значение
+  # срезается оператором «||» до значения по умолчанию.
+  HELIOS_SITE_SUBDIR: ${{ vars.HELIOS_SITE_SUBDIR || 'rtc-benchmark' }}
+
+  # Контрольная строка healthcheck. Взята из заголовка первого уровня главной
+  # страницы: <h1 id="rtc-benchmark">. Это статическая часть HTML, а не
+  # динамическое значение, и она меняется только вместе с переименованием
+  # проекта. ASCII-only — сравнение не зависит от кодировки терминала.
+  HELIOS_HEALTHCHECK_MARKER: 'id="rtc-benchmark"'
+  # Публикация не мгновенна: файл мог ещё не отдаться к моменту первого запроса.
+  HELIOS_HEALTHCHECK_ATTEMPTS: '10'
+  HELIOS_HEALTHCHECK_DELAY_SEC: '10'
+
+jobs:
+  build:
+    name: Сборка сайта
+    runs-on: ubuntu-latest
+    # Обычная сборка занимает минуты; лимит только страхует от зависшей
+    # установки зависимостей.
+    timeout-minutes: 20
+    steps:
+      - name: Получить исходники
+        uses: actions/checkout@v7
+
+      - name: Установить Python
+        uses: actions/setup-python@v7
+        with:
+          # Та же версия, на которой сайт проверен локально: requirements.txt
+          # зафиксирован по набору пакетов, установленных в 3.14.
+          python-version: '3.14'
+
+      - name: Установить зависимости
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Собрать сайт в строгом режиме
+        # python -m mkdocs, а не `mkdocs`: не зависит от того, попал ли каталог
+        # со скриптами в PATH.
+        # --strict превращает битые ссылки и предупреждения в ошибку сборки.
+        run: python -m mkdocs build --strict
+
+      - name: Сохранить артефакт сборки
+        # Каталог site/ целиком, без распаковки «после сборки» на месте
+        # публикации: на Helios уезжает ровно то, что проверил --strict.
+        uses: actions/upload-artifact@v7
+        with:
+          name: site-helios
+          path: site
+          # Сборка небольшая, а срок хранения ничего не решает: артефакт живёт
+          # только внутри текущего запуска workflow.
+          retention-days: 7
+          if-no-files-found: error
+          # По умолчанию upload-artifact выкидывает файлы, чьё имя начинается
+          # с точки. Сейчас таких нет, но без этого флага обещание «на Helios
+          # уезжает ровно то, что проверил --strict» зависело бы от того, какие
+          # файлы сегодня генерирует тема.
+          include-hidden-files: true
+
+  deploy:
+    name: Публикация на Helios
+    needs: build
+    # Публикуется только main. Основное условие — ref: у pull request он всегда
+    # refs/pull/N/merge, то есть не главная ветка. Проверка event_name оставлена
+    # как страховка на случай смены формата ref. Проверка `build` выполняется
+    # раньше этой job, поэтому несостоявшийся PR не публикуется даже «с прошлой
+    # удачной сборки».
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    # Healthcheck может легитимно крутить до ~11.5 минут (2 запроса × 10 попыток
+    # × 30 c + 9 пауз × 10 c), плюс время SCP. Лимит страхует от зависшего
+    # ssh/scp, без которого job занимал бы runner до дефолтных 360 минут.
+    timeout-minutes: 30
+    # Секреты Helios выдаются только на этой job и только через окружение.
+    # Охрана окружения проверяется на сервере GitHub и потому переживает правку
+    # workflow: коллега с правом записи может открыть ветку, снять `if` выше и
+    # вывести приватный ключ, но на approvals для окружения `helios` такой запуск
+    # остановится до выполнения шагов. Окружение создаётся GitHub при первом
+    # запуске; добавить ему required reviewers и правило « branches: main» —
+    # в Settings → Environments.
+    environment: helios
+    steps:
+      - name: Получить артефакт сборки
+        uses: actions/download-artifact@v8
+        with:
+          name: site-helios
+          path: site
+
+      - name: Проверить состав артефакта
+        run: |
+          if [ ! -f site/index.html ]; then
+            echo "::error::В артефакте нет site/index.html — публиковать нечего."
+            exit 1
+          fi
+          echo "Файлов в артефакте: $(find site -type f | wc -l)"
+          du -sh site
+
+      - name: Проверить секреты и настройки
+        # Отдельный шаг с внятной ошибкой: без него первая неудачная попытка
+        # выглядела бы как «Invalid format» в выводе ssh или scp.
+        env:
+          HELIOS_USER: ${{ secrets.HELIOS_USER }}
+          HELIOS_SSH_PRIVATE_KEY: ${{ secrets.HELIOS_SSH_PRIVATE_KEY }}
+          HELIOS_SSH_KNOWN_HOSTS: ${{ secrets.HELIOS_SSH_KNOWN_HOSTS }}
+        run: |
+          missing=''
+          [ -n "$HELIOS_USER" ]             || missing="$missing HELIOS_USER"
+          [ -n "$HELIOS_SSH_PRIVATE_KEY" ]  || missing="$missing HELIOS_SSH_PRIVATE_KEY"
+          [ -n "$HELIOS_SSH_KNOWN_HOSTS" ]  || missing="$missing HELIOS_SSH_KNOWN_HOSTS"
+          if [ -n "$missing" ]; then
+            echo "::error::Не заданы секреты репозитория:$missing"
+            echo "Добавьте их в Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
+          # Логин подставляется и в аргумент ssh/scp, и в команду, которую
+          # выполнит УДАЛЁННЫЙ shell (ssh "mkdir -p '.../$HELIOS_USER/...'"),
+          # поэтому значение с кавычкой или точкой с запятой вышло бы за
+          # пределы аргумента. Отдельно отсекаем ведущие «-» (иначе значение
+          # разберутся как опции ssh, например -oProxyCommand) и ведущую «.»
+          # (иначе «..» уводит путь из /home/studs/). Внутри имени остаются
+          # буквы, цифры, дефис, подчёркивание и точка — этого хватает логину
+          # вида sXXXXXX.
+          case "$HELIOS_USER" in
+            '' | -* | .*)
+              echo "::error::HELIOS_USER недопустим: не должен быть пустым и не должен начинаться с «-» или «.», во избежание разбора как опций ssh и выхода из /home/studs."
+              exit 1
+              ;;
+            *[!A-Za-z0-9._-]*)
+              echo "::error::HELIOS_USER содержит недопустимые символы: допустимы латиница, цифры, дефис, подчёркивание и точка."
+              exit 1
+              ;;
+          esac
+
+          # Имя подкаталога подставляется в удалённые команды, включая rm -rf,
+          # поэтому оно проверяется так же строго, как логин. Список разрешённых
+          # символов (без слэша и пробела) к тому же гарантирует, что имя
+          # годно как сегмент URL healthcheck.
+          case "$HELIOS_SITE_SUBDIR" in
+            '' | -* | .*)
+              echo "::error::HELIOS_SITE_SUBDIR недопустим: не должен быть пустым и не должен начинаться с «-» или «.», во избежание разбора как опций ssh и выхода из public_html."
+              exit 1
+              ;;
+            *[!A-Za-z0-9._-]*)
+              echo "::error::HELIOS_SITE_SUBDIR содержит недопустимые символы: допустимы латиница, цифры, дефис, подчёркивание и точка."
+              exit 1
+              ;;
+          esac
+
+          echo "Секреты и настройки на месте."
+
+      - name: Подготовить SSH-окружение
+        env:
+          HELIOS_SSH_PRIVATE_KEY: ${{ secrets.HELIOS_SSH_PRIVATE_KEY }}
+          HELIOS_SSH_KNOWN_HOSTS: ${{ secrets.HELIOS_SSH_KNOWN_HOSTS }}
+        run: |
+          install -d -m 700 ~/.ssh
+
+          # Приватный ключ живёт только в рамках запуска на runner'е.
+          # tr -d '\r' — защита от ключа, вставленного из редактора с Windows:
+          # встроенные переводы CR приводят к «Invalid format» в ssh.
+          printf '%s\n' "$HELIOS_SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+          # known_hosts берётся из секрета, а не из ssh-keyscan во время
+          # публикации: сверка host key остаётся обязательной
+          # (StrictHostKeyChecking=yes), но проверяет заранее подтверждённый
+          # ключ, а не тот, что подсунул сервер в момент подключения.
+          # StrictHostKeyChecking=no и пустой known_hosts здесь недопустимы.
+          printf '%s\n' "$HELIOS_SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+          test -s ~/.ssh/known_hosts || {
+            echo "::error::Секрет HELIOS_SSH_KNOWN_HOSTS пуст — сверять host key не с чем."
+            exit 1
+          }
+
+      - name: Подключиться к Helios по SSH
+        env:
+          HELIOS_USER: ${{ secrets.HELIOS_USER }}
+        # Набор опций, повторённый на всех ssh/scp-шагах ниже: только наш ключ,
+        # только наш known_hosts, никаких интерактивных паролей.
+        # BatchMode=yes запрещает ssh предлагать пароль или passphrase: иначе
+        # шаг остановился бы на запросе ввода, который в CI некому ответить.
+        run: |
+          ssh -p "$HELIOS_PORT" \
+              -o IdentitiesOnly=yes \
+              -o StrictHostKeyChecking=yes \
+              -o BatchMode=yes \
+              -o ConnectTimeout=30 \
+              "$HELIOS_USER@$HELIOS_HOST" \
+              'printf "SSH-доступ получен, хост: %s\n" "$(hostname -s)"'
+
+      - name: Подготовить подкаталог публикации
+        env:
+          HELIOS_USER: ${{ secrets.HELIOS_USER }}
+        run: |
+          # Точка назначения — подкаталог HELIOS_SITE_SUBDIR внутри public_html.
+          # Корень public_html, где у студента свои файлы, workflow не трогает:
+          # даже режим каталога переустанавливается только в момент его создания.
+          root="$HELIOS_HOME_ROOT/$HELIOS_USER/$HELIOS_PUBLIC_DIR"
+          target="$root/$HELIOS_SITE_SUBDIR"
+
+          # Подкаталог целиком принадлежит сайту, поэтому перед свежей загрузкой
+          # он удаляется и создаётся заново: публикация получается чистой и не
+          # накапливает файлы страниц, удалённых из nav. Безопасность rm -rf
+          # построена на двух проверках, обе выполняются на сервере перед
+          # удалением:
+          #   1) если по этому пути лежит ФАЙЛ (например, HELIOS_SITE_SUBDIR
+          #      опечаткой назвал index.html в корне) или
+          #   2) если по этому пути лежит КАТАЛОГ без служебного маркера
+          #      .rtc-benchmark, который этот workflow кладёт на сервер
+          #      («каталог создан не этим workflow»), —
+          # публикация останавливается, а не ломает чужое. Проверка имени в шаге
+          # «Проверить секреты и настройки» такую опечатку не ловит: имена из
+          # [A-Za-z0-9._-] могут совпасть с реальным файлом.
+          ssh -p "$HELIOS_PORT" \
+              -o IdentitiesOnly=yes \
+              -o StrictHostKeyChecking=yes \
+              -o BatchMode=yes \
+              -o ConnectTimeout=30 \
+              "$HELIOS_USER@$HELIOS_HOST" "
+          set -e
+          if [ -e '$target' ] && [ ! -d '$target' ]; then
+            echo \"::error::$target существует и не является каталогом — публикация остановлена.\"
+            exit 1
+          fi
+          if [ -e '$root' ] && [ ! -d '$root' ]; then
+            echo \"::error::$root существует и не является каталогом — публикация остановлена.\"
+            exit 1
+          fi
+          if [ -d '$target' ] && [ ! -f '$target/.rtc-benchmark' ]; then
+            echo \"::error::$target — каталог, но не созданный этим workflow — публикация остановлена.\"
+            exit 1
+          fi
+          if [ ! -d '$root' ]; then
+            mkdir -p '$root' && chmod 755 '$root'
+          fi
+          rm -rf '$target'
+          mkdir -p '$target'
+          chmod 755 '$target'
+          touch '$target/.rtc-benchmark'
+          chmod 644 '$target/.rtc-benchmark'
+          ls -ld '$root' '$target'"
+
+      - name: Передать файлы на Helios
+        env:
+          HELIOS_USER: ${{ secrets.HELIOS_USER }}
+        run: |
+          # 404.html на Helios не едет. MkDocs собирает его с абсолютными путями
+          # вида /rtc-benchmark/... (от корня домена) — на Pages они корректны,
+          # а под /~<логин>/<HELIOS_SITE_SUBDIR>/ то же содержимое отдалось бы
+          # без стилей. Поэтому 404.html исключается только из выгрузки на
+          # Helios; на Pages артефакт остаётся нетронутым.
+          rm -f site/404.html
+
+          # scp -r site/. , а не scp -r site: в первом случае в целевой каталог
+          # попадает содержимое site/, во втором — каталог site/ внутри него.
+          # site/. покрывает и скрытые файлы, которые glob site/* пропустил бы.
+          # Флаг -P (заглавная) — это порт.
+          #
+          # Права выставляем здесь, до отправки, и дублируем на сервере в шаге
+          # «Выставить права на файлы»: scp -p обычно переносит режим, но его
+          # поведение зависит от версии протокола и sshd на сервере, поэтому
+          # вторая переустановка — дешёвая страховка, а не полагание на одно scp.
+          find site -type d -exec chmod 755 {} +
+          find site -type f -exec chmod 644 {} +
+
+          scp -rp -P "$HELIOS_PORT" \
+              -o IdentitiesOnly=yes \
+              -o StrictHostKeyChecking=yes \
+              -o BatchMode=yes \
+              -o ConnectTimeout=30 \
+              site/. "$HELIOS_USER@$HELIOS_HOST:$HELIOS_HOME_ROOT/$HELIOS_USER/$HELIOS_PUBLIC_DIR/$HELIOS_SITE_SUBDIR/"
+
+      - name: Выставить права на файлы
+        env:
+          HELIOS_USER: ${{ secrets.HELIOS_USER }}
+        run: |
+          # Стандартный shell у run: — это `bash -e` без pipefail, поэтому
+          # упавший бы локальный find в конвейере остался бы незамеченным:
+          # статус конвейера тогда определяет только последняя команда, то есть
+          # ssh. С pipefail падает и левая часть.
+          set -o pipefail
+
+          # Страховка после scp -p: у современного scp (SFTP) режим сохраняется, но на
+          # старых версиях или при настройках sshd файл мог лечь не с теми
+          # правами. Повторная установка не ломает ничего, а при umask 077 на
+          # Helios защитила бы сайт, лёгший как 600, от 403 у Nginx, работающего
+          # от отдельного пользователя.
+          #
+          # Список путей берём ровно из той сборки, что ушла наверх, и по нему
+          # же выставляем права на сервере. Сплошной обход содержимого
+          # public_html был бы неверен: это общий веб-корень студента, и такой
+          # find снял бы бит исполнения с чужих файлов, которых workflow не
+          # касался. Работаем строго внутри подкаталога HELIOS_SITE_SUBDIR,
+          # который целиком принадлежит сайту. NUL-разделитель и xargs -0 — чтобы
+          # пробелы и спецсимволы в именах не превратились в аргументы. -r
+          # (--no-run-if-empty) — чтобы xargs не дёрнул chmod без операндов на
+          # пустом списке.
+          target="'$HELIOS_HOME_ROOT/$HELIOS_USER/$HELIOS_PUBLIC_DIR/$HELIOS_SITE_SUBDIR'"
+
+          cd site
+          find . -type d -print0 \
+            | ssh -p "$HELIOS_PORT" -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+                   -o BatchMode=yes -o ConnectTimeout=30 \
+                   "$HELIOS_USER@$HELIOS_HOST" \
+                   "cd $target && xargs -0 -r -n 100 chmod 755"
+
+          find . -type f -print0 \
+            | ssh -p "$HELIOS_PORT" -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+                   -o BatchMode=yes -o ConnectTimeout=30 \
+                   "$HELIOS_USER@$HELIOS_HOST" \
+                   "cd $target && xargs -0 -r -n 100 chmod 644"
+
+          echo "В артефакте публикации: каталогов $(find . -type d | wc -l), файлов $(find . -type f | wc -l)"
+
+      - name: Проверить публикацию
+        # Healthcheck идёт после SCP и бьёт по адресу Helios, а не по Pages:
+        # Pages и до этого был доступен, проверить нужно новую площадку.
+        env:
+          HELIOS_USER: ${{ secrets.HELIOS_USER }}
+        run: |
+          # Проверяются две точки. Первая — главная страница: код 200 и
+          # статическая контрольная строка из заголовка <h1 id="rtc-benchmark">.
+          # Вторая — search/search_index.json: его путь стабилен между сборками
+          # (в отличие от хешированных имён ассетов), поэтому запрос к нему
+          # ловит «главная есть, а остальное дерево не переехало» и не зависит
+          # от формулировки текста заголовка.
+          url="https://se.ifmo.ru/~$HELIOS_USER/$HELIOS_SITE_SUBDIR/"
+          search_url="https://se.ifmo.ru/~$HELIOS_USER/$HELIOS_SITE_SUBDIR/search/search_index.json"
+          body="$RUNNER_TEMP/helios-index.html"
+          search_body="$RUNNER_TEMP/helios-search.json"
+
+          for attempt in $(seq 1 "$HELIOS_HEALTHCHECK_ATTEMPTS"); do
+            echo "Попытка $attempt/$HELIOS_HEALTHCHECK_ATTEMPTS: $url"
+            # Обнуление файлов ответа: при сетевой ошибке curl их не
+            # перезапишет, и в лог попал бы размер тела от предыдущей попытки,
+            # то есть число, не относящееся к этому запросу.
+            : > "$body"
+            : > "$search_body"
+            # curl сам вернёт код 000 при сетевой ошибке, поэтому set -e здесь
+            # не нужен и не срабатывает ложно. stderr не глушим: иначе при
+            # реальном сбое сети в логе осталось бы только «код=000» без
+            # причины, а именно этот сбой чаще всего и нужно читать.
+            code="$(curl --silent --show-error --location --max-time 30 \
+                          --output "$body" --write-out '%{http_code}' \
+                          "$url" || true)"
+            search_code="$(curl --silent --show-error --location --max-time 30 \
+                                --output "$search_body" --write-out '%{http_code}' \
+                                "$search_url" || true)"
+
+            if [ "$code" = '200' ] \
+               && grep --quiet --fixed-strings "$HELIOS_HEALTHCHECK_MARKER" "$body" \
+               && [ "$search_code" = '200' ]; then
+              echo "OK: HTTP 200, контрольная строка найдена, поисковый индекс отдаётся."
+              {
+                echo "### Публикация на Helios"
+                echo
+                echo "- URL: ${url}"
+                echo "- HTTP: 200"
+                echo "- Контрольная строка: \`${HELIOS_HEALTHCHECK_MARKER}\`"
+                echo "- Поисковый индекс: HTTP ${search_code}"
+                echo "- Коммит: ${GITHUB_SHA}"
+              } >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+
+            echo "  код=$code, размер=$(wc -c < "$body" | tr -d ' ') байт; поисковый индекс: код=$search_code"
+            # Пауза только между попытками: после последней она лишь оттянула бы
+            # падение job на лишние секунды.
+            [ "$attempt" -lt "$HELIOS_HEALTHCHECK_ATTEMPTS" ] \
+              && sleep "$HELIOS_HEALTHCHECK_DELAY_SEC"
+          done
+
+          echo "::error::Публикация на Helios не подтверждена: $url"
+          echo "Проверьте вручную: ssh -p $HELIOS_PORT $HELIOS_USER@$HELIOS_HOST 'ls -l $HELIOS_HOME_ROOT/$HELIOS_USER/$HELIOS_PUBLIC_DIR/$HELIOS_SITE_SUBDIR'"
+          exit 1
