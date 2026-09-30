@@ -82,6 +82,13 @@ extra:
       link: https://github.com/HeavenlyGandalf/rtc-benchmark
       name: Репозиторий проекта на GitHub
 
+# Формулы рисует MathJax, вложенный в репозиторий: ссылок на внешние CDN
+# здесь нет намеренно, подробности — в docs/assets/mathjax/PROVENANCE.txt.
+# Порядок в списке обязателен: конфигурация должна выполниться до загрузчика.
+extra_javascript:
+  - assets/mathjax/mathjax-config.js
+  - assets/mathjax/tex-svg.js
+
 markdown_extensions:
   - admonition
   - attr_list
@@ -94,6 +101,11 @@ markdown_extensions:
       anchor_linenums: true
   - pymdownx.inlinehilite
   - pymdownx.superfences
+  # generic: true заставляет arithmatex выдавать разделители \( \), \[ \]
+  # вместо <script type="math/tex">: готовый HTML отдаётся в атрибутах
+  # class="arithmatex", и разбирать его должен MathJax на странице.
+  - pymdownx.arithmatex:
+      generic: true
 
 # Ссылка на файл документации, не попавший в nav, прерывает сборку
 # --strict. Это осознанно: молча потерянная страница хуже явной ошибки.
