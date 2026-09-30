@@ -2,7 +2,7 @@
 <rect width="100%" height="100%" fill="#ffffff"/>
 <style>.ttl{font-size:16px;font-weight:600;fill:#1f2328}.note{font-size:12px;fill:#57606a}.ax{stroke:#8b949e;stroke-width:1.2}.grid{stroke:#e4e8ec;stroke-width:1}.old{fill:#bc4c00}.new{fill:#1a7f37}.chk{fill:#0f5fa6}.lbl{font-size:13px;fill:#1f2328}</style>
 <text x="20" y="28" class="ttl">Время публикации сайта: старая и новая схема</text>
-<text x="20" y="48" class="note">Среднее по 3 (старая) и 5 (новая) запускам workflow, job публикации, секунды.</text>
+<text x="20" y="48" class="note">Среднее по 3 (старая) и 5 (новая) запускам, секунды. Синяя — всё время публикации вместе с проверкой.</text>
 <text x="20" y="66" class="note">Это время публикации документации, а не метрики стенда: замеры взяты из API GitHub.</text>
 <line x1="90" y1="320.0" x2="680" y2="320.0" class="grid"/>
 <text x="80" y="324.0" class="note" text-anchor="end">0</text>
@@ -36,9 +36,9 @@
 <rect x="394" y="291.6" width="58" height="28.4" class="new"/>
 <text x="423.0" y="283.6" class="lbl" text-anchor="middle" font-weight="600">11.4</text>
 <text x="423.0" y="340" class="lbl" text-anchor="middle">Pages, новая</text>
-<rect x="472" y="283.2" width="58" height="36.8" class="chk"/>
-<text x="501.0" y="275.2" class="lbl" text-anchor="middle" font-weight="600">14.8</text>
+<rect x="472" y="275.7" width="58" height="44.3" class="chk"/>
+<text x="501.0" y="267.7" class="lbl" text-anchor="middle" font-weight="600">17.8</text>
 <text x="501.0" y="340" class="lbl" text-anchor="middle">Pages, новая с проверкой</text>
 <text x="20" y="396" class="note">Helios: публикация стала в 2.57 раза быстрее — rsync переносит только изменившиеся файлы.</text>
-<text x="20" y="414" class="note">Pages: публикация почти не изменилась, но к ней добавилась проверка опубликованного сайта (синяя колонка).</text>
+<text x="20" y="414" class="note">Pages: добавилась проверка опубликованного сайта (синяя) — на 5.5 с больше, чем 12.3 с на старой схеме.</text>
 </svg>
