@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="470" viewBox="0 0 880 470" font-family="Roboto, Helvetica, Arial, sans-serif" font-size="14">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<style>.box{fill:#f6f8fa;stroke:#8b949e;stroke-width:1.5;rx:6}.pub{fill:#e6f4ea;stroke:#1a7f37;stroke-width:2;rx:6}.old{fill:#fff4e5;stroke:#bc4c00;stroke-width:1.5;rx:6}.lbl{font-size:14px;fill:#1f2328}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;fill:#1f2328}.ttl{font-size:16px;font-weight:600;fill:#1f2328}.note{font-size:12px;fill:#57606a}</style>
+<text x="20" y="28" class="ttl">Раскладка публикации на Helios (новая схема)</text>
+<text x="20" y="48" class="note">Публикация переключает одну ссылку; файлы новой версии лежат рядом и не затирают старую.</text>
+<rect x="14" y="62" width="852" height="392" fill="none" stroke="#d0d7de" stroke-dasharray="5 4" rx="8"/>
+<text x="26" y="82" class="note">~/public_html/  — корень сайта</text>
+<rect x="26" y="92" width="250" height="62" class="pub"/>
+<text x="38" y="114" class="lbl" font-weight="600">rtc-benchmark →</text>
+<text x="38" y="134" class="mono">символическая ссылка на</text>
+<text x="38" y="151" class="mono">каталог активного релиза</text>
+<text x="46" y="174" class="note">то, что отдаёт Nginx</text>
+<text x="300" y="108" class="ttl">rtc-benchmark-releases/</text>
+<rect x="300" y="118" width="300" height="52" class="pub"/>
+<text x="312" y="140" class="lbl" font-weight="600">current →</text>
+<text x="312" y="160" class="mono">символическая ссылка на активный</text>
+<text x="312" y="177" class="mono">релиз; переключается при публикации</text>
+<rect x="300" y="178" width="300" height="56" class="box"/>
+<text x="312" y="200" class="lbl" font-weight="600">785edb0… (активный)</text>
+<text x="312" y="220" class="mono">полная копия сайта, 63 файла</text>
+<rect x="620" y="178" width="234" height="56" class="box"/>
+<text x="632" y="200" class="lbl" font-weight="600">9adbcf8… (предыдущий)</text>
+<text x="632" y="220" class="mono">полная копия, не затирается</text>
+<rect x="300" y="242" width="300" height="56" class="box"/>
+<text x="312" y="264" class="lbl" font-weight="600">ecc2abb…</text>
+<text x="312" y="284" class="mono">полная копия</text>
+<rect x="620" y="242" width="234" height="56" class="box"/>
+<text x="632" y="264" class="lbl" font-weight="600">ec258d74…</text>
+<text x="632" y="284" class="mono">полная копия</text>
+<text x="312" y="318" class="note">хранится 3–5 последних релизов, остальные удаляет workflow</text>
+<rect x="300" y="330" width="300" height="52" class="old"/>
+<text x="312" y="352" class="lbl" font-weight="600">.previous</text>
+<text x="312" y="372" class="mono">обычный файл с SHA прошлого</text>
+<text x="312" y="389" class="mono">активного релиза</text>
+<rect x="620" y="330" width="234" height="52" class="old"/>
+<text x="632" y="352" class="lbl" font-weight="600">.rtc-benchmark</text>
+<text x="632" y="372" class="mono">маркер: каталог наш</text>
+<text x="632" y="389" class="mono">.legacy — отложенный старый сайт</text>
+<text x="26" y="212" class="ttl">preview/</text>
+<rect x="26" y="222" width="250" height="46" class="box"/>
+<text x="38" y="242" class="mono">имя-ветки/</text>
+<text x="38" y="260" class="note" font-size="12">публикация из ветки, production не задевается</text>
+<path d="M 556 400 C 620 400, 660 420, 700 420" fill="none" stroke="#1a7f37" stroke-width="2"/>
+<text x="300" y="418" class="note">Откат: current переводится на .previous — файлы не трогаются, меняется только ссылка.</text>
+</svg>
