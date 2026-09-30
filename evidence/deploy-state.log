@@ -1,0 +1,79 @@
+# Состояние развёртываний, на которых собраны данные отчёта
+# Источник: GitHub REST API /repos/HeavenlyGandalf/rtc-benchmark/actions/
+# Проверено 30 сентября 2026.
+
+## Текущий main = a3b161b, обе площадки развёрнуты из него
+
+прогон 36704097321  Deploy site to GitHub Pages  событие=push  ветка=main  sha=a3b161ba5ad89ccfe9ac83295422f0e106e184ee
+  итог: completed/success
+  джоб Сборка сайта             completed/success
+      1. Set up job                       completed/success
+      2. Получить исходники               completed/success
+      3. Установить Python                completed/success
+      4. Установить зависимости           completed/success
+      5. Собрать сайт в строгом режиме    completed/success
+      6. Сохранить артефакт сборки        completed/success
+      11. Post Установить Python           completed/success
+      12. Post Получить исходники          completed/success
+      13. Complete job                     completed/success
+  джоб Публикация               completed/success
+      1. Set up job                       completed/success
+      2. Настроить GitHub Pages           completed/success
+      3. Опубликовать в GitHub Pages      completed/success
+      4. Complete job                     completed/success
+  джоб Проверка публикации      completed/success
+      1. Set up job                       completed/success
+      2. Проверить опубликованный сайт    completed/success
+      3. Complete job                     completed/success
+
+прогон 36704097410  Deploy site to Helios  событие=push  ветка=main  sha=a3b161ba5ad89ccfe9ac83295422f0e106e184ee
+  итог: completed/success
+  джоб Сборка сайта             completed/success
+      1. Set up job                       completed/success
+      2. Получить исходники               completed/success
+      3. Установить Python                completed/success
+      4. Установить зависимости           completed/success
+      5. Собрать сайт в строгом режиме    completed/success
+      6. Добавить build-info.json         completed/success
+      7. Сохранить артефакт сборки        completed/success
+      13. Post Установить Python           completed/success
+      14. Post Получить исходники          completed/success
+      15. Complete job                     completed/success
+  джоб Публикация на Helios     completed/success
+      1. Set up job                       completed/success
+      2. Получить артефакт сборки         completed/success
+      3. Проверить состав артефакта       completed/success
+      4. Проверить секреты и настройки    completed/success
+      5. Подготовить SSH-окружение        completed/success
+      6. Подключиться к Helios по SSH     completed/success
+      7. Определить схему раскладки и имя цели completed/success
+      8. Подготовить каталог приёмника    completed/success
+      9. Выгрузить на Helios              completed/success
+      10. Очистить старые релизы           completed/success
+      11. Переключить публикацию           completed/success
+      12. Очистить старые превью           completed/skipped
+      13. Проверить публикацию             completed/success
+      14. Complete job                     completed/success
+
+прогон 36690988716  Deploy site to GitHub Pages  событие=push  ветка=main  sha=785edb07b6747eec2f61410200b00274fd01a164
+  итог: completed/success
+  джоб Сборка сайта             completed/success
+      1. Set up job                       completed/success
+      2. Получить исходники               completed/success
+      3. Установить Python                completed/success
+      4. Установить зависимости           completed/success
+      5. Собрать сайт в строгом режиме    completed/success
+      6. Сохранить артефакт сборки        completed/success
+      11. Post Установить Python           completed/success
+      12. Post Получить исходники          completed/success
+      13. Complete job                     completed/success
+  джоб Публикация               completed/success
+      1. Set up job                       completed/success
+      2. Настроить GitHub Pages           completed/success
+      3. Опубликовать в GitHub Pages      completed/success
+      4. Complete job                     completed/success
+  джоб Проверка публикации      completed/success
+      1. Set up job                       completed/success
+      2. Проверить опубликованный сайт    completed/success
+      3. Complete job                     completed/success
+

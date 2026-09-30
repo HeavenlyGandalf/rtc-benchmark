@@ -1,0 +1,36 @@
+# A4/A7. Журнал шага проверки публикации на GitHub Pages, прогон 36691288086
+# Прогон запущен вручную с заведомо неверным маркером.
+
+2026-09-30T08:42:18.6281198Z   echo "::error::Публикация на GitHub Pages не подтверждена: $url"
+2026-09-30T08:42:18.6281832Z   exit 1
+2026-09-30T08:42:18.6282233Z fi
+2026-09-30T08:42:18.9852954Z shell: /usr/bin/bash -e {0}
+2026-09-30T08:42:18.9854120Z env:
+2026-09-30T08:42:18.9854721Z   PAGES_HEALTHCHECK_MARKER: id="маркера-нет-такого"
+2026-09-30T08:42:18.9855437Z   PAGES_HEALTHCHECK_ATTEMPTS: 10
+2026-09-30T08:42:18.9856103Z   PAGES_HEALTHCHECK_DELAY_SEC: 10
+2026-09-30T08:42:18.9856822Z   PAGES_URL: https://heavenlygandalf.github.io/rtc-benchmark/
+2026-09-30T08:42:18.9857537Z ##[endgroup]
+2026-09-30T08:42:19.0058950Z Healthcheck: https://heavenlygandalf.github.io/rtc-benchmark/
+2026-09-30T08:42:19.0147985Z Попытка 1/10: https://heavenlygandalf.github.io/rtc-benchmark/
+2026-09-30T08:42:19.5982157Z   код=200, размер=29757 байт; поиск: код=200
+2026-09-30T08:42:29.6026237Z Попытка 2/10: https://heavenlygandalf.github.io/rtc-benchmark/
+2026-09-30T08:42:29.8991677Z   код=200, размер=29757 байт; поиск: код=200
+2026-09-30T08:42:39.9017667Z Попытка 3/10: https://heavenlygandalf.github.io/rtc-benchmark/
+2026-09-30T08:42:40.0711731Z   код=200, размер=29757 байт; поиск: код=200
+2026-09-30T08:42:50.0737005Z Попытка 4/10: https://heavenlygandalf.github.io/rtc-benchmark/
+2026-09-30T08:42:50.2236953Z   код=200, размер=29757 байт; поиск: код=200
+2026-09-30T08:43:00.2263220Z Попытка 5/10: https://heavenlygandalf.github.io/rtc-benchmark/
+2026-09-30T08:43:00.3728684Z   код=200, размер=29757 байт; поиск: код=200
+2026-09-30T08:43:10.3754415Z Попытка 6/10: https://heavenlygandalf.github.io/rtc-benchmark/
+2026-09-30T08:43:10.5202833Z   код=200, размер=29757 байт; поиск: код=200
+2026-09-30T08:43:20.5230135Z Попытка 7/10: https://heavenlygandalf.github.io/rtc-benchmark/
+2026-09-30T08:43:20.6883966Z   код=200, размер=29757 байт; поиск: код=200
+2026-09-30T08:43:30.6911094Z Попытка 8/10: https://heavenlygandalf.github.io/rtc-benchmark/
+2026-09-30T08:43:30.8380004Z   код=200, размер=29757 байт; поиск: код=200
+2026-09-30T08:43:40.8711237Z Попытка 9/10: https://heavenlygandalf.github.io/rtc-benchmark/
+2026-09-30T08:43:41.0366253Z   код=200, размер=29757 байт; поиск: код=200
+2026-09-30T08:43:51.0391714Z Попытка 10/10: https://heavenlygandalf.github.io/rtc-benchmark/
+2026-09-30T08:43:51.1863096Z   код=200, размер=29757 байт; поиск: код=200
+2026-09-30T08:43:51.1902237Z ##[error]Публикация на GitHub Pages не подтверждена: https://heavenlygandalf.github.io/rtc-benchmark/
+2026-09-30T08:43:51.1916069Z ##[error]Process completed with exit code 1.

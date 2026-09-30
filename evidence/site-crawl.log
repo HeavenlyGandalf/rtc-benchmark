@@ -1,0 +1,60 @@
+# C4. Обход всех страниц сайта в реальном браузере
+# Дата: 2026-09-30T11:10:08Z, коммит a3b161b
+# Chrome через puppeteer-core; canonical сверяется с Pages на обоих адресах.
+
+## GitHub Pages
+ok   /              HTTP 200 формул= 0 svg= 0 таблиц=2 строк=  8 картинок-битых=0 canonical=ok «rtc-benchmark¶»
+ok   /about/        HTTP 200 формул= 0 svg= 0 таблиц=2 строк= 15 картинок-битых=0 canonical=ok «О проекте¶»
+ok   /debugging/    HTTP 200 формул= 0 svg= 0 таблиц=5 строк= 29 картинок-битых=0 canonical=ok «Отчёт об отладке¶»
+ok   /license/      HTTP 200 формул= 0 svg= 0 таблиц=1 строк=  3 картинок-битых=0 canonical=ok «Лицензия¶»
+ok   /limitations/  HTTP 200 формул= 0 svg= 0 таблиц=0 строк=  0 картинок-битых=0 canonical=ok «Ограничения¶»
+ok   /methodology/  HTTP 200 формул=15 svg=16 таблиц=3 строк= 16 картинок-битых=0 canonical=ok «Методика эксперимента¶»
+ok   /results/      HTTP 200 формул= 0 svg= 0 таблиц=3 строк= 14 картинок-битых=0 canonical=ok «Результаты¶»
+ok   /running/      HTTP 200 формул= 0 svg= 0 таблиц=5 строк= 41 картинок-битых=0 canonical=ok «Как запустить стенд¶»
+ok   /scenarios/    HTTP 200 формул= 0 svg= 0 таблиц=1 строк=  3 картинок-битых=0 canonical=ok «Сценарии экспериментов¶»
+ok   /webrtc/       HTTP 200 формул= 0 svg= 0 таблиц=2 строк= 10 картинок-битых=0 canonical=ok «WebRTC¶»
+ok   /webtransport/ HTTP 200 формул= 0 svg= 0 таблиц=3 строк= 16 картинок-битых=0 canonical=ok «WebTransport¶»
+
+Ожидаемые внешние запросы (плагин social темы, 404 — нет GitHub Release):
+  / https://api.github.com/repos/HeavenlyGandalf/rtc-benchmark/releases/latest — HTTP 404
+  /about/ https://api.github.com/repos/HeavenlyGandalf/rtc-benchmark/releases/latest — HTTP 404
+  /debugging/ https://api.github.com/repos/HeavenlyGandalf/rtc-benchmark/releases/latest — HTTP 404
+  /license/ https://api.github.com/repos/HeavenlyGandalf/rtc-benchmark/releases/latest — HTTP 404
+  /limitations/ https://api.github.com/repos/HeavenlyGandalf/rtc-benchmark/releases/latest — HTTP 404
+  /methodology/ https://api.github.com/repos/HeavenlyGandalf/rtc-benchmark/releases/latest — HTTP 404
+  /results/ https://api.github.com/repos/HeavenlyGandalf/rtc-benchmark/releases/latest — HTTP 404
+  /running/ https://api.github.com/repos/HeavenlyGandalf/rtc-benchmark/releases/latest — HTTP 404
+  /scenarios/ https://api.github.com/repos/HeavenlyGandalf/rtc-benchmark/releases/latest — HTTP 404
+  /webrtc/ https://api.github.com/repos/HeavenlyGandalf/rtc-benchmark/releases/latest — HTTP 404
+  /webtransport/ https://api.github.com/repos/HeavenlyGandalf/rtc-benchmark/releases/latest — HTTP 404
+
+Все страницы чисты
+
+## Helios
+(первая попытка оборвалась таймаутом на /limitations/ — сеть моргнула; прогон повторён)
+ok   /              HTTP 200 формул= 0 svg= 0 таблиц=2 строк=  8 картинок-битых=0 canonical=ok «rtc-benchmark¶»
+ok   /about/        HTTP 200 формул= 0 svg= 0 таблиц=2 строк= 15 картинок-битых=0 canonical=ok «О проекте¶»
+ok   /debugging/    HTTP 200 формул= 0 svg= 0 таблиц=5 строк= 29 картинок-битых=0 canonical=ok «Отчёт об отладке¶»
+ok   /license/      HTTP 200 формул= 0 svg= 0 таблиц=1 строк=  3 картинок-битых=0 canonical=ok «Лицензия¶»
+ok   /limitations/  HTTP 200 формул= 0 svg= 0 таблиц=0 строк=  0 картинок-битых=0 canonical=ok «Ограничения¶»
+ok   /methodology/  HTTP 200 формул=15 svg=16 таблиц=3 строк= 16 картинок-битых=0 canonical=ok «Методика эксперимента¶»
+ok   /results/      HTTP 200 формул= 0 svg= 0 таблиц=3 строк= 14 картинок-битых=0 canonical=ok «Результаты¶»
+ok   /running/      HTTP 200 формул= 0 svg= 0 таблиц=5 строк= 41 картинок-битых=0 canonical=ok «Как запустить стенд¶»
+ok   /scenarios/    HTTP 200 формул= 0 svg= 0 таблиц=1 строк=  3 картинок-битых=0 canonical=ok «Сценарии экспериментов¶»
+ok   /webrtc/       HTTP 200 формул= 0 svg= 0 таблиц=2 строк= 10 картинок-битых=0 canonical=ok «WebRTC¶»
+ok   /webtransport/ HTTP 200 формул= 0 svg= 0 таблиц=3 строк= 16 картинок-битых=0 canonical=ok «WebTransport¶»
+
+Ожидаемые внешние запросы (плагин social темы, 404 — нет GitHub Release):
+  / https://api.github.com/repos/HeavenlyGandalf/rtc-benchmark/releases/latest — HTTP 404
+  /about/ https://api.github.com/repos/HeavenlyGandalf/rtc-benchmark/releases/latest — HTTP 404
+  /debugging/ https://api.github.com/repos/HeavenlyGandalf/rtc-benchmark/releases/latest — HTTP 404
+  /license/ https://api.github.com/repos/HeavenlyGandalf/rtc-benchmark/releases/latest — HTTP 404
+  /limitations/ https://api.github.com/repos/HeavenlyGandalf/rtc-benchmark/releases/latest — HTTP 404
+  /methodology/ https://api.github.com/repos/HeavenlyGandalf/rtc-benchmark/releases/latest — HTTP 404
+  /results/ https://api.github.com/repos/HeavenlyGandalf/rtc-benchmark/releases/latest — HTTP 404
+  /running/ https://api.github.com/repos/HeavenlyGandalf/rtc-benchmark/releases/latest — HTTP 404
+  /scenarios/ https://api.github.com/repos/HeavenlyGandalf/rtc-benchmark/releases/latest — HTTP 404
+  /webrtc/ https://api.github.com/repos/HeavenlyGandalf/rtc-benchmark/releases/latest — HTTP 404
+  /webtransport/ https://api.github.com/repos/HeavenlyGandalf/rtc-benchmark/releases/latest — HTTP 404
+
+Все страницы чисты

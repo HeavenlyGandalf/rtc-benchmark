@@ -1,0 +1,22 @@
+ls -la | grep -E "rtc-benchmark|preview":
+drwxr-xr-x   7 <логин> studs     8 30 сент. 13:38 preview
+lrwxr-xr-x   1 <логин> studs    63 30 сент. 13:43 rtc-benchmark -> rtc-benchmark-releases/a3b161ba5ad89ccfe9ac83295422f0e106e184ee
+drwxr-xr-x  14 <логин> studs    18 30 сент. 10:06 rtc-benchmark-prev
+drwxr-xr-x   8 <логин> studs    12 30 сент. 13:43 rtc-benchmark-releases
+
+ls -la rtc-benchmark-releases:
+-rw-r--r--   1 <логин> studs 24 30 сент. 10:40 .legacy
+-rw-r--r--   1 <логин> studs 41 30 сент. 13:43 .previous
+-rw-r--r--   1 <логин> studs  0 30 сент. 10:40 .rtc-benchmark
+drwxr-xr-x  14 <логин> studs 19 30 сент. 13:03 3658a9fcbb08a1d222353084161333e46244c9fd
+drwxr-xr-x  14 <логин> studs 19 30 сент. 12:27 785edb07b6747eec2f61410200b00274fd01a164
+drwxr-xr-x  14 <логин> studs 19 30 сент. 11:08 9adbcf8e89d804a7b939e6ee9f64dde43a337f44
+drwxr-xr-x  14 <логин> studs 19 30 сент. 13:43 a3b161ba5ad89ccfe9ac83295422f0e106e184ee
+lrwxr-xr-x   1 <логин> studs 40 30 сент. 13:43 current -> a3b161ba5ad89ccfe9ac83295422f0e106e184ee
+drwxr-xr-x  14 <логин> studs 19 30 сент. 11:27 ecc2abb6a9131bb1c930989f713240cd2120b88f
+drwxr-xr-x  14 <логин> studs 19 30 сент. 10:35 legacy-20260930T074053Z
+
+readlink + .previous:
+current -> a3b161ba5ad89ccfe9ac83295422f0e106e184ee
+site    -> rtc-benchmark-releases/a3b161ba5ad89ccfe9ac83295422f0e106e184ee
+.previous: 3658a9fcbb08a1d222353084161333e46244c9fd

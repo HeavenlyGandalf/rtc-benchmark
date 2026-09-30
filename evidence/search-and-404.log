@@ -1,0 +1,9 @@
+# C4. Поиск и страница 404 в браузере
+# Дата: 2026-09-30T11:12:34Z, коммит a3b161b
+
+GitHub Pages  поиск «jitter»: результатов 3 → WebRTC, Видеотрансляция (сценарий 4)
+GitHub Pages  поиск «packet»: результатов 3 → WebRTC, Видеотрансляция (сценарий 4)
+GitHub Pages  404: код/заголовок = «rtc-benchmark: WebRTC и WebTransport» h1 = «404 - Not found»
+Helios        поиск «jitter»: результатов 3 → WebRTC, Видеотрансляция (сценарий 4)
+Helios        поиск «packet»: результатов 3 → WebRTC, Видеотрансляция (сценарий 4)
+Helios        404: код/заголовок = «404 Not Found» h1 = «Not Found»

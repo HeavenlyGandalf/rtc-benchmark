@@ -1,0 +1,36 @@
+# A7. Проверка публикации на Helios, прогон 36689761249 (неверный маркер)
+# Опубликован релиз ecc2abb; проверка не прошла, сайт возвращён на предыдущий релиз.
+
+## Параметры проверки
+  HELIOS_HEALTHCHECK_MARKER: id="маркера-нет-такого"
+  HELIOS_HEALTHCHECK_ATTEMPTS: 10
+  HELIOS_HEALTHCHECK_DELAY_SEC: 10
+
+## Десять попыток и итог
+Попытка 1/10: https://se.ifmo.ru/~<логин>/rtc-benchmark/
+  код=200, размер=29757 байт; поиск: код=200; build-info: код=200; sha=ecc2abb6a9131bb1c930989f713240cd2120b88f
+Попытка 2/10: https://se.ifmo.ru/~<логин>/rtc-benchmark/
+  код=200, размер=29757 байт; поиск: код=200; build-info: код=200; sha=ecc2abb6a9131bb1c930989f713240cd2120b88f
+Попытка 3/10: https://se.ifmo.ru/~<логин>/rtc-benchmark/
+  код=200, размер=29757 байт; поиск: код=200; build-info: код=200; sha=ecc2abb6a9131bb1c930989f713240cd2120b88f
+Попытка 4/10: https://se.ifmo.ru/~<логин>/rtc-benchmark/
+  код=200, размер=29757 байт; поиск: код=200; build-info: код=200; sha=ecc2abb6a9131bb1c930989f713240cd2120b88f
+Попытка 5/10: https://se.ifmo.ru/~<логин>/rtc-benchmark/
+  код=200, размер=29757 байт; поиск: код=200; build-info: код=200; sha=ecc2abb6a9131bb1c930989f713240cd2120b88f
+Попытка 6/10: https://se.ifmo.ru/~<логин>/rtc-benchmark/
+  код=200, размер=29757 байт; поиск: код=200; build-info: код=200; sha=ecc2abb6a9131bb1c930989f713240cd2120b88f
+Попытка 7/10: https://se.ifmo.ru/~<логин>/rtc-benchmark/
+  код=200, размер=29757 байт; поиск: код=200; build-info: код=200; sha=ecc2abb6a9131bb1c930989f713240cd2120b88f
+Попытка 8/10: https://se.ifmo.ru/~<логин>/rtc-benchmark/
+  код=200, размер=29757 байт; поиск: код=200; build-info: код=200; sha=ecc2abb6a9131bb1c930989f713240cd2120b88f
+Попытка 9/10: https://se.ifmo.ru/~<логин>/rtc-benchmark/
+  код=200, размер=29757 байт; поиск: код=200; build-info: код=200; sha=ecc2abb6a9131bb1c930989f713240cd2120b88f
+Попытка 10/10: https://se.ifmo.ru/~<логин>/rtc-benchmark/
+  код=200, размер=29757 байт; поиск: код=200; build-info: код=200; sha=ecc2abb6a9131bb1c930989f713240cd2120b88f
+##[error]Healthcheck не пройден. Пробую вернуть прежнее состояние сайта.
+Возврат: /home/studs/***/public_html/rtc-benchmark -> rtc-benchmark-releases/9adbcf8e89d804a7b939e6ee9f64dde43a337f44
+Возвращён релиз 9adbcf8e89d804a7b939e6ee9f64dde43a337f44
+##[error]Публикация на Helios не подтверждена: https://se.ifmo.ru/~<логин>/rtc-benchmark/ — прежнее состояние сайта восстановлено, job завершается ошибкой.
+Проверьте вручную: ssh -p 2222 ***@helios.cs.ifmo.ru 'ls -l /home/studs/***/public_html'
+##[error]Process completed with exit code 1.
+Cleaning up orphan processes
