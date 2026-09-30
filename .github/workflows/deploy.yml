@@ -27,6 +27,12 @@ on:
   # добавления файла: до следующего push в main workflow сам не стартует.
   # Ветку выбирать main — запуск из другой ветки соберёт сайт, но не опубликует.
   workflow_dispatch:
+    inputs:
+      healthcheck_marker:
+        description: 'Контрольная строка healthcheck вместо штатной id="rtc-benchmark" (проверка срабатывания)'
+        required: false
+        default: ''
+        type: string
 
 # Не отменять текущий деплой: два одновременных деплоя конкурируют за одно
 # окружение Pages, и более ранний может остаться опубликованным.
@@ -38,6 +44,18 @@ concurrency:
 
 permissions:
   contents: read
+
+env:
+  # Контрольная строка проверки опубликованного сайта: заголовок первого уровня
+  # главной страницы <h1 id="rtc-benchmark">. Это статическая часть HTML, а не
+  # динамическое значение, поэтому она меняется только вместе с переименованием
+  # проекта. ASCII-only — сравнение не зависит от кодировки терминала.
+  # Вход workflow_dispatch healthcheck_marker позволяет подставить заведомо
+  # неверную строку и убедиться, что проверка действительно падает.
+  PAGES_HEALTHCHECK_MARKER: ${{ inputs.healthcheck_marker || 'id="rtc-benchmark"' }}
+  # Публикация не мгновенна: файл мог ещё не отдаться к моменту первого запроса.
+  PAGES_HEALTHCHECK_ATTEMPTS: '10'
+  PAGES_HEALTHCHECK_DELAY_SEC: '10'
 
 jobs:
   build:
@@ -95,6 +113,12 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    # Адрес публикации отдаётся наружу явно. Без этого блока job outputs
+    # считается пустым объектом, и обращение из следующей job
+    # needs.deploy.outputs.page_url не разрешается — actionlint
+    # считает такое обращение ошибкой, и оно действительно не работает.
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Настроить GitHub Pages
         # Последний рубеж перед публикацией: падает, если в Settings → Pages
@@ -104,3 +128,82 @@ jobs:
       - name: Опубликовать в GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+
+  verify:
+    name: Проверка публикации
+    # Идёт после deploy: проверять сайт до публикации незачем, а проверять
+    # неопубликованный артефакт по адресу Pages нельзя. needs: deploy
+    # заодно означает, что сбой проверки красит и публикацию, хотя deploy
+    # отработал успешно: адрес в Pages останется рабочим, красным будет
+    # выглядеть только проверка, и это вводит в заблуждение при разборе.
+    needs: deploy
+    runs-on: ubuntu-latest
+    # Права contents: read достаточно: проверка ходит по публичному адресу
+    # обычным HTTP и ничего не публикует.
+    permissions:
+      contents: read
+    steps:
+      - name: Проверить опубликованный сайт
+        env:
+          # Адрес берётся у job deploy: он уже отработал, поэтому шаг есть.
+          # Без заглушки на случай пропуска deploy проверка не должна падать
+          # с невнятным сообщением.
+          PAGES_URL: ${{ needs.deploy.outputs.page_url }}
+        run: |
+          set -uo pipefail
+
+          url="${PAGES_URL%/}/"
+          if [ -z "${PAGES_URL:-}" ]; then
+            echo "::error::Job deploy не отдала адрес публикации — проверять нечего."
+            exit 1
+          fi
+
+          # Что ищем. index.html и search/search_index.json достаточно:
+          # первый доказывает, что отдалась главная, второй — что сборка
+          # целиком, потому что индекс собирается из всех страниц.
+          #
+          # build-info.json на Pages не кладёт: этот workflow его не создаёт,
+          # и проверять там нечего. Точный SHA публикации на Pages
+          # подтверждается самим workflow — сборка запускается на том же
+          # коммите, который затем публикуется, и build-info.json добавлен
+          # только в deploy-helios.yml. Подменять им проверку здесь нельзя.
+          echo "Healthcheck: $url"
+          ok=0
+          for attempt in $(seq 1 "$PAGES_HEALTHCHECK_ATTEMPTS"); do
+            echo "Попытка $attempt/$PAGES_HEALTHCHECK_ATTEMPTS: $url"
+            body_file="$(mktemp)"
+            search_file="$(mktemp)"
+            # Обнуление файлов ответа: при сетевой ошибке curl их не создаёт,
+            # и grep на прошлом содержимом дал бы ложное «страница нашлась».
+            # curl сам вернёт код 000 при сетевой ошибке, поэтому set -e здесь
+            # не нужен, но код всё равно разбираем явно.
+            code="$(curl -sS -L --max-time 30 -o "$body_file" -w '%{http_code}' \
+              "$url" || true)"
+            search_code="$(curl -sS -L --max-time 30 -o "$search_file" -w '%{http_code}' \
+              "${url}search/search_index.json" || true)"
+            if [ "$code" = 200 ] \
+              && grep --quiet --fixed-strings "$PAGES_HEALTHCHECK_MARKER" "$body_file" \
+              && [ "$search_code" = 200 ]; then
+              echo "OK: HTTP 200, контрольная строка найдена, поисковый индекс отдаётся."
+              echo "- URL: $url"
+              echo "- Контрольная строка: \`$PAGES_HEALTHCHECK_MARKER\`"
+              # ${GITHUB_SHA:-} а не ${GITHUB_SHA}: под set -u скрипт падает
+              # и на этом сообщении, если переменной нет — в самом workflow она
+              # есть всегда, а вот при локальной проверке шага нет.
+              echo "- Коммит workflow: ${GITHUB_SHA:-неизвестен}"
+              ok=1
+              rm -f "$body_file" "$search_file"
+              break
+            fi
+            echo "  код=$code, размер=$(wc -c < "$body_file" | tr -d ' ') байт; поиск: код=$search_code"
+            rm -f "$body_file" "$search_file"
+            [ "$attempt" -lt "$PAGES_HEALTHCHECK_ATTEMPTS" ] \
+              && sleep "$PAGES_HEALTHCHECK_DELAY_SEC"
+          done
+          if [ "$ok" -eq 0 ]; then
+            # Возвращать нечего: предыдущая публикация на Pages недоступна для
+            # отката, у Pages нет релизов. Поэтому job просто падает — красный
+            # статус и будет сигналом, что публиковать было нельзя.
+            echo "::error::Публикация на GitHub Pages не подтверждена: $url"
+            exit 1
+          fi
