@@ -3,18 +3,54 @@
 # Helios — вторая площадка рядом с GitHub Pages, а не замена ему: workflow
 # deploy.yml продолжает публиковать сайт на Pages без изменений.
 #
-# Способ доставки взят из инструкции по лабораторной работе
-# (web/docs/deploy-1lab.md в репозитории Roggired/ITMO): Nginx на Helios
-# настроен администраторами и студентом не управляется, файлы кладутся в
-# ~/public_html и раздаются по https://se.ifmo.ru/~<логин>/. Передача — SSH/SCP
-# на порту 2222. Ни Docker, ни FTP, ни rsync, ни внешние хранилища: для этой
-# инфраструктуры они не требуются.
+# Способ доставки: rsync по SSH (порт 2222). Наличие rsync на сервере проверено
+# вручную: `rsync --version` на Helios отдаёт
+#   rsync  version 3.4.1  protocol version 32
+#   Capabilities: 64-bit files, 64-bit inums, 64-bit timestamps, ...
+# Раньше здесь стоял scp; переход на rsync дал то, чего у scp нет:
+#   * --delete — в каталоге публикации не остаётся файлов удалённых страниц;
+#   * передаются только изменившиеся файлы, а не весь сайт целиком;
+#   * каталог-приёмник проверяется маркером ДО передачи, а не после.
+# Ни Docker, ни FTP, ни внешние хранилища для этой инфраструктуры не нужны.
 #
-# В корень public_html сайт НЕ кладётся: корень занят другими работами студента
-# (свой index.html и т.п.), и перезапись снесла бы их. Сайт живёт в отдельном
-# подкаталоге public_html/<HELIOS_SITE_SUBDIR> и доступен по
-# https://se.ifmo.ru/~<логин>/<HELIOS_SITE_SUBDIR>/ — тот же механизм, что
-# описан в инструкции («создать директорию lab1 внутри public_html»).
+# Nginx на Helios настроен администраторами и студентом не управляется, файлы
+# кладутся в ~/public_html и раздаются по https://se.ifmo.ru/~<логин>/.
+# В корень public_html сайт НЕ кладётся: корень занят другими работами
+# студента (свой index.html, converter.html, XSLT.html и т.п.), и перезапись
+# снесла бы их. Сайт живёт в отдельном подкаталоге public_html/<HELIOS_SITE_SUBDIR>.
+#
+# РАСКЛАДКА НА СЕРВЕРЕ (символьные ссылки в public_html на Helios разрешены —
+# проверено вручную: `ln -s` создаётся, `ln -sfn` переключает каталог, Nginx
+# отдаёт файлы через цепочку ссылок с кодом 200):
+#
+#   ~/public_html/
+#   ├── <HELIOS_SITE_SUBDIR>                  -> rtc-benchmark-releases/<sha>
+#   │                                            (переключаемая ссылка «current»)
+#   ├── rtc-benchmark-releases/               каталог релизов
+#   │   ├── .rtc-benchmark                     маркер: каталог создан этим workflow
+#   │   ├── current -> <sha>                   указатель на активный релиз
+#   │   └── <sha>/                             содержимое релиза, 3–5 последних
+#   └── preview/                              превью веток
+#       ├── .rtc-benchmark                     маркер
+#       └── <имя-ветки>/                       превью не-main ветки
+#
+# Публичный адрес production не меняется: https://se.ifmo.ru/~<логин>/<subdir>/
+# Ссылка rtc-benchmark-releases/current -> <sha> отдаёт тот же сайт по пути
+# /rtc-benchmark-releases/current/ и служит для ручной сверки, какой релиз жив.
+#
+# Почему releases/, а не «выгрузка прямо в каталог сайта»: при выгрузке на месте
+# оборванная передача оставляет сайт неполным, и до повторного запуска он
+# отдаётся «наполовину». Релизная схема разрывает связь между загрузкой и
+# отдачей: файлы едут в отдельный каталог, а посетители видят только то, на что
+# уже переключена ссылка. Публикация становится переключением одной ссылки,
+# откат — тем же переключением назад.
+#
+# Запасная схема на случай, если символические ссылки в public_html запрещены:
+# «выгрузка в соседний каталог + mv». Файлы едут в <subdir>-next, после
+# успешной загрузки <subdir> переименовывается в <subdir>-prev, а <subdir>-next
+# занимает его имя. Откат — обратное mv, тоже без сети. Схема выбирается
+# автоматически пробой `ln -s` на сервере; вход workflow_dispatch layout_mode
+# позволяет принудительно выбрать любую из двух (так проверяется запасная).
 #
 # Сайт переносится в подкаталог без правок конфигурации MkDocs: use_directory_urls
 # и site_url дают относительные ссылки, поэтому один и тот же артефакт сборки
@@ -24,26 +60,59 @@
 #   HELIOS_USER               — логин на Helios (в примере инструкции sXXXXXX)
 #   HELIOS_SSH_PRIVATE_KEY    — приватный ключ без парольной фразы (OpenSSH)
 #   HELIOS_SSH_KNOWN_HOSTS    — строка(и) host key Helios из ssh-keyscan
-# Необязательная переменная (Variable), имя подкаталога публикации:
+# Необязательные переменные (Variables):
 #   HELIOS_SITE_SUBDIR        — по умолчанию rtc-benchmark
+#   HELIOS_KEEP_RELEASES      — по умолчанию 5
+#   HELIOS_KEEP_PREVIEWS      — по умолчанию 5
 # Ни логина, ни ключа, ни пароля в репозитории нет и быть не должно.
 
 name: Deploy site to Helios
 
 on:
+  # main — production: релиз и переключение ссылки.
+  # Остальные ветки — превью в public_html/preview/<имя-ветки>/.
+  # В одном триггере обе ветки: GitHub Actions не допускает одновременно
+  # branches и branches-ignore у одного события, а различать их уместно по
+  # GITHUB_REF — ровно это делает шаг «Определить схему раскладки».
+  #
+  # Публикация из main превью НЕ удаляет: она пишет только в
+  # rtc-benchmark-releases/<sha>/ и меняет одну ссылку, путь preview/ в её
+  # командах не встречается вовсе.
   push:
-    branches: [main]
+    branches: ['**']
   # Строгая сборка на pull request: битая ссылка обнаруживается до merge.
-  # Публикации нет — job deploy пропускается, секреты не нужны.
+  # Секреты не нужны и не запрашиваются: job deploy на pull request пропускается.
   pull_request:
-  # Ручной запуск из интерфейса. Ветку выбирать main: запуск из другой ветки
-  # соберёт и проверит сайт, но ничего не опубликует.
+  # Ручной запуск из интерфейса.
+  #   ветка main + пустой rollback_to  — публикация очередного релиза;
+  #   другая ветка                    — публикация превью этой ветки;
+  #   rollback_to = <sha|previous>    — откат без пересборки сайта.
   workflow_dispatch:
+    inputs:
+      rollback_to:
+        description: 'Откат на релиз: полный или короткий sha либо previous. Пусто — обычная публикация'
+        required: false
+        default: ''
+        type: string
+      healthcheck_marker:
+        description: 'Контрольная строка healthcheck вместо штатной id="rtc-benchmark" (проверка срабатывания)'
+        required: false
+        default: ''
+        type: string
+      layout_mode:
+        description: 'Схема раскладки: auto — проба на сервере, symlink — ссылки, dirswap — выгрузка в соседний каталог с mv'
+        required: false
+        default: 'auto'
+        type: string
+      keep_releases:
+        description: 'Сколько последних релизов хранить на сервере'
+        required: false
+        default: ''
+        type: string
 
-# Не отменять текущий деплой: два одновременных SCP в один подкаталог
-# публикации перетирают друг друга, и на сервере может остаться смесь файлов
-# от разных коммитов. Группа привязана к ветке, поэтому проверки pull request
-# не встают в очередь к рабочему деплою.
+# Не отменять текущий деплой: два одновременных rsync в один каталог
+# перетирают друг друга. Группа привязана к ветке, поэтому проверки pull request
+# не встают в очередь к рабочему деплою. Для main группа всегда одна.
 concurrency:
   group: helios-${{ github.ref }}
   cancel-in-progress: false
@@ -56,6 +125,10 @@ permissions:
 env:
   HELIOS_HOST: helios.cs.ifmo.ru
   HELIOS_PORT: '2222'
+  # Адрес, по которому сайт отдаётся наружу. Это НЕ производное от HELIOS_HOST:
+  # SSH-имя и публичное имя севера у Helios разные, и подставлять одно вместо
+  # другого — верный способ получить healthcheck, который проверяет не тот сайт.
+  HELIOS_BASE_URL: ${{ vars.HELIOS_BASE_URL || 'https://se.ifmo.ru' }}
   # Домашняя директория студента на Helios по инструкции: /home/studs/<логин>.
   HELIOS_HOME_ROOT: /home/studs
   # Каталог, который отдаёт Nginx. Права 755 — требование инструкции.
@@ -65,12 +138,20 @@ env:
   # без правки workflow можно в Settings → Variables. Пустое/незаданное значение
   # срезается оператором «||» до значения по умолчанию.
   HELIOS_SITE_SUBDIR: ${{ vars.HELIOS_SITE_SUBDIR || 'rtc-benchmark' }}
+  # Каталог релизов и каталог превью — соседи сайта внутри public_html.
+  HELIOS_RELEASES_DIR: rtc-benchmark-releases
+  HELIOS_PREVIEW_DIR: preview
+  # Сколько релизов и превью хранить. Требование задания: 3–5 релизов.
+  HELIOS_KEEP_RELEASES: ${{ inputs.keep_releases || vars.HELIOS_KEEP_RELEASES || '5' }}
+  HELIOS_KEEP_PREVIEWS: ${{ vars.HELIOS_KEEP_PREVIEWS || '5' }}
 
   # Контрольная строка healthcheck. Взята из заголовка первого уровня главной
   # страницы: <h1 id="rtc-benchmark">. Это статическая часть HTML, а не
   # динамическое значение, и она меняется только вместе с переименованием
   # проекта. ASCII-only — сравнение не зависит от кодировки терминала.
-  HELIOS_HEALTHCHECK_MARKER: 'id="rtc-benchmark"'
+  # Вход workflow_dispatch healthcheck_marker позволяет подставить заведомо
+  # неверную строку и убедиться, что job действительно падает.
+  HELIOS_HEALTHCHECK_MARKER: ${{ inputs.healthcheck_marker || 'id="rtc-benchmark"' }}
   # Публикация не мгновенна: файл мог ещё не отдаться к моменту первого запроса.
   HELIOS_HEALTHCHECK_ATTEMPTS: '10'
   HELIOS_HEALTHCHECK_DELAY_SEC: '10'
@@ -104,6 +185,35 @@ jobs:
         # --strict превращает битые ссылки и предупреждения в ошибку сборки.
         run: python -m mkdocs build --strict
 
+      - name: Добавить build-info.json
+        # Файл идентифицирует сборку по HTTP: без него главная страница
+        # релиза N и релиза N+1 неразличимы, а именно это нужно, чтобы
+        # доказать, что откат вернул именно релиз N. Содержимое сайта не
+        # меняется: файл дописывается в site/ уже после сборки, поэтому
+        # проверка --strict остаётся ровно такой же.
+        run: |
+          python - <<'PY'
+          import datetime
+          import json
+          import os
+
+          info = {
+              "repository": os.environ["GITHUB_REPOSITORY"],
+              "ref": os.environ["GITHUB_REF"],
+              "sha": os.environ["GITHUB_SHA"],
+              "run_id": os.environ["GITHUB_RUN_ID"],
+              "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT", "1"),
+              "built_at": datetime.datetime.now(datetime.timezone.utc)
+                          .replace(microsecond=0)
+                          .isoformat()
+                          .replace("+00:00", "Z"),
+          }
+          with open("site/build-info.json", "w", encoding="utf-8") as fh:
+              json.dump(info, fh, ensure_ascii=False, indent=2)
+              fh.write("\n")
+          print(json.dumps(info, ensure_ascii=False))
+          PY
+
       - name: Сохранить артефакт сборки
         # Каталог site/ целиком, без распаковки «после сборки» на месте
         # публикации: на Helios уезжает ровно то, что проверил --strict.
@@ -124,16 +234,16 @@ jobs:
   deploy:
     name: Публикация на Helios
     needs: build
-    # Публикуется только main. Основное условие — ref: у pull request он всегда
-    # refs/pull/N/merge, то есть не главная ветка. Проверка event_name оставлена
-    # как страховка на случай смены формата ref. Проверка `build` выполняется
-    # раньше этой job, поэтому несостоявшийся PR не публикуется даже «с прошлой
-    # удачной сборки».
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    # Публикация не выполняется на pull request: там нужна только строгая
+    # сборка, а секреты на чужих форках недоступны в принципе.
+    # Проверка event_name оставлена как страховка на случай смены формата ref.
+    # Проверка `build` выполняется раньше этой job, поэтому несостоявшийся PR
+    # не публикуется даже «с прошлой удачной сборки».
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     # Healthcheck может легитимно крутить до ~11.5 минут (2 запроса × 10 попыток
-    # × 30 c + 9 пауз × 10 c), плюс время SCP. Лимит страхует от зависшего
-    # ssh/scp, без которого job занимал бы runner до дефолтных 360 минут.
+    # × 30 c + 9 пауз × 10 c), плюс время rsync. Лимит страхует от зависшего
+    # ssh/rsync, без которого job занимал бы runner до дефолтных 360 минут.
     timeout-minutes: 30
     # Секреты Helios выдаются только на этой job и только через окружение.
     # Охрана окружения проверяется на сервере GitHub и потому переживает правку
@@ -145,12 +255,15 @@ jobs:
     environment: helios
     steps:
       - name: Получить артефакт сборки
+        # При откате пересборки нет: откатывается уже готовый релиз.
+        if: inputs.rollback_to == '' || inputs.rollback_to == null
         uses: actions/download-artifact@v8
         with:
           name: site-helios
           path: site
 
       - name: Проверить состав артефакта
+        if: inputs.rollback_to == '' || inputs.rollback_to == null
         run: |
           if [ ! -f site/index.html ]; then
             echo "::error::В артефакте нет site/index.html — публиковать нечего."
@@ -166,6 +279,8 @@ jobs:
           HELIOS_USER: ${{ secrets.HELIOS_USER }}
           HELIOS_SSH_PRIVATE_KEY: ${{ secrets.HELIOS_SSH_PRIVATE_KEY }}
           HELIOS_SSH_KNOWN_HOSTS: ${{ secrets.HELIOS_SSH_KNOWN_HOSTS }}
+          ROLLBACK_TO_INPUT: ${{ inputs.rollback_to || '' }}
+          LAYOUT_MODE_INPUT: ${{ inputs.layout_mode || 'auto' }}
         run: |
           missing=''
           [ -n "$HELIOS_USER" ]             || missing="$missing HELIOS_USER"
@@ -177,14 +292,13 @@ jobs:
             exit 1
           fi
 
-          # Логин подставляется и в аргумент ssh/scp, и в команду, которую
-          # выполнит УДАЛЁННЫЙ shell (ssh "mkdir -p '.../$HELIOS_USER/...'"),
-          # поэтому значение с кавычкой или точкой с запятой вышло бы за
-          # пределы аргумента. Отдельно отсекаем ведущие «-» (иначе значение
-          # разберутся как опции ssh, например -oProxyCommand) и ведущую «.»
-          # (иначе «..» уводит путь из /home/studs/). Внутри имени остаются
-          # буквы, цифры, дефис, подчёркивание и точка — этого хватает логину
-          # вида sXXXXXX.
+          # Логин подставляется и в аргумент ssh/rsync, и в команду, которую
+          # выполнит УДАЛЁННЫЙ shell, поэтому значение с кавычкой или точкой с
+          # запятой вышло бы за пределы аргумента. Отдельно отсекаем ведущие «-»
+          # (иначе значение разберутся как опции ssh, например -oProxyCommand)
+          # и ведущую «.» (иначе «..» уводит путь из /home/studs/). Внутри имени
+          # остаются буквы, цифры, дефис, подчёркивание и точка — этого хватает
+          # логину вида sXXXXXX.
           case "$HELIOS_USER" in
             '' | -* | .*)
               echo "::error::HELIOS_USER недопустим: не должен быть пустым и не должен начинаться с «-» или «.», во избежание разбора как опций ssh и выхода из /home/studs."
@@ -196,22 +310,186 @@ jobs:
               ;;
           esac
 
-          # Имя подкаталога подставляется в удалённые команды, включая rm -rf,
-          # поэтому оно проверяется так же строго, как логин. Список разрешённых
+          # Имена каталогов подставляются в удалённые команды, включая rm -rf,
+          # поэтому проверяются так же строго, как логин. Список разрешённых
           # символов (без слэша и пробела) к тому же гарантирует, что имя
           # годно как сегмент URL healthcheck.
-          case "$HELIOS_SITE_SUBDIR" in
-            '' | -* | .*)
-              echo "::error::HELIOS_SITE_SUBDIR недопустим: не должен быть пустым и не должен начинаться с «-» или «.», во избежание разбора как опций ssh и выхода из public_html."
+          for name in "$HELIOS_SITE_SUBDIR" "$HELIOS_RELEASES_DIR" "$HELIOS_PREVIEW_DIR"; do
+            case "$name" in
+              '' | -* | .*)
+                echo "::error::$name недопустимо: имя должно быть непустым и не должно начинаться с «-» или «.», во избежание разбора как опций и выхода из public_html."
+                exit 1
+                ;;
+              *[!A-Za-z0-9._-]*)
+                echo "::error::$name содержит недопустимые символы: допустимы латиница, цифры, дефис, подчёркивание и точка."
+                exit 1
+                ;;
+            esac
+          done
+
+          # Счётчики хранимых релизов и превью: только цифры, иначе значение
+          # пошло бы в параметры сортировки и rm на сервере.
+          for n in "$HELIOS_KEEP_RELEASES" "$HELIOS_KEEP_PREVIEWS"; do
+            case "$n" in
+              '' | *[!0-9]*)
+                echo "::error::Счётчик хранимых каталогов должен быть целым числом, получено: «$n»."
+                exit 1
+                ;;
+            esac
+            if [ "$n" -lt 1 ]; then
+              echo "::error::Счётчик хранимых каталогов должен быть не меньше 1, получено: «$n»."
               exit 1
-              ;;
-            *[!A-Za-z0-9._-]*)
-              echo "::error::HELIOS_SITE_SUBDIR содержит недопустимые символы: допустимы латиница, цифры, дефис, подчёркивание и точка."
+            fi
+          done
+
+          # Значения workflow_dispatch приходят через env, а не подстановкой
+          # выражения в тело скрипта: подстановка происходит ДО запуска shell,
+          # и опечатка в значении (кавычка, перевод строки) сломала бы скрипт
+          # раньше, чем сработала бы какая-либо проверка. Здесь inputs уже
+          # обычные переменные окружения, их безопасно валидировать.
+          #
+          # Побочная причина не писать такие выражения даже в комментарии:
+          # разборщик выражений GitHub читает весь файл и не знает про
+          # комментарии, поэтому пустое выражение в тексте делает весь workflow
+          # нечитаемым, и запуск падает до появления какого-либо job.
+          # Именно так выглядел первый неудачный запуск этой ветки.
+          case "$LAYOUT_MODE_INPUT" in
+            auto | symlink | dirswap) ;;
+            *)
+              echo "::error::layout_mode должен быть одним из значений: auto, symlink, dirswap, получено: «$LAYOUT_MODE_INPUT»."
               exit 1
               ;;
           esac
 
+          # rollback_to подставляется в команду удалённого shell, поэтому
+          # допускается ровно два вида значения: слово previous либо префикс
+          # sha из шестнадцатеричных цифр. Проверка здесь, а не в шаге
+          # переключения, превращает опечатку в понятную ошибку до загрузки.
+          rollback_to="$ROLLBACK_TO_INPUT"
+          if [ -n "$rollback_to" ]; then
+            case "$rollback_to" in
+              previous) ;;
+              *[!0-9a-f]* | '')
+                echo "::error::rollback_to должен быть словом previous или sha (только цифры 0–9 и буквы a–f), получено: «$rollback_to»."
+                exit 1
+                ;;
+            esac
+            if [ "${#rollback_to}" -gt 40 ]; then
+              echo "::error::rollback_to длиннее 40 символов — это не sha."
+              exit 1
+            fi
+          fi
+
           echo "Секреты и настройки на месте."
+
+      - name: Определить схему раскладки и имя цели
+        # Здесь решается, куда именно едет сборка: релиз в public_html (main),
+        # превью ветки или откат на существующий релиз. Схема (симлинк или mv)
+        # определяется на сервере: если создать символическую ссылку в
+        # public_html нельзя, включается запасная схема «соседний каталог + mv».
+        id: layout
+        env:
+          HELIOS_USER: ${{ secrets.HELIOS_USER }}
+          ROLLBACK_TO: ${{ inputs.rollback_to || '' }}
+          # На push и pull_request inputs.* пусты, и без || 'auto' схема была бы
+          # пустой строкой: отличающейся и от auto, и от dirswap, то есть
+          # попадающей в запасную ветку «указано вручную» с пустым значением.
+          LAYOUT_MODE: ${{ inputs.layout_mode || 'auto' }}
+        run: |
+          set -euo pipefail
+
+          helios_ssh() {
+            ssh -p "$HELIOS_PORT" \
+                -o IdentitiesOnly=yes \
+                -o StrictHostKeyChecking=yes \
+                -o BatchMode=yes \
+                -o ConnectTimeout=30 \
+                "$HELIOS_USER@$HELIOS_HOST" "bash -s -- $*"
+          }
+
+          # --- что публикуем -------------------------------------------------
+          if [ -n "$ROLLBACK_TO" ]; then
+            kind=rollback
+            if [ "$GITHUB_REF" != 'refs/heads/main' ]; then
+              echo "::error::Откат запускают из main: в ветке «${GITHUB_REF#refs/heads/}» нет production-раскладки. Выберите ветку main и повторите."
+              exit 1
+            fi
+            if [ "$ROLLBACK_TO" = previous ]; then
+              echo "Режим отката: на предыдущий активный релиз."
+            else
+              echo "Режим отката: на релиз, указанный явно: $ROLLBACK_TO"
+            fi
+          elif [ "$GITHUB_REF" = 'refs/heads/main' ]; then
+            kind=release
+          else
+            kind=preview
+          fi
+
+          # --- имя превью: белый список [a-z0-9-] и ограничение длины -------
+          # Ветка попадает в путь на сервере и в URL, поэтому приводится к
+          # безопасному виду: нижний регистр, только [a-z0-9-], слитные дефисы,
+          # без ведущих и хвостовых дефисов, длина не больше 40 символов.
+          # Если при нормализации имя изменилось, к нему добавляются семь
+          # символов sha: иначе ветки «feat/a» и «feat-a» получили бы один
+          # каталог и затирали друг друга.
+          preview_name=''
+          if [ "$kind" = preview ]; then
+            raw="$GITHUB_REF_NAME"
+            lower="$(printf '%s' "$raw" | tr '[:upper:]' '[:lower:]')"
+            norm="$(printf '%s' "$lower" \
+                     | sed -e 's/[^a-z0-9-]\{1,\}/-/g' -e 's/-\{2,\}/-/g' \
+                           -e 's/^-//' -e 's/-\{2,\}/-/g' -e 's/-$//')"
+            norm="$(printf '%s' "$norm" | cut -c1-40 | sed -e 's/-*$//')"
+            if [ -z "$norm" ]; then
+              norm="branch-${GITHUB_SHA:0:7}"
+            elif [ "$norm" != "$lower" ]; then
+              norm="${norm}-${GITHUB_SHA:0:7}"
+            fi
+            preview_name="$norm"
+            echo "Имя ветки «$raw» нормализовано в «$preview_name»."
+          fi
+
+          # --- схема: символьная ссылка или mv ------------------------------
+          # Проба делается на настоящем файле в public_html и сразу
+          # удаляется, иначе в веб-корне остался бы мусор.
+          #
+          # ПОЧЕМУ АРГУМЕНТЫ В ОДИНАРНЫХ КАВЫЧКАХ. ssh склеивает свои аргументы
+          # в одну строку команды и отдаёт её удалённому shell на разбор. Аргумент
+          # с пустым значением без кавычек при этом ИСЧЕЗАЕТ: на его месте
+          # остаётся два пробела, которые shell схлопывает, и все следующие
+          # аргументы сдвигаются на одну позицию. Пустой rollback_to или
+          # пустое имя превью — обычное дело, а сдвиг означал бы, что удалённый
+          # скрипт получит не тот sha и не тот режим. Значения безопасны для
+          # одинарных кавычек: выше проверено, что в них допустимы только
+          # [A-Za-z0-9._-] и hex sha, а одинарной кавычки в этом наборе нет.
+          mode="$LAYOUT_MODE"
+          if [ "$mode" = auto ]; then
+            if helios_ssh "'$HELIOS_HOME_ROOT'" "'$HELIOS_USER'" "'$HELIOS_PUBLIC_DIR'" <<'REMOTE'
+          set -e
+          home_root="$1"; user="$2"; public="$3"
+          probe="$home_root/$user/$public/.rtc-symlink-probe"
+          rm -f "$probe"
+          ln -s probe "$probe" 2>/dev/null || exit 1
+          rm -f "$probe"
+          REMOTE
+            then
+              mode=symlink
+              echo "Символические ссылки в public_html доступны — релизная схема со ссылкой current."
+            else
+              mode=dirswap
+              echo "::warning::Символические ссылки в public_html недоступны — схема «выгрузка в соседний каталог + mv»."
+            fi
+          else
+            echo "Схема раскладки задана вручную: $mode"
+          fi
+
+          {
+            echo "kind=$kind"
+            echo "mode=$mode"
+            echo "preview_name=$preview_name"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "kind=$kind mode=$mode preview_name=${preview_name:-—}"
 
       - name: Подготовить SSH-окружение
         env:
@@ -238,10 +516,19 @@ jobs:
             exit 1
           }
 
+          # rsync на Helios есть (проверено: 3.4.1, protocol 32), а на runner
+          # он есть в образе ubuntu-latest. Проверка даёт внятную причину
+          # вместо «rsync: command not found», если образ изменится.
+          command -v rsync >/dev/null || {
+            echo "::error::На runner нет rsync."
+            exit 1
+          }
+          echo "rsync на runner: $(rsync --version | head -1)"
+
       - name: Подключиться к Helios по SSH
         env:
           HELIOS_USER: ${{ secrets.HELIOS_USER }}
-        # Набор опций, повторённый на всех ssh/scp-шагах ниже: только наш ключ,
+        # Набор опций, повторённый на всех ssh/rsync-шагах ниже: только наш ключ,
         # только наш known_hosts, никаких интерактивных паролей.
         # BatchMode=yes запрещает ssh предлагать пароль или passphrase: иначе
         # шаг остановился бы на запросе ввода, который в CI некому ответить.
@@ -252,64 +539,138 @@ jobs:
               -o BatchMode=yes \
               -o ConnectTimeout=30 \
               "$HELIOS_USER@$HELIOS_HOST" \
-              'printf "SSH-доступ получен, хост: %s\n" "$(hostname -s)"'
+              'printf "SSH-доступ получен, хост: %s, rsync на сервере: %s\n" "$(hostname -s)" "$(rsync --version | head -1)"'
 
-      - name: Подготовить подкаталог публикации
+      - name: Подготовить каталог приёмника
+        # Проверки, общие для релизной и запасной схем: public_html должен
+        # существовать и быть каталогом, а каталоги, в которые пойдёт rsync
+        # с --delete, обязаны быть помечены как созданные этим workflow.
+        #
+        # Именно здесь --delete получает право что-то удалять. Без маркера
+        # .rtc-benchmark каталог считается чужим: публикация останавливается,
+        # а не ломает чужое. Проверка имени в шаге «Проверить секреты и
+        # настройки» такую опечатку не ловит: имена из [A-Za-z0-9._-] могут
+        # совпасть с реальным файлом.
+        if: steps.layout.outputs.kind == 'release' || steps.layout.outputs.kind == 'rollback' || steps.layout.outputs.kind == 'preview'
         env:
           HELIOS_USER: ${{ secrets.HELIOS_USER }}
+          SHA: ${{ github.sha }}
+          KIND: ${{ steps.layout.outputs.kind }}
+          MODE: ${{ steps.layout.outputs.mode }}
+          PREVIEW_NAME: ${{ steps.layout.outputs.preview_name }}
         run: |
-          # Точка назначения — подкаталог HELIOS_SITE_SUBDIR внутри public_html.
-          # Корень public_html, где у студента свои файлы, workflow не трогает:
-          # даже режим каталога переустанавливается только в момент его создания.
-          root="$HELIOS_HOME_ROOT/$HELIOS_USER/$HELIOS_PUBLIC_DIR"
-          target="$root/$HELIOS_SITE_SUBDIR"
-
-          # Подкаталог целиком принадлежит сайту, поэтому перед свежей загрузкой
-          # он удаляется и создаётся заново: публикация получается чистой и не
-          # накапливает файлы страниц, удалённых из nav. Безопасность rm -rf
-          # построена на двух проверках, обе выполняются на сервере перед
-          # удалением:
-          #   1) если по этому пути лежит ФАЙЛ (например, HELIOS_SITE_SUBDIR
-          #      опечаткой назвал index.html в корне) или
-          #   2) если по этому пути лежит КАТАЛОГ без служебного маркера
-          #      .rtc-benchmark, который этот workflow кладёт на сервер
-          #      («каталог создан не этим workflow»), —
-          # публикация останавливается, а не ломает чужое. Проверка имени в шаге
-          # «Проверить секреты и настройки» такую опечатку не ловит: имена из
-          # [A-Za-z0-9._-] могут совпасть с реальным файлом.
+          set -euo pipefail
           ssh -p "$HELIOS_PORT" \
-              -o IdentitiesOnly=yes \
-              -o StrictHostKeyChecking=yes \
-              -o BatchMode=yes \
-              -o ConnectTimeout=30 \
-              "$HELIOS_USER@$HELIOS_HOST" "
-          set -e
-          if [ -e '$target' ] && [ ! -d '$target' ]; then
-            echo \"::error::$target существует и не является каталогом — публикация остановлена.\"
-            exit 1
-          fi
-          if [ -e '$root' ] && [ ! -d '$root' ]; then
-            echo \"::error::$root существует и не является каталогом — публикация остановлена.\"
-            exit 1
-          fi
-          if [ -d '$target' ] && [ ! -f '$target/.rtc-benchmark' ]; then
-            echo \"::error::$target — каталог, но не созданный этим workflow — публикация остановлена.\"
-            exit 1
-          fi
-          if [ ! -d '$root' ]; then
-            mkdir -p '$root' && chmod 755 '$root'
-          fi
-          rm -rf '$target'
-          mkdir -p '$target'
-          chmod 755 '$target'
-          touch '$target/.rtc-benchmark'
-          chmod 644 '$target/.rtc-benchmark'
-          ls -ld '$root' '$target'"
+              -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+              -o BatchMode=yes -o ConnectTimeout=30 \
+              "$HELIOS_USER@$HELIOS_HOST" \
+              "bash -s -- '$HELIOS_HOME_ROOT' '$HELIOS_USER' '$HELIOS_PUBLIC_DIR' \
+               '$HELIOS_SITE_SUBDIR' '$HELIOS_RELEASES_DIR' '$HELIOS_PREVIEW_DIR' \
+               '$SHA' '$KIND' '$MODE' '$PREVIEW_NAME'" <<'REMOTE'
+          set -eu
+          home_root="$1"; user="$2"; public="$3"; subdir="$4"
+          releases="$5"; preview="$6"; sha="$7"; kind="$8"; mode="$9"; preview_name="${10:-}"
 
-      - name: Передать файлы на Helios
+          public_html="$home_root/$user/$public"
+
+          # 1) Корень public_html: там лежат файлы других работ студента,
+          #    rsync с --delete по этому пути снёс бы их.
+          if [ ! -d "$public_html" ]; then
+            echo "::error::$public_html не найден — каталог, который отдаёт Nginx, должен существовать."
+            exit 1
+          fi
+
+          # 2) Куда именно пишем.
+          case "$kind" in
+            preview)
+              container="$public_html/$preview"
+              target="$container/$preview_name"
+              ;;
+            release)
+              if [ "$mode" = dirswap ]; then
+                # Запасная схема: рядом с сайтом, без символической ссылки.
+                container=''
+                target="$public_html/$subdir-next"
+              else
+                container="$public_html/$releases"
+                target="$container/$sha"
+              fi
+              ;;
+            rollback)
+              # Откат ничего не качает: каталоги уже есть на сервере.
+              echo "Откат: каталоги не готовятся, только переключение."
+              exit 0
+              ;;
+            *)
+              echo "::error::Неизвестный вид публикации: $kind"
+              exit 1
+              ;;
+          esac
+
+          # 3) Каталог-контейнер: без маркера он не наш.
+          if [ -n "$container" ]; then
+            if [ -e "$container" ] && [ ! -d "$container" ]; then
+              echo "::error::$container существует и не является каталогом — публикация остановлена."
+              exit 1
+            fi
+            if [ -d "$container" ] && [ ! -f "$container/.rtc-benchmark" ]; then
+              echo "::error::$container — каталог без маркера .rtc-benchmark, то есть создан не этим workflow. Публикация остановлена, чтобы не тронуть чужие файлы."
+              exit 1
+            fi
+            if [ ! -d "$container" ]; then
+              mkdir -p "$container"
+              chmod 755 "$container"
+              : > "$container/.rtc-benchmark"
+              chmod 644 "$container/.rtc-benchmark"
+              echo "Создан каталог $container с маркером .rtc-benchmark."
+            fi
+          fi
+
+          # 4) Каталог-приёмник: тоже только наш.
+          if [ -e "$target" ] && [ ! -d "$target" ]; then
+            echo "::error::$target существует и не является каталогом — публикация остановлена."
+            exit 1
+          fi
+          if [ -d "$target" ] && [ ! -f "$target/.rtc-benchmark" ]; then
+            echo "::error::$target — каталог без маркера .rtc-benchmark, то есть создан не этим workflow. Публикация остановлена."
+            exit 1
+          fi
+          if [ ! -d "$target" ]; then
+            mkdir -p "$target"
+            chmod 755 "$target"
+            : > "$target/.rtc-benchmark"
+            chmod 644 "$target/.rtc-benchmark"
+            echo "Создан каталог приёмника $target."
+          else
+            # Каталог остался от прерванного запуска этого же sha: rsync
+            # с --delete докачает его до полного состояния.
+            echo "Каталог приёмника $target уже существует (повторный запуск или докачка)."
+          fi
+
+          ls -ld "$public_html" ${container:+"$container"} "$target"
+          REMOTE
+
+      - name: Выгрузить на Helios
+        # rsync -rlpt: рекурсивно, с сохранением прав и времени. Владельца
+        # сохранять нельзя (-a/-o), иначе файлы уедут с uid runner и Nginx
+        # получит 403.
+        #
+        # --delete удаляет в каталоге приёмника всё, чего нет в сборке.
+        # Каталог приёмника только что проверен маркером и создан нами, поэтому
+        # удалять там нечего, кроме остатков предыдущей попытки.
+        #
+        # --exclude=.rtc-benchmark защищает маркер: без exclude rsync с
+        # --delete снёс бы его, и следующий запуск счёл бы каталог чужим.
+        if: steps.layout.outputs.kind == 'release' || steps.layout.outputs.kind == 'preview'
         env:
           HELIOS_USER: ${{ secrets.HELIOS_USER }}
+          SHA: ${{ github.sha }}
+          KIND: ${{ steps.layout.outputs.kind }}
+          MODE: ${{ steps.layout.outputs.mode }}
+          PREVIEW_NAME: ${{ steps.layout.outputs.preview_name }}
         run: |
+          set -euo pipefail
+
           # 404.html на Helios не едет. MkDocs собирает его с абсолютными путями
           # вида /rtc-benchmark/... (от корня домена) — на Pages они корректны,
           # а под /~<логин>/<HELIOS_SITE_SUBDIR>/ то же содержимое отдалось бы
@@ -317,125 +678,481 @@ jobs:
           # Helios; на Pages артефакт остаётся нетронутым.
           rm -f site/404.html
 
-          # scp -r site/. , а не scp -r site: в первом случае в целевой каталог
-          # попадает содержимое site/, во втором — каталог site/ внутри него.
-          # site/. покрывает и скрытые файлы, которые glob site/* пропустил бы.
-          # Флаг -P (заглавная) — это порт.
-          #
-          # Права выставляем здесь, до отправки, и дублируем на сервере в шаге
-          # «Выставить права на файлы»: scp -p обычно переносит режим, но его
-          # поведение зависит от версии протокола и sshd на сервере, поэтому
-          # вторая переустановка — дешёвая страховка, а не полагание на одно scp.
+          # Права выставляем до отправки, а не после: rsync переносит их вместе
+          # с файлами (-p), и к моменту, когда каталог начнут читать, он уже
+          # читаем. umask 077 на Helios в этом случае не помешал бы.
           find site -type d -exec chmod 755 {} +
           find site -type f -exec chmod 644 {} +
 
-          scp -rp -P "$HELIOS_PORT" \
-              -o IdentitiesOnly=yes \
-              -o StrictHostKeyChecking=yes \
-              -o BatchMode=yes \
-              -o ConnectTimeout=30 \
-              site/. "$HELIOS_USER@$HELIOS_HOST:$HELIOS_HOME_ROOT/$HELIOS_USER/$HELIOS_PUBLIC_DIR/$HELIOS_SITE_SUBDIR/"
+          case "$KIND" in
+            preview)
+              dest="$HELIOS_HOME_ROOT/$HELIOS_USER/$HELIOS_PUBLIC_DIR/$HELIOS_PREVIEW_DIR/$PREVIEW_NAME"
+              ;;
+            *)
+              if [ "$MODE" = dirswap ]; then
+                dest="$HELIOS_HOME_ROOT/$HELIOS_USER/$HELIOS_PUBLIC_DIR/$HELIOS_SITE_SUBDIR-next"
+              else
+                dest="$HELIOS_HOME_ROOT/$HELIOS_USER/$HELIOS_PUBLIC_DIR/$HELIOS_RELEASES_DIR/$SHA"
+              fi
+              ;;
+          esac
 
-      - name: Выставить права на файлы
+          echo "Передача в $dest"
+          start="$SECONDS"
+          rsync -rlpt --delete --exclude='.rtc-benchmark' \
+            -e "ssh -p $HELIOS_PORT -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o BatchMode=yes -o ConnectTimeout=30" \
+            site/ "$HELIOS_USER@$HELIOS_HOST:$dest/"
+          echo "rsync завершён за $((SECONDS - start)) с"
+
+          # Страховка после передачи: один вызов chmod на сервере вместо обхода
+          # find|xargs через ssh. chmod -R идёт по каталогу приёмника, где лежат
+          # только файлы этого workflow. a+rX — прочитать всем, а исполняемый
+          # бит добавляется только каталогам и уже исполняемым файлам.
+          ssh -p "$HELIOS_PORT" \
+              -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+              -o BatchMode=yes -o ConnectTimeout=30 \
+              "$HELIOS_USER@$HELIOS_HOST" "bash -s -- '$dest'" <<'REMOTE'
+          set -eu
+          dest="$1"
+          chmod -R a+rX "$dest"
+          # Проверки, которые ловят именно недокачанную публикацию.
+          [ -f "$dest/.rtc-benchmark" ]  || { echo "::error::Маркер каталога потерян — публикация неполна."; exit 1; }
+          [ -f "$dest/index.html" ]      || { echo "::error::Нет index.html — публикация неполна."; exit 1; }
+          [ -f "$dest/build-info.json" ] || { echo "::error::Нет build-info.json — публикация неполна."; exit 1; }
+          printf 'В каталоге публикации: каталогов %s, файлов %s\n' \
+            "$(find "$dest" -type d | wc -l | tr -d ' ')" \
+            "$(find "$dest" -type f | wc -l | tr -d ' ')"
+          REMOTE
+
+      - name: Очистить старые релизы
+        # Хранится HELIOS_KEEP_RELEASES последних релизов (задание: 3–5).
+        # Порядок — по времени изменения каталога, свежие вверху. Каталоги без
+        # маркера и каталоги legacy-* в сортировку не попадают: первые могут
+        # оказаться чужми, вторые — это отложенный старый каталог public_html,
+        # который удаляют вручную.
+        if: steps.layout.outputs.kind == 'release' || steps.layout.outputs.kind == 'rollback'
         env:
           HELIOS_USER: ${{ secrets.HELIOS_USER }}
         run: |
-          # Стандартный shell у run: — это `bash -e` без pipefail, поэтому
-          # упавший бы локальный find в конвейере остался бы незамеченным:
-          # статус конвейера тогда определяет только последняя команда, то есть
-          # ssh. С pipefail падает и левая часть.
-          set -o pipefail
+          set -euo pipefail
+          if [ "${{ steps.layout.outputs.mode }}" = dirswap ]; then
+            echo "Схема «соседний каталог + mv»: список релизов не ведётся, очистка не выполняется."
+            exit 0
+          fi
+          ssh -p "$HELIOS_PORT" \
+              -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+              -o BatchMode=yes -o ConnectTimeout=30 \
+              "$HELIOS_USER@$HELIOS_HOST" \
+              "bash -s -- '$HELIOS_HOME_ROOT' '$HELIOS_USER' '$HELIOS_PUBLIC_DIR' \
+               '$HELIOS_RELEASES_DIR' '$HELIOS_KEEP_RELEASES'" <<'REMOTE'
+          set -eu
+          home_root="$1"; user="$2"; public="$3"; releases="$4"; keep="$5"
+          relroot="$home_root/$user/$public/$releases"
 
-          # Страховка после scp -p: у современного scp (SFTP) режим сохраняется, но на
-          # старых версиях или при настройках sshd файл мог лечь не с теми
-          # правами. Повторная установка не ломает ничего, а при umask 077 на
-          # Helios защитила бы сайт, лёгший как 600, от 403 у Nginx, работающего
-          # от отдельного пользователя.
-          #
-          # Список путей берём ровно из той сборки, что ушла наверх, и по нему
-          # же выставляем права на сервере. Сплошной обход содержимого
-          # public_html был бы неверен: это общий веб-корень студента, и такой
-          # find снял бы бит исполнения с чужих файлов, которых workflow не
-          # касался. Работаем строго внутри подкаталога HELIOS_SITE_SUBDIR,
-          # который целиком принадлежит сайту. NUL-разделитель и xargs -0 — чтобы
-          # пробелы и спецсимволы в именах не превратились в аргументы. -r
-          # (--no-run-if-empty) — чтобы xargs не дёрнул chmod без операндов на
-          # пустом списке.
-          target="'$HELIOS_HOME_ROOT/$HELIOS_USER/$HELIOS_PUBLIC_DIR/$HELIOS_SITE_SUBDIR'"
+          [ -f "$relroot/.rtc-benchmark" ] || {
+            echo "::error::Каталог релизов без маркера — очистка остановлена."
+            exit 1
+          }
 
-          cd site
-          find . -type d -print0 \
-            | ssh -p "$HELIOS_PORT" -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
-                   -o BatchMode=yes -o ConnectTimeout=30 \
-                   "$HELIOS_USER@$HELIOS_HOST" \
-                   "cd $target && xargs -0 -r -n 100 chmod 755"
+          # Точка входа ссылки не хранится как каталог, поэтому find -type d
+          # её не возвращает и удалить её нельзя. Исключение имени оставлено
+          # для явности.
+          stale="$(cd "$relroot" && find . -mindepth 1 -maxdepth 1 -type d \
+                     ! -name '.rtc-benchmark' ! -name 'legacy-*' ! -name 'current' -print \
+                   | sed 's|^\./||' \
+                   | while read -r d; do
+                       [ -f "$relroot/$d/.rtc-benchmark" ] || continue
+                       printf '%s %s\n' "$(stat -f '%m' "$relroot/$d")" "$d"
+                     done \
+                   | sort -rn | tail -n "+$((keep + 1))" | awk '{print $2}')"
 
-          find . -type f -print0 \
-            | ssh -p "$HELIOS_PORT" -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
-                   -o BatchMode=yes -o ConnectTimeout=30 \
-                   "$HELIOS_USER@$HELIOS_HOST" \
-                   "cd $target && xargs -0 -r -n 100 chmod 644"
+          stored="$(cd "$relroot" && find . -mindepth 1 -maxdepth 1 -type d \
+                      ! -name '.rtc-benchmark' ! -name 'legacy-*' -print | wc -l | tr -d ' ')"
+          if [ -z "$stale" ]; then
+            echo "Хранится релизов: $stored (лимит $keep) — удалять нечего."
+            exit 0
+          fi
+          for d in $stale; do
+            echo "Удаляю релиз $d (за пределами лимита $keep)"
+            rm -rf "${relroot:?}/$d"
+          done
+          ls -1 "$relroot"
+          REMOTE
 
-          echo "В артефакте публикации: каталогов $(find . -type d | wc -l), файлов $(find . -type f | wc -l)"
+      - name: Переключить публикацию
+        # Собственно публикация. Пока передача шла в отдельный каталог,
+        # посетители видели прежний сайт целиком; здесь происходит переключение
+        # на новый — одной операцией, без сети.
+        #
+        # Переключение делается `ln -sfn`, а не «создать временную ссылку и
+        # перенести её mv». На FreeBSD mv СЛЕДУЕТ символической ссылке в
+        # назначении: если private_html/<subdir> уже указывает на каталог
+        # релиза, то `mv tmp private_html/<subdir>` не заменяет ссылку, а
+        # уносит tmp внутрь КАЖДАГОГО каталога релиза и возвращает код 0.
+        # Проверено на Helios: после такой команды ссылка оставалась прежней,
+        # а внутри releases/<старый sha>/ появлялся файл current.tmp.<pid>.
+        # `ln -sfn` такой ссылки не разыменовывает и меняет цель на месте
+        # (проверено тем же экспериментом).
+        if: steps.layout.outputs.kind == 'release' || steps.layout.outputs.kind == 'rollback'
+        env:
+          HELIOS_USER: ${{ secrets.HELIOS_USER }}
+          SHA: ${{ github.sha }}
+          KIND: ${{ steps.layout.outputs.kind }}
+          MODE: ${{ steps.layout.outputs.mode }}
+          ROLLBACK_TO: ${{ inputs.rollback_to || '' }}
+        run: |
+          set -euo pipefail
+          ssh -p "$HELIOS_PORT" \
+              -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+              -o BatchMode=yes -o ConnectTimeout=30 \
+              "$HELIOS_USER@$HELIOS_HOST" \
+              "bash -s -- '$HELIOS_HOME_ROOT' '$HELIOS_USER' '$HELIOS_PUBLIC_DIR' \
+               '$HELIOS_SITE_SUBDIR' '$HELIOS_RELEASES_DIR' '$SHA' \
+               '$ROLLBACK_TO' '$KIND' '$MODE'" <<'REMOTE'
+          set -eu
+          home_root="$1"; user="$2"; public="$3"; subdir="$4"
+          releases="$5"; sha="$6"; rollback="$7"; kind="$8"; mode="$9"
+
+          public_html="$home_root/$user/$public"
+          relroot="$public_html/$releases"
+          site="$public_html/$subdir"
+          pointer="$relroot/current"
+          stamp="$(date -u +%Y%m%dT%H%M%SZ)"
+
+          # --- запасная схема: соседний каталог + mv ------------------------
+          if [ "$mode" = dirswap ]; then
+            if [ "$kind" = rollback ]; then
+              [ -d "$public_html/$subdir-prev" ] || {
+                echo "::error::$public_html/$subdir-prev не найден — откатываться не на что."
+                exit 1
+              }
+              echo "Возврат: $subdir → $subdir-bad.$stamp, $subdir-prev → $subdir"
+              mv "$site" "$public_html/$subdir-bad.$stamp"
+              mv "$public_html/$subdir-prev" "$site"
+            else
+              [ -f "$public_html/$subdir-next/.rtc-benchmark" ] || {
+                echo "::error::Каталог $subdir-next не загружен или не наш — переключение не выполняется."
+                exit 1
+              }
+              # Если на месте с прошлой релизной публикации осталась ссылка,
+              # mv её не тронет, а уведёт новый каталог внутрь старого
+              # релива. Ссылка снимается, её цель проверяется маркером выше.
+              if [ -L "$site" ]; then
+                echo "Снимаю оставшуюся с прошлой схемы ссылку $site (цель: $(readlink "$site"))"
+                rm -f "$site"
+              fi
+              if [ -d "$site" ]; then
+                # Старый сайт целиком уходит в -prev: это и есть запасной
+                # «предыдущий релиз», на который возвращает откат.
+                rm -rf "$public_html/$subdir-prev.old"
+                [ -d "$public_html/$subdir-prev" ] && mv "$public_html/$subdir-prev" "$public_html/$subdir-prev.old"
+                mv "$site" "$public_html/$subdir-prev"
+              fi
+              mv "$public_html/$subdir-next" "$site"
+            fi
+            chmod -R a+rX "$site"
+            echo "Активный каталог: $site (схема dirswap)"
+            ls -la "$public_html" | sed -n '1,20p'
+            exit 0
+          fi
+
+          # --- релизная схема: переключение ссылки --------------------------
+          # Что было активно ДО переключения. Это и есть «предыдущий релиз»,
+          # на который возвращает откат. Сама ссылка $pointer для этого не годится:
+          # после переключения она указывает на новый релиз, и «откат на
+          # предыдущий» превратился бы в пустую операцию. Поэтому значение
+          # сохраняется отдельно, в файле .previous, и обновляется при каждом
+          # переключении — включая откат, поэтому два отката подряд ходят
+          # туда-обратно, как переключатель.
+          old_active="$(readlink "$pointer" 2>/dev/null || true)"
+
+          if [ "$kind" = rollback ]; then
+            if [ "$rollback" = previous ]; then
+              sha="$(cat "$relroot/.previous" 2>/dev/null || true)"
+              [ -n "$sha" ] || { echo "::error::Файл $relroot/.previous пуст или отсутствует — откатываться не на что."; exit 1; }
+              echo "Откат на предыдущий активный релиз: $sha"
+            else
+              sha="$rollback"
+              echo "Откат на релиз, указанный явно: $sha"
+            fi
+          fi
+
+          # Переключаться на несуществующий или чужой каталог нельзя.
+          if [ ! -f "$relroot/$sha/.rtc-benchmark" ]; then
+            echo "::error::Релиз $sha не найден в $relroot (нет маркера .rtc-benchmark). Доступные: $(cd "$relroot" && find . -mindepth 1 -maxdepth 1 -type d -print 2>/dev/null | sed 's|^\./||;s|/$||' | tr '\n' ' ')"
+            exit 1
+          fi
+
+          # Указатель на активный релиз: маленькая ссылка внутри каталога
+          # релизов. Её значение нужно и для отката на предыдущий, и для ручной
+          # сверки по URL /<релизы>/current/.
+          ln -sfn "$sha" "$pointer"
+
+          # Разовая миграция со старой схемы: до неё public_html/<subdir> был
+          # обычным каталогом. mv поверх каталога не сработал бы (rename
+          # отказывается заменять непустой каталог), поэтому старый каталог
+          # уходит в releases/legacy-<метка> и больше не участвует в
+          # переключении: освободить его можно вручную.
+          if [ -d "$site" ] && [ ! -L "$site" ]; then
+            legacy="$relroot/legacy-$stamp"
+            echo "Обнаружен старый каталог публикации (не символическая ссылка) — переношу в $legacy"
+            mv "$site" "$legacy"
+            # Имя отложенного каталога записывается отдельно от .previous:
+            # при первой релизной публикации возвращать не на что, и наверх
+            # уходит именно этот каталог. Искать его по шаблону legacy-* в
+            # healthcheck пришлось бы гадать, какая из них отложена этой сборкой.
+            printf '%s\n' "legacy-$stamp" > "$relroot/.legacy"
+          fi
+
+          ln -sfn "$releases/$sha" "$site"
+
+          # Ссылка переключена, но доверять этому нельзя: цель проверяется
+          # тем же readlink, которым ниже пользуется откат. Расхождение
+          # означало бы, что сайт отдаётся не из того релиза, который записан
+          # в сводке, и healthcheck ниже это бы поймал — но лучше не доводить.
+          if [ "$(readlink "$site")" != "$releases/$sha" ] || [ "$(readlink "$pointer")" != "$sha" ]; then
+            echo "::error::Ссылка не переключилась: site -> $(readlink "$site"), current -> $(readlink "$pointer")"
+            exit 1
+          fi
+
+          # Прежний активный релиз записывается в .previous. mv здесь уместен:
+          # .previous — обычный файл, а не символическая ссылка, и описанная
+          # выше особенность mv на Helios его не касается.
+          if [ -n "$old_active" ] && [ "$old_active" != "$sha" ]; then
+            printf '%s\n' "$old_active" > "$relroot/.previous.tmp.$$"
+            mv -f "$relroot/.previous.tmp.$$" "$relroot/.previous"
+            echo "Предыдущий активный релиз сохранён в .previous: $old_active"
+          fi
+
+          echo "Активный релиз: $sha"
+          echo "--- раскладка public_html ---"
+          ls -la "$public_html" | sed -n '1,20p'
+          echo "--- каталог релизов ---"
+          ls -la "$relroot"
+          printf 'site -> %s\n' "$(readlink "$site")"
+          REMOTE
+
+      - name: Очистить старые превью
+        # Хранится HELIOS_KEEP_PREVIEWS последних превью по времени изменения.
+        if: steps.layout.outputs.kind == 'preview'
+        env:
+          HELIOS_USER: ${{ secrets.HELIOS_USER }}
+        run: |
+          set -euo pipefail
+          ssh -p "$HELIOS_PORT" \
+              -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+              -o BatchMode=yes -o ConnectTimeout=30 \
+              "$HELIOS_USER@$HELIOS_HOST" \
+              "bash -s -- '$HELIOS_HOME_ROOT' '$HELIOS_USER' '$HELIOS_PUBLIC_DIR' \
+               '$HELIOS_PREVIEW_DIR' '$HELIOS_KEEP_PREVIEWS'" <<'REMOTE'
+          set -eu
+          home_root="$1"; user="$2"; public="$3"; preview="$4"; keep="$5"
+          preview_root="$home_root/$user/$public/$preview"
+
+          [ -f "$preview_root/.rtc-benchmark" ] || {
+            echo "::error::Каталог превью без маркера — очистка остановлена."
+            exit 1
+          }
+
+          stale="$(cd "$preview_root" && find . -mindepth 1 -maxdepth 1 -type d \
+                     ! -name '.rtc-benchmark' -print \
+                   | sed 's|^\./||' \
+                   | while read -r d; do
+                       [ -f "$preview_root/$d/.rtc-benchmark" ] || continue
+                       printf '%s %s\n' "$(stat -f '%m' "$preview_root/$d")" "$d"
+                     done \
+                   | sort -rn | tail -n "+$((keep + 1))" | awk '{print $2}')"
+
+          stored="$(cd "$preview_root" && find . -mindepth 1 -maxdepth 1 -type d \
+                      ! -name '.rtc-benchmark' -print | wc -l | tr -d ' ')"
+          if [ -z "$stale" ]; then
+            echo "Хранится превью: $stored (лимит $keep) — удалять нечего."
+            exit 0
+          fi
+          for d in $stale; do
+            echo "Удаляю превью $d (за пределами лимита $keep)"
+            rm -rf "${preview_root:?}/$d"
+          done
+          ls -1 "$preview_root"
+          REMOTE
 
       - name: Проверить публикацию
-        # Healthcheck идёт после SCP и бьёт по адресу Helios, а не по Pages:
-        # Pages и до этого был доступен, проверить нужно новую площадку.
+        # Healthcheck идёт после передачи и бьёт по адресу Helios, а не по
+        # Pages: Pages и до этого был доступен, проверить нужно новую площадку.
+        # Проверяются три точки:
+        #   1) главная страница — код 200 и статическая контрольная строка из
+        #      заголовка <h1 id="rtc-benchmark">;
+        #   2) search/search_index.json — путь стабилен между сборками, в
+        #      отличие от хешированных имён ассетов, поэтому запрос к нему
+        #      ловит «главная есть, а остальное дерево не переехало»;
+        #   3) build-info.json — отвечает тем sha, который разворачивали. Это
+        #      доказательство, что по URL отдаётся именно нужный релиз, и
+        #      благодаря нему же откат отличается от неудачной публикации.
         env:
           HELIOS_USER: ${{ secrets.HELIOS_USER }}
+          SHA: ${{ github.sha }}
+          KIND: ${{ steps.layout.outputs.kind }}
+          MODE: ${{ steps.layout.outputs.mode }}
+          ROLLBACK_TO: ${{ inputs.rollback_to || '' }}
         run: |
-          # Проверяются две точки. Первая — главная страница: код 200 и
-          # статическая контрольная строка из заголовка <h1 id="rtc-benchmark">.
-          # Вторая — search/search_index.json: его путь стабилен между сборками
-          # (в отличие от хешированных имён ассетов), поэтому запрос к нему
-          # ловит «главная есть, а остальное дерево не переехало» и не зависит
-          # от формулировки текста заголовка.
-          url="https://se.ifmo.ru/~$HELIOS_USER/$HELIOS_SITE_SUBDIR/"
-          search_url="https://se.ifmo.ru/~$HELIOS_USER/$HELIOS_SITE_SUBDIR/search/search_index.json"
+          set -uo pipefail
+
+          case "$KIND" in
+            preview)
+              url="$HELIOS_BASE_URL/~$HELIOS_USER/$HELIOS_PREVIEW_DIR/${{ steps.layout.outputs.preview_name }}/"
+              ;;
+            rollback)
+              url="$HELIOS_BASE_URL/~$HELIOS_USER/$HELIOS_SITE_SUBDIR/"
+              ;;
+            *)
+              url="$HELIOS_BASE_URL/~$HELIOS_USER/$HELIOS_SITE_SUBDIR/"
+              ;;
+          esac
+          search_url="${url}search/search_index.json"
+          info_url="${url}build-info.json"
           body="$RUNNER_TEMP/helios-index.html"
           search_body="$RUNNER_TEMP/helios-search.json"
+          info_body="$RUNNER_TEMP/helios-info.json"
 
+          echo "Healthcheck: $url"
+          echo "Ожидаемый релиз: ${SHA}"
+
+          ok=0
           for attempt in $(seq 1 "$HELIOS_HEALTHCHECK_ATTEMPTS"); do
             echo "Попытка $attempt/$HELIOS_HEALTHCHECK_ATTEMPTS: $url"
             # Обнуление файлов ответа: при сетевой ошибке curl их не
             # перезапишет, и в лог попал бы размер тела от предыдущей попытки,
             # то есть число, не относящееся к этому запросу.
-            : > "$body"
-            : > "$search_body"
+            : > "$body"; : > "$search_body"; : > "$info_body"
             # curl сам вернёт код 000 при сетевой ошибке, поэтому set -e здесь
             # не нужен и не срабатывает ложно. stderr не глушим: иначе при
             # реальном сбое сети в логе осталось бы только «код=000» без
             # причины, а именно этот сбой чаще всего и нужно читать.
             code="$(curl --silent --show-error --location --max-time 30 \
-                          --output "$body" --write-out '%{http_code}' \
-                          "$url" || true)"
+                          --output "$body" --write-out '%{http_code}' "$url" || true)"
             search_code="$(curl --silent --show-error --location --max-time 30 \
                                 --output "$search_body" --write-out '%{http_code}' \
                                 "$search_url" || true)"
+            info_code="$(curl --silent --show-error --location --max-time 30 \
+                               --output "$info_body" --write-out '%{http_code}' \
+                               "$info_url" || true)"
+            served_sha=''
+            if [ "$info_code" = 200 ]; then
+              served_sha="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("sha",""))' "$info_body" 2>/dev/null || true)"
+            fi
 
-            if [ "$code" = '200' ] \
+            if [ "$code" = 200 ] \
                && grep --quiet --fixed-strings "$HELIOS_HEALTHCHECK_MARKER" "$body" \
-               && [ "$search_code" = '200' ]; then
-              echo "OK: HTTP 200, контрольная строка найдена, поисковый индекс отдаётся."
+               && [ "$search_code" = 200 ] \
+               && [ "$info_code" = 200 ] \
+               && { [ "$KIND" = rollback ] || [ "$served_sha" = "$SHA" ]; }; then
+              echo "OK: HTTP 200, контрольная строка найдена, поисковый индекс и build-info.json отдаются."
+              echo "Отдаётся релиз: ${served_sha:-неизвестен}"
+              ok=1
               {
                 echo "### Публикация на Helios"
                 echo
+                echo "- Вид публикации: ${KIND}"
                 echo "- URL: ${url}"
                 echo "- HTTP: 200"
                 echo "- Контрольная строка: \`${HELIOS_HEALTHCHECK_MARKER}\`"
                 echo "- Поисковый индекс: HTTP ${search_code}"
-                echo "- Коммит: ${GITHUB_SHA}"
+                echo "- build-info.json: HTTP ${info_code}, отдаётся релиз \`${served_sha:-неизвестен}\`"
+                echo "- Схема раскладки: ${MODE}"
+                echo "- Коммит workflow: ${GITHUB_SHA}"
               } >> "$GITHUB_STEP_SUMMARY"
-              exit 0
+              break
             fi
 
-            echo "  код=$code, размер=$(wc -c < "$body" | tr -d ' ') байт; поисковый индекс: код=$search_code"
+            echo "  код=$code, размер=$(wc -c < "$body" | tr -d ' ') байт; поиск: код=$search_code; build-info: код=$info_code; sha=${served_sha:-—}"
             # Пауза только между попытками: после последней она лишь оттянула бы
             # падение job на лишние секунды.
             [ "$attempt" -lt "$HELIOS_HEALTHCHECK_ATTEMPTS" ] \
               && sleep "$HELIOS_HEALTHCHECK_DELAY_SEC"
           done
 
-          echo "::error::Публикация на Helios не подтверждена: $url"
-          echo "Проверьте вручную: ssh -p $HELIOS_PORT $HELIOS_USER@$HELIOS_HOST 'ls -l $HELIOS_HOME_ROOT/$HELIOS_USER/$HELIOS_PUBLIC_DIR/$HELIOS_SITE_SUBDIR'"
-          exit 1
+          # --- автоматический возврат на предыдущий релиз --------------------
+          # Смысл проверки в том, что она ловит не «сеть легла», а именно
+          # негодную публикацию: главная отвечает 200, но не той строкой или
+          # не тем релизом. Поэтому возврат делается только когда развернутый
+          # релиз НЕ тот, который разворачивали, и только если есть куда вернуться.
+          if [ "$ok" -eq 0 ] && [ "$KIND" = release ]; then
+            echo "::error::Healthcheck не пройден. Пробую вернуть прежнее состояние сайта."
+            # Что именно возвращать, решает сервер, а не раннер: только там
+            # известно, что осталось от прежней публикации. Сценариев три, и
+            # порядок не произвольный — от самого частого к самому редкому.
+            #
+            # 1) Схема dirswap. Прежний сайт целым каталогом лежит рядом
+            #    (<subdir>-prev), его достаточно вернуть на место. Проверять
+            #    нужно именно каталог: в этой схеме <subdir> — обычный каталог,
+            #    и ln -sfn поверх него не сработал бы, а создал бы ссылку внутри.
+            # 2) Прежний релиз. Берётся .previous, а не ссылка current: current
+            #    уже указывает на неудачный релиз, и сравнение с ним всегда дало бы
+            #    «возвращаться не на что».
+            # 3) Первая публикация по новой схеме. Прежних релизов ещё нет, но
+            #    старый каталог публикации workflow отложил в releases/legacy-*,
+            #    и его нужно вернуть на место.
+            ssh -p "$HELIOS_PORT" -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+                -o BatchMode=yes -o ConnectTimeout=30 \
+                "$HELIOS_USER@$HELIOS_HOST" \
+                "bash -s -- '$HELIOS_HOME_ROOT' '$HELIOS_USER' '$HELIOS_PUBLIC_DIR' \
+                 '$HELIOS_SITE_SUBDIR' '$HELIOS_RELEASES_DIR' '$MODE' '$SHA'" <<'REMOTE'
+            set -eu
+            home_root="$1"; user="$2"; public="$3"; subdir="$4"; releases="$5"; mode="$6"; bad="$7"
+            public_html="$home_root/$user/$public"
+            relroot="$public_html/$releases"
+            site="$public_html/$subdir"
+            stamp="$(date -u +%Y%m%dT%H%M%SZ)"
+
+            if [ "$mode" = dirswap ] && [ -d "$site-prev" ]; then
+              echo "Возврат: $subdir -> $subdir-bad.$stamp, $subdir-prev -> $subdir"
+              mv "$site" "$site-bad.$stamp"
+              mv "$site-prev" "$site"
+              [ -f "$site/index.html" ] || { echo "::error::После возврата в каталоге нет index.html."; exit 1; }
+              echo "Возвращён прежний каталог публикации (схема dirswap)"
+              exit 0
+            fi
+
+            prev="$(cat "$relroot/.previous" 2>/dev/null || true)"
+            if [ -n "$prev" ] && [ "$prev" != "$bad" ] && [ -f "$relroot/$prev/.rtc-benchmark" ]; then
+              echo "Возврат: $site -> $releases/$prev"
+              ln -sfn "$prev" "$relroot/current"
+              ln -sfn "$releases/$prev" "$site"
+              if [ "$(readlink "$site")" != "$releases/$prev" ]; then
+                echo "::error::Возврат не удался: site -> $(readlink "$site")"
+                exit 1
+              fi
+              # Неудачный релиз становится предыдущим: следующий откат вернёт
+              # сайт на него, если окажется плохим уже возвращённый.
+              printf '%s\n' "$bad" > "$relroot/.previous.tmp.$$"
+              mv -f "$relroot/.previous.tmp.$$" "$relroot/.previous"
+              echo "Возвращён релиз $prev"
+              exit 0
+            fi
+
+            legacy="$(find "$relroot" -mindepth 1 -maxdepth 1 -type d -name 'legacy-*' -print | head -n 1 || true)"
+            if [ -n "$legacy" ]; then
+              echo "Возврат: каталог публикации до первой релизной сборки $(basename "$legacy")"
+              [ -L "$site" ] && rm -f "$site"
+              [ -e "$site" ] && { echo "::error::На месте $site есть посторонний объект — возврат не выполняю."; exit 1; }
+              mv "$legacy" "$site"
+              printf '%s\n' "из $(basename "$legacy")" > "$relroot/.previous.tmp.$$"
+              mv -f "$relroot/.previous.tmp.$$" "$relroot/.previous"
+              [ -f "$site/index.html" ] || { echo "::error::После возврата в каталоге нет index.html."; exit 1; }
+              echo "Возвращён прежний каталог публикации (до первой релизной сборки)"
+              exit 0
+            fi
+
+            echo "::error::Возвращаться не на что: нет ни <$subdir>-prev, ни записанного предыдущего релиза, ни отложенного каталога legacy-* в $relroot."
+            exit 1
+          REMOTE
+            echo "::error::Публикация на Helios не подтверждена: $url — прежнее состояние сайта восстановлено, job завершается ошибкой."
+            echo "Проверьте вручную: ssh -p $HELIOS_PORT $HELIOS_USER@$HELIOS_HOST 'ls -l $HELIOS_HOME_ROOT/$HELIOS_USER/$HELIOS_PUBLIC_DIR'"
+            exit 1
+          fi
+
+          if [ "$ok" -eq 0 ]; then
+            echo "::error::Публикация на Helios не подтверждена: $url"
+            echo "Проверьте вручную: ssh -p $HELIOS_PORT $HELIOS_USER@$HELIOS_HOST 'ls -l $HELIOS_HOME_ROOT/$HELIOS_USER/$HELIOS_PUBLIC_DIR/$HELIOS_SITE_SUBDIR'"
+            exit 1
+          fi
