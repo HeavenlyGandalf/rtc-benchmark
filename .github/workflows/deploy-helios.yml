@@ -382,6 +382,56 @@ jobs:
 
           echo "Секреты и настройки на месте."
 
+      - name: Подготовить SSH-окружение
+        env:
+          HELIOS_SSH_PRIVATE_KEY: ${{ secrets.HELIOS_SSH_PRIVATE_KEY }}
+          HELIOS_SSH_KNOWN_HOSTS: ${{ secrets.HELIOS_SSH_KNOWN_HOSTS }}
+        run: |
+          install -d -m 700 ~/.ssh
+
+          # Приватный ключ живёт только в рамках запуска на runner'е.
+          # tr -d '\r' — защита от ключа, вставленного из редактора с Windows:
+          # встроенные переводы CR приводят к «Invalid format» в ssh.
+          printf '%s\n' "$HELIOS_SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+          # known_hosts берётся из секрета, а не из ssh-keyscan во время
+          # публикации: сверка host key остаётся обязательной
+          # (StrictHostKeyChecking=yes), но проверяет заранее подтверждённый
+          # ключ, а не тот, что подсунул сервер в момент подключения.
+          # StrictHostKeyChecking=no и пустой known_hosts здесь недопустимы.
+          printf '%s\n' "$HELIOS_SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+          test -s ~/.ssh/known_hosts || {
+            echo "::error::Секрет HELIOS_SSH_KNOWN_HOSTS пуст — сверять host key не с чем."
+            exit 1
+          }
+
+          # rsync на Helios есть (проверено: 3.4.1, protocol 32), а на runner
+          # он есть в образе ubuntu-latest. Проверка даёт внятную причину
+          # вместо «rsync: command not found», если образ изменится.
+          command -v rsync >/dev/null || {
+            echo "::error::На runner нет rsync."
+            exit 1
+          }
+          echo "rsync на runner: $(rsync --version | head -1)"
+
+      - name: Подключиться к Helios по SSH
+        env:
+          HELIOS_USER: ${{ secrets.HELIOS_USER }}
+        # Набор опций, повторённый на всех ssh/rsync-шагах ниже: только наш ключ,
+        # только наш known_hosts, никаких интерактивных паролей.
+        # BatchMode=yes запрещает ssh предлагать пароль или passphrase: иначе
+        # шаг остановился бы на запросе ввода, который в CI некому ответить.
+        run: |
+          ssh -p "$HELIOS_PORT" \
+              -o IdentitiesOnly=yes \
+              -o StrictHostKeyChecking=yes \
+              -o BatchMode=yes \
+              -o ConnectTimeout=30 \
+              "$HELIOS_USER@$HELIOS_HOST" \
+              'printf "SSH-доступ получен, хост: %s, rsync на сервере: %s\n" "$(hostname -s)" "$(rsync --version | head -1)"'
+
       - name: Определить схему раскладки и имя цели
         # Здесь решается, куда именно едет сборка: релиз в public_html (main),
         # превью ветки или откат на существующий релиз. Схема (симлинк или mv)
@@ -475,9 +525,17 @@ jobs:
             then
               mode=symlink
               echo "Символические ссылки в public_html доступны — релизная схема со ссылкой current."
-            else
+            elif helios_ssh "'$HELIOS_USER'" true 2>/dev/null; then
+              # Сервер отвечает, значит дело не в SSH, а в запрете ссылок.
               mode=dirswap
               echo "::warning::Символические ссылки в public_html недоступны — схема «выгрузка в соседний каталог + mv»."
+            else
+              # Разница принципиальна: молча уйти на запасную схему при
+              # недоступном сервере — значит опубликовать не то и не заметить
+              # этого. Недоступность SSH здесь ошибка, а не повод сменить схему.
+              echo "::error::Проба не выполнена: до сервера не удалось достучаться по SSH. Схема раскладки не выбрана, публикация остановлена."
+              helios_ssh "'$HELIOS_USER'" true || true
+              exit 1
             fi
           else
             echo "Схема раскладки задана вручную: $mode"
@@ -490,56 +548,6 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
           echo "kind=$kind mode=$mode preview_name=${preview_name:-—}"
-
-      - name: Подготовить SSH-окружение
-        env:
-          HELIOS_SSH_PRIVATE_KEY: ${{ secrets.HELIOS_SSH_PRIVATE_KEY }}
-          HELIOS_SSH_KNOWN_HOSTS: ${{ secrets.HELIOS_SSH_KNOWN_HOSTS }}
-        run: |
-          install -d -m 700 ~/.ssh
-
-          # Приватный ключ живёт только в рамках запуска на runner'е.
-          # tr -d '\r' — защита от ключа, вставленного из редактора с Windows:
-          # встроенные переводы CR приводят к «Invalid format» в ssh.
-          printf '%s\n' "$HELIOS_SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-
-          # known_hosts берётся из секрета, а не из ssh-keyscan во время
-          # публикации: сверка host key остаётся обязательной
-          # (StrictHostKeyChecking=yes), но проверяет заранее подтверждённый
-          # ключ, а не тот, что подсунул сервер в момент подключения.
-          # StrictHostKeyChecking=no и пустой known_hosts здесь недопустимы.
-          printf '%s\n' "$HELIOS_SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/known_hosts
-          test -s ~/.ssh/known_hosts || {
-            echo "::error::Секрет HELIOS_SSH_KNOWN_HOSTS пуст — сверять host key не с чем."
-            exit 1
-          }
-
-          # rsync на Helios есть (проверено: 3.4.1, protocol 32), а на runner
-          # он есть в образе ubuntu-latest. Проверка даёт внятную причину
-          # вместо «rsync: command not found», если образ изменится.
-          command -v rsync >/dev/null || {
-            echo "::error::На runner нет rsync."
-            exit 1
-          }
-          echo "rsync на runner: $(rsync --version | head -1)"
-
-      - name: Подключиться к Helios по SSH
-        env:
-          HELIOS_USER: ${{ secrets.HELIOS_USER }}
-        # Набор опций, повторённый на всех ssh/rsync-шагах ниже: только наш ключ,
-        # только наш known_hosts, никаких интерактивных паролей.
-        # BatchMode=yes запрещает ssh предлагать пароль или passphrase: иначе
-        # шаг остановился бы на запросе ввода, который в CI некому ответить.
-        run: |
-          ssh -p "$HELIOS_PORT" \
-              -o IdentitiesOnly=yes \
-              -o StrictHostKeyChecking=yes \
-              -o BatchMode=yes \
-              -o ConnectTimeout=30 \
-              "$HELIOS_USER@$HELIOS_HOST" \
-              'printf "SSH-доступ получен, хост: %s, rsync на сервере: %s\n" "$(hostname -s)" "$(rsync --version | head -1)"'
 
       - name: Подготовить каталог приёмника
         # Проверки, общие для релизной и запасной схем: public_html должен
