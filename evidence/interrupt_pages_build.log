@@ -1,0 +1,15 @@
+https://github.com/HeavenlyGandalf/rtc-benchmark/actions/runs/36698825693
+run_id=36698825693
+ожидание шага «Установить зависимости»: hit
+отменяю запуск на середине шага «Установить зависимости»
+conclusion=cancelled
+   1 Set up job                                   completed/success
+   2 Получить исходники                           completed/success
+   3 Установить Python                            completed/success
+   4 Установить зависимости                       completed/success
+   5 Собрать сайт в строгом режиме                completed/success
+   6 Сохранить артефакт сборки                    completed/success
+  11 Post Установить Python                       completed/success
+  12 Post Получить исходники                      completed/success
+  13 Complete job                                 completed/success
+RUN_ID=36698825693

@@ -1,0 +1,10 @@
+https://github.com/HeavenlyGandalf/rtc-benchmark/actions/runs/36698690038
+run_id=36698690038
+ожидание шага «Опубликовать в GitHub Pages»: hit
+отменяю запуск на середине шага «Опубликовать в GitHub Pages»
+conclusion=cancelled
+   1 Set up job                                   completed/success
+   2 Настроить GitHub Pages                       completed/success
+   3 Опубликовать в GitHub Pages                  completed/success
+   4 Complete job                                 completed/success
+RUN_ID=36698690038

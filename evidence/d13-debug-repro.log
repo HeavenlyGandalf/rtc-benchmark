@@ -1,0 +1,48 @@
+# D1–D3. Воспроизведение ошибок сборки сайта
+# Дата: 30 сентября 2026. macOS (darwin/arm64), Python 3.14, MkDocs 1.6.1, Material 9.7.7.
+# Проект скопирован из репозитория как есть; менялся только mkdocs.yml.
+
+## D1. Неизвестная опция верхнего уровня base_url
+
+Добавлено в mkdocs.yml рядом с site_url:
+    base_url: "/rtc-benchmark/"
+
+Команда: python -m mkdocs build --strict
+Вывод:
+ │  ⚠  Warning from the Material for MkDocs team
+ │
+ │  MkDocs 2.0, the underlying framework of Material for MkDocs,
+ │  will introduce backward-incompatible changes, including:
+ │
+ │  × All plugins will stop working – the plugin system has been removed
+ │  × All theme overrides will break – the theming system has been rewritten
+ │  × No migration path exists – existing projects cannot be upgraded
+ │  × Closed contribution model – community members can't report bugs
+ │  × Currently unlicensed – unsuitable for production use
+ │
+ │  Our full analysis:
+ │
+ │  https://squidfunk.github.io/mkdocs-material/blog/2026/02/18/mkdocs-2.0/
+WARNING -  Config value 'base_url': Unrecognised configuration name: base_url
+Aborted with 1 configuration warnings in 'strict' mode!
+
+## D2. sitemap.xml собирается пустым
+
+Из mkdocs.yml убрана строка site_url.
+Без site_url:
+  URL в sitemap.xml: 0
+  размер sitemap.xml:      109 байт
+  канонических ссылок на главной: 0
+Контроль — тот же проект с site_url:
+  URL в sitemap.xml: 11
+  первый URL: <loc>https://heavenlygandalf.github.io/rtc-benchmark/</loc>
+  канонических ссылок на главной: 1
+
+## D3. Ссылку нельзя поставить в copyright
+
+В mkdocs.yml: copyright: "[CC BY 4.0](license.md)"
+Подвал главной (выдержка):
+  md-copyright"> <div class="md-copyright__highlight"> [CC BY 4.0](license.md) </div> Made with <a href="https://squidfun
+
+  есть <a href="license.md"> на странице: False
+  цель ссылки как файл: нет, только каталог site/license/

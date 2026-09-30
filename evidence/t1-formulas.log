@@ -1,0 +1,6 @@
+MkDocs   адрес page-04/index.html mjx=1 svg=1 → формула отрисована       «Команды»
+Sphinx   адрес page-04.html      mjx=1 svg=0 → формула отрисована       «Команды»
+Pelican  адрес komandy.html      mjx=0 svg=0 → формула осталась текстом «T1»
+Quarto   адрес page-04.html      mjx=1 svg=0 → формула отрисована       «Команды»
+
+Не разобрались: 1.

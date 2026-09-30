@@ -1,0 +1,6 @@
+run 36698690038: completed/cancelled
+cancel был подан во время шага «Опубликовать в GitHub Pages», но шаг всё равно завершился:
+  [Публикация] 1 Set up job                              2с success
+  [Публикация] 2 Настроить GitHub Pages                  0с success
+  [Публикация] 3 Опубликовать в GitHub Pages             8с success
+  [Публикация] 4 Complete job                            0с success

@@ -1,0 +1,14 @@
+date: 2026-09-30T07:00:48Z
+os: 26.4.1 arm64
+python: Python 3.14.0
+pip: pip 26.2.1 from /private/var/folders/w_/042x4b6n3kdd2qcx63yvl18c0000gn/T/opencode/t1/venv/lib/python3.14/site-packages/pip (python 3.14)
+mkdocs: 1.6.1
+mkdocs-material: 9.7.7
+markdown: 3.11
+pymdown-extensions: 12.1
+sphinx: sphinx-build 9.1.0
+myst-parser: 5.1.0
+sphinx-design: 0.7.0
+docutils: 0.22.4
+pelican: 4.12.0 
+quarto: 1.8.24
