@@ -1,0 +1,29 @@
+# A6. Прерывание выгрузки на Helios, прогон 36696819334
+# Ветка test/interruption-throttle, коммит 3d560737. В этом коммите в workflow
+# были две ТОЛЬКО ТЕСТОВЫЕ правки, которых нет в main: принудительный
+# kind=release для этой ветки и --bwlimit=4 у rsync. Без них отмена не
+# успевала наступить: 1,8 МБ по SSH уходили за 4 секунды.
+
+## Режим публикации: релиз, переключение ссылкой
+
+SHA: 3d560737b3c6d1d2ec34ead0d019833ce3edfb69
+KIND: release
+MODE: symlink
+
+## Команда выгрузки с троттлингом
+
+rsync -rlpt --delete --bwlimit=4 --exclude='.rtc-benchmark' \
+  -e "ssh -p $HELIOS_PORT -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o BatchMode=yes -o ConnectTimeout=30" \
+  site/ $HELIOS_USER@$HELIOS_HOST:$dest/
+
+## Начало выгрузки и отмена
+
+Передача в <каталог релиза 3d560737…>
+##[error]The operation was canceled.
+Cleaning up orphan processes
+Terminate orphan process: pid (2087) (rsync)
+Terminate orphan process: pid (2088) (ssh)
+
+Выгрузка шла с 09:33:35 до 09:49:53 — 16 минут 18 секунд. Шаг
+«Переключить публикацию» не выполнялся: rsync не успел закончить, и
+ссылка current осталась на предыдущем релизе.
