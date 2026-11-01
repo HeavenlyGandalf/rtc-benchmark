@@ -5,6 +5,8 @@ import { MODE_LABELS, type ChannelMode } from './transports/types.js';
 import { fmt } from './util.js';
 import { startWebRtcVideo, type VideoSession, type VideoStats } from './video/webrtcVideo.js';
 import { startWtVideo } from './video/wtVideo.js';
+import { p2pConnect } from './transports/p2pWebrtc.js';
+import { connectWtRelay, fetchServerInfo } from './transports/webtransport.js';
 
 Chart.register(...registerables);
 
@@ -336,3 +338,17 @@ $('btn-video-wt').addEventListener('click', toggleWtVideo);
 $('btn-csv').addEventListener('click', exportCsv);
 checkSupport();
 log('Стенд готов. Запустите сценарии 1–3 и проверки видео.');
+
+// Экспорт измерительного API для автоматического headless-раннера
+// (scripts/run-series.mjs вызывает его через page.evaluate и получает сырые
+// числа, а не текст из DOM). На работу UI не влияет.
+(window as unknown as { __bench: Record<string, unknown> }).__bench = {
+  BenchSession,
+  runSetupTest,
+  runRttTest,
+  runThroughputTest,
+  MODES,
+  p2pConnect,
+  connectWtRelay,
+  fetchServerInfo,
+};

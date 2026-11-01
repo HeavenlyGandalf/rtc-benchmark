@@ -4,6 +4,7 @@ import type { BenchChannel, ChannelMode } from './types.js';
 export interface ServerInfo {
   certHash: string;
   wtUrl: string;
+  wtRelayUrl?: string;
 }
 
 function hexToBytes(hex: string): Uint8Array {
@@ -25,6 +26,21 @@ export async function connectWebTransport(info: ServerInfo): Promise<{ wt: WebTr
   });
   await wt.ready;
   return { wt, setupMs: performance.now() - t0 };
+}
+
+/** Соединение с relay-путём WebTransport (/relay): сервер пересылает дейтаграммы
+ * другому пиру. Используется в multi-host-сравнении H1 (клиент-серверный путь). */
+export async function connectWtRelay(
+  info: ServerInfo,
+): Promise<{ wt: WebTransport; channel: WtDatagramChannel; setupMs: number }> {
+  const url = info.wtRelayUrl ?? info.wtUrl.replace(/\/echo$/, '/relay');
+  const t0 = performance.now();
+  const wt = new WebTransport(url, {
+    serverCertificateHashes: [{ algorithm: 'sha-256', value: hexToBytes(info.certHash).buffer as ArrayBuffer }],
+  });
+  await wt.ready;
+  const channel = new WtDatagramChannel(wt);
+  return { wt, channel, setupMs: performance.now() - t0 };
 }
 
 /** Надёжный двунаправленный QUIC-поток с кадрированием [u32 длина][payload]. */
