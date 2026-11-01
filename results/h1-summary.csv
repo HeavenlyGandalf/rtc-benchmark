@@ -1,0 +1,4 @@
+﻿profile;p2p_rtt_ms;p2p_rtt_sd;relay_rtt_ms;relay_rtt_sd;relay_to_p2p_ratio;ratio_sd;p2p_setup_ms;relay_setup_ms;runs
+4g;113.00;0.00;206.40;0.00;1.83;0.00;1493.6;364.8;1
+lan;1.80;0.00;2.60;0.00;1.44;0.00;459.5;11.3;1
+wifi;35.90;0.00;69.90;0.00;1.95;0.00;837.5;86.9;1

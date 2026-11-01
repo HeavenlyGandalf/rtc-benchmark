@@ -1,0 +1,1946 @@
+[
+  {
+    "profile": "4g",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "p95, мс",
+    "value": 233.39999997615814,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "p99, мс",
+    "value": 249.59999999403954,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "σ, мс",
+    "value": 42.36184953312193,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "джиттер, мс",
+    "value": 21.471664513143796,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "медиана, мс",
+    "value": 112.09999999403954,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "потери, %",
+    "value": 0,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "p95, мс",
+    "value": 125.59999999403954,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "p99, мс",
+    "value": 143.7000000178814,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "σ, мс",
+    "value": 13.62247701768403,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "джиттер, мс",
+    "value": 13.393290622298263,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "медиана, мс",
+    "value": 105,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "потери, %",
+    "value": 2.5,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "p95, мс",
+    "value": 124.80000001192093,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "p99, мс",
+    "value": 128.69999998807907,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "σ, мс",
+    "value": 12.201992356654678,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "джиттер, мс",
+    "value": 16.282330915329965,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "медиана, мс",
+    "value": 105.09999999403954,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "потери, %",
+    "value": 0.5,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "p95, мс",
+    "value": 195.7000000178814,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "p99, мс",
+    "value": 228.59999999403954,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "σ, мс",
+    "value": 29.789962400104223,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "джиттер, мс",
+    "value": 13.029246303811398,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "медиана, мс",
+    "value": 108.30000001192093,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "потери, %",
+    "value": 0,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "Пропускная способность",
+    "transport": "WebRTC/надёжный",
+    "metric": "Мбит/с",
+    "value": 0.7451365333240685,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "Пропускная способность",
+    "transport": "WebRTC/надёжный",
+    "metric": "потери, %",
+    "value": 54.54545454545454,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "Пропускная способность",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "Мбит/с",
+    "value": 0.2377076532461598,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "Пропускная способность",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "потери, %",
+    "value": 68.18181818181817,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "Пропускная способность",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "Мбит/с",
+    "value": 0.8480426027625229,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "Пропускная способность",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "потери, %",
+    "value": 7.394366197183098,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "Пропускная способность",
+    "transport": "WebTransport/поток",
+    "metric": "Мбит/с",
+    "value": 1.3714257578088938,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "Пропускная способность",
+    "transport": "WebTransport/поток",
+    "metric": "потери, %",
+    "value": 5.555555555555555,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "Установление",
+    "transport": "WebRTC",
+    "metric": "медиана, мс",
+    "value": 679.1999999880791,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "Установление",
+    "transport": "WebRTC",
+    "metric": "среднее, мс",
+    "value": 791.6466666688522,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "Установление",
+    "transport": "WebTransport",
+    "metric": "медиана, мс",
+    "value": 228.09999999403954,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "4g",
+    "scenario": "Установление",
+    "transport": "WebTransport",
+    "metric": "среднее, мс",
+    "value": 236.36333333452544,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "p95, мс",
+    "value": 97.09999999403954,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "p99, мс",
+    "value": 140.90000000596046,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "σ, мс",
+    "value": 16.84795845302096,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "джиттер, мс",
+    "value": 7.310044771321641,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "медиана, мс",
+    "value": 54.099999994039536,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "потери, %",
+    "value": 0,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "p95, мс",
+    "value": 65.5,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "p99, мс",
+    "value": 68,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "σ, мс",
+    "value": 6.987062615291823,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "джиттер, мс",
+    "value": 8.015975310339465,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "медиана, мс",
+    "value": 53.80000001192093,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "потери, %",
+    "value": 0,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "p95, мс",
+    "value": 65.2999999821186,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "p99, мс",
+    "value": 68.69999998807907,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "σ, мс",
+    "value": 6.806404612308816,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "джиттер, мс",
+    "value": 9.491988459894433,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "медиана, мс",
+    "value": 53.400000005960464,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "потери, %",
+    "value": 0,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "p95, мс",
+    "value": 67.5,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "p99, мс",
+    "value": 120.90000000596046,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "σ, мс",
+    "value": 10.775583963296095,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "джиттер, мс",
+    "value": 7.910969957863234,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "медиана, мс",
+    "value": 56,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "потери, %",
+    "value": 0,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "Пропускная способность",
+    "transport": "WebRTC/надёжный",
+    "metric": "Мбит/с",
+    "value": 1.5079365601166834,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "Пропускная способность",
+    "transport": "WebRTC/надёжный",
+    "metric": "потери, %",
+    "value": 36.36363636363637,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "Пропускная способность",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "Мбит/с",
+    "value": 0.7446257328556194,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "Пропускная способность",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "потери, %",
+    "value": 62.121212121212125,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "Пропускная способность",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "Мбит/с",
+    "value": 1.8923509284901299,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "Пропускная способность",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "потери, %",
+    "value": 3.9215686274509802,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "Пропускная способность",
+    "transport": "WebTransport/поток",
+    "metric": "Мбит/с",
+    "value": 2.4273395284187744,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "Пропускная способность",
+    "transport": "WebTransport/поток",
+    "metric": "потери, %",
+    "value": 0,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "Установление",
+    "transport": "WebRTC",
+    "metric": "медиана, мс",
+    "value": 414,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "Установление",
+    "transport": "WebRTC",
+    "metric": "среднее, мс",
+    "value": 417.7066666652759,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "Установление",
+    "transport": "WebTransport",
+    "metric": "медиана, мс",
+    "value": 121.59999999403954,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "5g",
+    "scenario": "Установление",
+    "transport": "WebTransport",
+    "metric": "среднее, мс",
+    "value": 124.46333333551884,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "p95, мс",
+    "value": 2,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "p99, мс",
+    "value": 2.300000011920929,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "σ, мс",
+    "value": 0.37012666704524083,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "джиттер, мс",
+    "value": 0.30836976378557956,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "медиана, мс",
+    "value": 1.2999999821186066,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "потери, %",
+    "value": 0,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "p95, мс",
+    "value": 2.100000023841858,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "p99, мс",
+    "value": 2.5999999940395355,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "σ, мс",
+    "value": 0.3796284366993555,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "джиттер, мс",
+    "value": 0.26183057254755954,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "медиана, мс",
+    "value": 1.300000011920929,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "потери, %",
+    "value": 0,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "p95, мс",
+    "value": 2.5,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "p99, мс",
+    "value": 3.300000011920929,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "σ, мс",
+    "value": 0.6656658308901666,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "джиттер, мс",
+    "value": 0.31687893250674104,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "медиана, мс",
+    "value": 1.4000000059604645,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "потери, %",
+    "value": 0,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "p95, мс",
+    "value": 2.4000000059604645,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "p99, мс",
+    "value": 2.699999988079071,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "σ, мс",
+    "value": 0.42004731907469994,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "джиттер, мс",
+    "value": 0.42951777772997757,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "медиана, мс",
+    "value": 1.699999988079071,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "потери, %",
+    "value": 0,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "Пропускная способность",
+    "transport": "WebRTC/надёжный",
+    "metric": "Мбит/с",
+    "value": 446.26656465275937,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "Пропускная способность",
+    "transport": "WebRTC/надёжный",
+    "metric": "потери, %",
+    "value": 0,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "Пропускная способность",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "Мбит/с",
+    "value": 426.4171822416281,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "Пропускная способность",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "потери, %",
+    "value": 6.801488123628732,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "Пропускная способность",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "Мбит/с",
+    "value": 99.62484183880329,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "Пропускная способность",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "потери, %",
+    "value": 0,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "Пропускная способность",
+    "transport": "WebTransport/поток",
+    "metric": "Мбит/с",
+    "value": 386.58508298417127,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "Пропускная способность",
+    "transport": "WebTransport/поток",
+    "metric": "потери, %",
+    "value": 0,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "Установление",
+    "transport": "WebRTC",
+    "metric": "медиана, мс",
+    "value": 134.80000001192093,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "Установление",
+    "transport": "WebRTC",
+    "metric": "среднее, мс",
+    "value": 136.20999999642373,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "Установление",
+    "transport": "WebTransport",
+    "metric": "медиана, мс",
+    "value": 7,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lan",
+    "scenario": "Установление",
+    "transport": "WebTransport",
+    "metric": "среднее, мс",
+    "value": 6.9299999942382176,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "p95, мс",
+    "value": 47.70000001788139,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "p99, мс",
+    "value": 48.29999998211861,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "σ, мс",
+    "value": 1.1555362388667587,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "джиттер, мс",
+    "value": 1.5476569913381288,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "медиана, мс",
+    "value": 45.30000001192093,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "потери, %",
+    "value": 0,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "p95, мс",
+    "value": 48.19999998807907,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "p99, мс",
+    "value": 48.80000001192093,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "σ, мс",
+    "value": 1.3751798950037346,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "джиттер, мс",
+    "value": 1.332434174037431,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "медиана, мс",
+    "value": 45.099999994039536,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "потери, %",
+    "value": 0,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "p95, мс",
+    "value": 47.099999994039536,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "p99, мс",
+    "value": 47.80000001192093,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "σ, мс",
+    "value": 1.1127038027796239,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "джиттер, мс",
+    "value": 1.4113558876444667,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "медиана, мс",
+    "value": 45.099999994039536,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "потери, %",
+    "value": 0,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "p95, мс",
+    "value": 48.19999998807907,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "p99, мс",
+    "value": 49.599999994039536,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "σ, мс",
+    "value": 1.433425877428484,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "джиттер, мс",
+    "value": 0.9488928030803061,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "медиана, мс",
+    "value": 45.69999998807907,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "потери, %",
+    "value": 0,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "Пропускная способность",
+    "transport": "WebRTC/надёжный",
+    "metric": "Мбит/с",
+    "value": 1.684946651243747,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "Пропускная способность",
+    "transport": "WebRTC/надёжный",
+    "metric": "потери, %",
+    "value": 71.83098591549296,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "Пропускная способность",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "Мбит/с",
+    "value": 0.08497973220577872,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "Пропускная способность",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "потери, %",
+    "value": 77.66990291262135,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "Пропускная способность",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "Мбит/с",
+    "value": 2.5057674511550663,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "Пропускная способность",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "потери, %",
+    "value": 0.8928571428571428,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "Пропускная способность",
+    "transport": "WebTransport/поток",
+    "metric": "Мбит/с",
+    "value": 2.707924333413526,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "Пропускная способность",
+    "transport": "WebTransport/поток",
+    "metric": "потери, %",
+    "value": 0,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "Установление",
+    "transport": "WebRTC",
+    "metric": "медиана, мс",
+    "value": 372.90000000596046,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "Установление",
+    "transport": "WebRTC",
+    "metric": "среднее, мс",
+    "value": 372.3699999988079,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "Установление",
+    "transport": "WebTransport",
+    "metric": "медиана, мс",
+    "value": 109.30000001192093,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "limited",
+    "scenario": "Установление",
+    "transport": "WebTransport",
+    "metric": "среднее, мс",
+    "value": 108.59333333571752,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "p95, мс",
+    "value": 248.59999999403954,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "p99, мс",
+    "value": 311.2999999821186,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "σ, мс",
+    "value": 59.62510603257884,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "джиттер, мс",
+    "value": 13.69877101245121,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "медиана, мс",
+    "value": 121.40000000596046,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "потери, %",
+    "value": 1.5,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "p95, мс",
+    "value": 88.30000001192093,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "p99, мс",
+    "value": 120.30000001192093,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "σ, мс",
+    "value": 5.036478384460355,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "джиттер, мс",
+    "value": 1.349947693048371,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "медиана, мс",
+    "value": 83.7000000178814,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "потери, %",
+    "value": 10,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "p95, мс",
+    "value": 86.40000000596046,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "p99, мс",
+    "value": 88.39999997615814,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "σ, мс",
+    "value": 1.182177554729253,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "джиттер, мс",
+    "value": 1.088788205596725,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "медиана, мс",
+    "value": 84.30000001192093,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "потери, %",
+    "value": 10.5,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "p95, мс",
+    "value": 189.7000000178814,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "p99, мс",
+    "value": 192.69999998807907,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "σ, мс",
+    "value": 38.285109946728994,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "джиттер, мс",
+    "value": 8.625312223622345,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "медиана, мс",
+    "value": 86,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "потери, %",
+    "value": 0,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "Пропускная способность",
+    "transport": "WebRTC/надёжный",
+    "metric": "Мбит/с",
+    "value": 0.6472518584766127,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "Пропускная способность",
+    "transport": "WebRTC/надёжный",
+    "metric": "потери, %",
+    "value": 43.93939393939394,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "Пропускная способность",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "Мбит/с",
+    "value": 0.11526562486277393,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "Пропускная способность",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "потери, %",
+    "value": 84.84848484848484,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "Пропускная способность",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "Мбит/с",
+    "value": 1.2429983755005227,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "Пропускная способность",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "потери, %",
+    "value": 23.818897637795274,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "Пропускная способность",
+    "transport": "WebTransport/поток",
+    "metric": "Мбит/с",
+    "value": 1.8152873780295875,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "Пропускная способность",
+    "transport": "WebTransport/поток",
+    "metric": "потери, %",
+    "value": 15.384615384615385,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "Установление",
+    "transport": "WebRTC",
+    "metric": "медиана, мс",
+    "value": 581,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "Установление",
+    "transport": "WebRTC",
+    "metric": "среднее, мс",
+    "value": 832.7133333305518,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "Установление",
+    "transport": "WebTransport",
+    "metric": "медиана, мс",
+    "value": 179.09999999403954,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "lossy",
+    "scenario": "Установление",
+    "transport": "WebTransport",
+    "metric": "среднее, мс",
+    "value": 238.12999999622505,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "p95, мс",
+    "value": 92.90000000596046,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "p99, мс",
+    "value": 109.89999997615814,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "σ, мс",
+    "value": 19.809614931274464,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "джиттер, мс",
+    "value": 8.22700750464625,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "медиана, мс",
+    "value": 35.19999998807907,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "RTT",
+    "transport": "WebRTC/надёжный",
+    "metric": "потери, %",
+    "value": 0,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "p95, мс",
+    "value": 40.599999994039536,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "p99, мс",
+    "value": 42.80000001192093,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "σ, мс",
+    "value": 4.378634788935099,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "джиттер, мс",
+    "value": 4.81657162502346,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "медиана, мс",
+    "value": 33.5,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "RTT",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "потери, %",
+    "value": 3,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "p95, мс",
+    "value": 40.80000001192093,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "p99, мс",
+    "value": 43.69999998807907,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "σ, мс",
+    "value": 4.61745028166818,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "джиттер, мс",
+    "value": 5.549002865241623,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "медиана, мс",
+    "value": 33.900000005960464,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "RTT",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "потери, %",
+    "value": 1,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "p95, мс",
+    "value": 44.5,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "p99, мс",
+    "value": 81.30000001192093,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "σ, мс",
+    "value": 7.798335143446712,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "джиттер, мс",
+    "value": 5.479178728791486,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "медиана, мс",
+    "value": 35.29999998211861,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "RTT",
+    "transport": "WebTransport/поток",
+    "metric": "потери, %",
+    "value": 0,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "Пропускная способность",
+    "transport": "WebRTC/надёжный",
+    "metric": "Мбит/с",
+    "value": 2.3880330312499187,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "Пропускная способность",
+    "transport": "WebRTC/надёжный",
+    "metric": "потери, %",
+    "value": 25.961538461538463,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "Пропускная способность",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "Мбит/с",
+    "value": 1.5130887414975613,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "Пропускная способность",
+    "transport": "WebRTC/ненадёжный",
+    "metric": "потери, %",
+    "value": 46.601941747572816,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "Пропускная способность",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "Мбит/с",
+    "value": 2.648545835974755,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "Пропускная способность",
+    "transport": "WebTransport/дейтаграмма",
+    "metric": "потери, %",
+    "value": 13.941299790356393,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "Пропускная способность",
+    "transport": "WebTransport/поток",
+    "metric": "Мбит/с",
+    "value": 3.3169139278332684,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "Пропускная способность",
+    "transport": "WebTransport/поток",
+    "metric": "потери, %",
+    "value": 0,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "Установление",
+    "transport": "WebRTC",
+    "metric": "медиана, мс",
+    "value": 309.09999999403954,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "Установление",
+    "transport": "WebRTC",
+    "metric": "среднее, мс",
+    "value": 346.3399999976158,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "Установление",
+    "transport": "WebTransport",
+    "metric": "медиана, мс",
+    "value": 78.59999999403954,
+    "runs": 1,
+    "stddev": 0
+  },
+  {
+    "profile": "wifi",
+    "scenario": "Установление",
+    "transport": "WebTransport",
+    "metric": "среднее, мс",
+    "value": 80.89666666785875,
+    "runs": 1,
+    "stddev": 0
+  }
+]
