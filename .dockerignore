@@ -1,0 +1,14 @@
+.git
+node_modules
+.pnp.cjs
+.pnp.loader.mjs
+results
+site
+_bmad
+_bmad-output
+.claude
+.venv-docs
+.opencode
+docs/assets
+**/*.png
+.DS_Store

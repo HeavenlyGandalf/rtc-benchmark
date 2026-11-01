@@ -1,0 +1,19 @@
+# Запуск эксперимента: docker compose -f experiment/compose.yml run --rm bench
+# Результаты пишутся в ./results на хосте (том смонтирован).
+services:
+  bench:
+    build:
+      context: ..
+      dockerfile: experiment/Dockerfile
+    cap_add:
+      - NET_ADMIN          # нужно для tc netem на lo
+    volumes:
+      - ../results:/app/results
+    environment:
+      # Список профилей через пробел; можно сузить: PROFILES="lan lossy".
+      PROFILES: "lan wifi 4g 5g lossy limited"
+      # Параметры серии (см. scripts/run-series.mjs).
+      REPS: "30"
+      RTT_COUNT: "200"
+      RTT_INTERVAL: "10"
+      TP_DURATION: "3"

@@ -1,0 +1,8 @@
+{
+  "lan":     { "label": "LAN (базовая линия)", "delay": "0ms",       "loss": "0%",   "rate": "" },
+  "wifi":    { "label": "Wi-Fi",               "delay": "15ms 5ms",  "loss": "0.5%", "rate": "" },
+  "4g":      { "label": "4G",                  "delay": "50ms 15ms", "loss": "1%",   "rate": "" },
+  "5g":      { "label": "5G",                  "delay": "25ms 8ms",  "loss": "0.2%", "rate": "" },
+  "lossy":   { "label": "Потери 5%",           "delay": "40ms",      "loss": "5%",   "rate": "" },
+  "limited": { "label": "Полоса 5 Мбит/с",     "delay": "20ms",      "loss": "0%",   "rate": "5mbit" }
+}

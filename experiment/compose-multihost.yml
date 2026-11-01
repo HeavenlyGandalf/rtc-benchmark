@@ -1,0 +1,52 @@
+# Multi-host стенд для проверки H1: три контейнера на bridge-сети с netem.
+#   server — стенд (сигналинг + WebTransport echo/relay + WebRTC echo)
+#   peerB  — отвечающий пир (эхо для P2P и relay)
+#   peerA  — измеряющий пир (P2P RTT vs relay RTT), пишет results/raw/h1-*.json
+#
+# Запуск одного профиля:
+#   PROFILE=4g docker compose -f experiment/compose-multihost.yml up \
+#       --abort-on-container-exit --exit-code-from peerA
+# Требует собранного образа rtc-bench-exp (docker build -f experiment/Dockerfile .).
+services:
+  server:
+    image: rtc-bench-exp
+    cap_add: [NET_ADMIN]
+    environment:
+      ROLE: server
+      PROFILE: ${PROFILE:-lan}
+    command: bash experiment/peer-entry.sh
+    networks: [benchnet]
+
+  peerB:
+    image: rtc-bench-exp
+    cap_add: [NET_ADMIN]
+    depends_on: [server]
+    environment:
+      ROLE: peerB
+      PROFILE: ${PROFILE:-lan}
+      BENCH_URL: http://server:8080
+    volumes:
+      - ../scripts/run-peer-b.mjs:/app/scripts/run-peer-b.mjs:ro
+    command: bash experiment/peer-entry.sh
+    networks: [benchnet]
+
+  peerA:
+    image: rtc-bench-exp
+    cap_add: [NET_ADMIN]
+    depends_on: [server, peerB]
+    environment:
+      ROLE: peerA
+      PROFILE: ${PROFILE:-lan}
+      BENCH_URL: http://server:8080
+      H1_COUNT: ${H1_COUNT:-200}
+      H1_INTERVAL: ${H1_INTERVAL:-10}
+    volumes:
+      - ../results:/app/results
+      - ../scripts/run-peer-a.mjs:/app/scripts/run-peer-a.mjs:ro
+      - ../scripts/aggregate-h1.mjs:/app/scripts/aggregate-h1.mjs:ro
+    command: bash experiment/peer-entry.sh
+    networks: [benchnet]
+
+networks:
+  benchnet:
+    driver: bridge
