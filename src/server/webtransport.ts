@@ -23,10 +23,52 @@ export async function startWebTransportServer(opts: WtServerOptions): Promise<Ht
 
   server.startServer();
   await server.ready;
-  console.log(`[WT]   WebTransport (HTTP/3) слушает udp://${opts.host}:${opts.port}, путь /echo`);
+  console.log(`[WT]   WebTransport (HTTP/3) слушает udp://${opts.host}:${opts.port}, пути /echo, /relay`);
 
   acceptSessions(server).catch((err) => console.error('[WT] accept loop error:', err));
+  acceptRelaySessions(server).catch((err) => console.error('[WT] relay loop error:', err));
   return server;
+}
+
+// Relay-путь для multi-host-сравнения (H1): сервер пересёт дейтаграммы между
+// ДВУМЯ пирами (A→сервер→B и обратно), в отличие от /echo (возврат отправителю).
+// Это даёт клиент-серверный путь с «серверным хопом» для сравнения с прямым P2P.
+interface RelayPeer {
+  writer: { write(v: Uint8Array): Promise<void> };
+  partner: RelayPeer | null;
+}
+
+async function acceptRelaySessions(server: Http3Server): Promise<void> {
+  const reader = server.sessionStream('/relay').getReader();
+  let pending: RelayPeer | null = null;
+  for (;;) {
+    const { done, value: session } = await reader.read();
+    if (done) break;
+    (async () => {
+      await (session as any).ready;
+      const writer = (session as any).datagrams.writable.getWriter();
+      const self: RelayPeer = { writer, partner: null };
+      // Блок без await — атомарное связывание первых двух сессий в пару.
+      if (pending) {
+        const other: RelayPeer = pending;
+        self.partner = other;
+        other.partner = self;
+        pending = null;
+        console.log('[WT]   relay: пара пиров образована');
+      } else {
+        pending = self;
+      }
+      const r = (session as any).datagrams.readable.getReader();
+      (async () => {
+        for (;;) {
+          const { done, value } = await r.read();
+          if (done) break;
+          if (self.partner) self.partner.writer.write(value).catch(() => {});
+        }
+      })().catch(() => {});
+      (session as any).closed.then(() => { if (pending === self) pending = null; }).catch(() => {});
+    })().catch((err) => console.error('[WT] relay session error:', err));
+  }
 }
 
 async function acceptSessions(server: Http3Server): Promise<void> {

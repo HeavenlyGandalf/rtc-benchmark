@@ -49,6 +49,11 @@ const MIME: Record<string, string> = {
   '.svg': 'image/svg+xml',
 };
 
+// Состояние сигналинга P2P (одна комната): offer/answer двух браузерных пиров.
+let p2pOffer: string | null = null;
+let p2pAnswer: string | null = null;
+let peerReady = false;
+
 function readBody(req: IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
@@ -74,6 +79,7 @@ const httpServer = createServer(async (req, res) => {
       sendJson(res, 200, {
         certHash: certHashHex,
         wtUrl: `https://${wtHost}:${WT_PORT}/echo`,
+        wtRelayUrl: `https://${wtHost}:${WT_PORT}/relay`,
       });
       return;
     }
@@ -82,6 +88,47 @@ const httpServer = createServer(async (req, res) => {
       const { sdp } = JSON.parse(await readBody(req));
       const answer = await handleWebRtcOffer(sdp);
       sendJson(res, 200, answer);
+      return;
+    }
+
+    // --- P2P WebRTC: сервер ТОЛЬКО ретранслирует SDP между двумя браузерными
+    // пирами (в передаче данных не участвует). Одна комната в памяти.
+    // Без trickle ICE: пиры присылают SDP с уже собранными кандидатами. ---
+    if (url.pathname === '/api/p2p/reset' && req.method === 'POST') {
+      p2pOffer = null;
+      p2pAnswer = null;
+      sendJson(res, 200, { ok: true });
+      return;
+    }
+
+    // Простой флаг готовности для синхронизации контейнеров в multi-host-прогоне:
+    // отвечающий пир (peerB) выставляет его, измеряющий (peerA) ждёт.
+    if (url.pathname === '/api/ready') {
+      if (req.method === 'POST') {
+        peerReady = true;
+        sendJson(res, 200, { ok: true });
+      } else {
+        sendJson(res, 200, { ready: peerReady });
+      }
+      return;
+    }
+    if (url.pathname === '/api/p2p/offer') {
+      if (req.method === 'POST') {
+        p2pOffer = JSON.parse(await readBody(req)).sdp;
+        p2pAnswer = null;
+        sendJson(res, 200, { ok: true });
+      } else {
+        sendJson(res, 200, { sdp: p2pOffer });
+      }
+      return;
+    }
+    if (url.pathname === '/api/p2p/answer') {
+      if (req.method === 'POST') {
+        p2pAnswer = JSON.parse(await readBody(req)).sdp;
+        sendJson(res, 200, { ok: true });
+      } else {
+        sendJson(res, 200, { sdp: p2pAnswer });
+      }
       return;
     }
 
