@@ -30,6 +30,10 @@
     "test": "yarn test:rtc && yarn test:wt",
     "test:rtc": "node scripts/test-rtc-echo.mjs",
     "test:wt": "node scripts/test-wt-echo.mjs",
-    "e2e": "node scripts/e2e.mjs"
+    "e2e": "node scripts/e2e.mjs",
+    "series": "node scripts/run-series.mjs",
+    "scale": "node scripts/run-scale.mjs",
+    "p2p": "node scripts/run-p2p.mjs",
+    "aggregate": "node scripts/aggregate.mjs"
   }
 }
