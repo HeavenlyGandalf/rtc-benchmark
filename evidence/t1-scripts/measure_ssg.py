@@ -8,17 +8,29 @@
 Учитывается всё, что реально делает пользователь: для MkDocs — `mkdocs build`,
 для Sphinx — `sphinx-build`, для Pelican — `pelican`, для Quarto — `quarto
 render` (это внешний процесс на Node, время снимается целиком).
+
+Что нужно поставить перед запуском:
+
+  python3 -m venv evidence/t1-scripts/venv
+  evidence/t1-scripts/venv/bin/pip install mkdocs mkdocs-material sphinx \
+      myst-parser pelican
+  # Quarto ставится отдельно, распаковкой архива в evidence/t1-scripts/quarto
+
+Пути можно переопределить переменными окружения T1_VENV_BIN и T1_QUARTO,
+если venv и Quarto лежат в другом месте. Папки venv/, quarto/ и ssg/ в
+репозиторий не кладутся — они создаются этим скриптом и его напарником.
 """
 import os
 import shutil
 import statistics
 import subprocess
+import sys
 import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, "ssg")
-VENV = os.path.join(HERE, "venv", "bin")
-QUARTO = os.path.join(HERE, "quarto", "bin", "quarto")
+VENV = os.environ.get("T1_VENV_BIN", os.path.join(HERE, "venv", "bin"))
+QUARTO = os.environ.get("T1_QUARTO", os.path.join(HERE, "quarto", "bin", "quarto"))
 RUNS = 5
 
 TOOLS = [
@@ -44,6 +56,27 @@ OUT_DIRS = {
     "pelican": "output",
     "quarto": "_site",
 }
+
+
+def preflight():
+    """Проверяет, что всё нужное на месте, до начала замеров."""
+    wanted = [
+        ("mkdocs", os.path.join(VENV, "mkdocs")),
+        ("sphinx", os.path.join(VENV, "python")),
+        ("pelican", os.path.join(VENV, "pelican")),
+        ("quarto", QUARTO),
+    ]
+    missing = [(n, p) for n, p in wanted if not os.path.exists(p)]
+    if missing:
+        print("Не хватает инструментов:", file=sys.stderr)
+        for name, path in missing:
+            print(f"  {name}: {path}", file=sys.stderr)
+        print(
+            "\nСоздайте venv и поставьте зависимости, см. шапку скрипта.\n"
+            "Пути переопределяются через T1_VENV_BIN и T1_QUARTO.",
+            file=sys.stderr,
+        )
+        raise SystemExit(1)
 
 
 def clean(sub):
@@ -94,6 +127,8 @@ def dir_stats(path):
                 html += 1
     return total, files, html
 
+
+preflight()
 
 env = dict(os.environ)
 env["PATH"] = f"{VENV}:{env.get('PATH', '')}"

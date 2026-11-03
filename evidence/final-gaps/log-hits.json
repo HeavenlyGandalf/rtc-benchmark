@@ -1,0 +1,247 @@
+[
+ {
+  "run": 36704097410,
+  "sha": "a3b161b",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T10:43:24.2405084Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T10:43:24.2405739Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T10:43:24.2406473Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T10:43:24.2407129Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36703517132,
+  "sha": "c1e4e9d",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T10:37:45.7340630Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T10:37:45.7342101Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T10:37:45.7343870Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T10:37:45.7345386Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36699975134,
+  "sha": "3658a9f",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T10:03:21.0119057Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T10:03:21.0119309Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T10:03:21.0119585Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T10:03:21.0119821Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36699785464,
+  "sha": "04d31b0",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T10:01:27.2134164Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T10:01:27.2135074Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T10:01:27.2136057Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T10:01:27.2136923Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36696819334,
+  "sha": "3d56073",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T09:33:27.3521400Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T09:33:27.3522845Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T09:33:27.3524438Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T09:33:27.3525898Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36696371747,
+  "sha": "ce51620",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T09:31:20.6564545Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T09:31:20.6565061Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T09:31:20.6565609Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T09:31:20.6566093Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36696358327,
+  "sha": "ce51620",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T09:29:06.0617765Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T09:29:06.0619221Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T09:29:06.0621055Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T09:29:06.0622518Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36696142743,
+  "sha": "785edb0",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T09:27:04.0500845Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T09:27:04.0502226Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T09:27:04.0503779Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T09:27:04.0505189Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36694482294,
+  "sha": "785edb0",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T09:11:37.3824933Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T09:11:37.3826328Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T09:11:37.3827820Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T09:11:37.3829213Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36692373262,
+  "sha": "785edb0",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T08:52:20.0982934Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T08:52:20.0984316Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T08:52:20.0985811Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T08:52:20.0987211Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36692260261,
+  "sha": "785edb0",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T08:51:17.5016811Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T08:51:17.5017714Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T08:51:17.5018671Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T08:51:17.5019531Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36692147308,
+  "sha": "785edb0",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T08:50:09.5359906Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T08:50:09.5360680Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T08:50:09.5361517Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T08:50:09.5362400Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36692035881,
+  "sha": "785edb0",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T08:49:07.0435242Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T08:49:07.0436257Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T08:49:07.0437368Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T08:49:07.0438388Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36691926269,
+  "sha": "785edb0",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T08:48:04.4392191Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T08:48:04.4393283Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T08:48:04.4394402Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T08:48:04.4395425Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36690988840,
+  "sha": "785edb0",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T08:39:15.4948195Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T08:39:15.4949086Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T08:39:15.4950075Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T08:39:15.4950965Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36690831698,
+  "sha": "b10258a",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T08:37:39.5857274Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T08:37:39.5857565Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T08:37:39.5857877Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T08:37:39.5858147Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36690124477,
+  "sha": "ecc2abb",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T08:30:54.9345532Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T08:30:54.9346594Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T08:30:54.9347544Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T08:30:54.9348401Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36689761249,
+  "sha": "ecc2abb",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T08:27:26.3330164Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T08:27:26.3330542Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T08:27:26.3330936Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T08:27:26.3331297Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36689552308,
+  "sha": "ecc2abb",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T08:25:21.3809218Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T08:25:21.3810148Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T08:25:21.3811139Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T08:25:21.3812015Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36689080729,
+  "sha": "ecc2abb",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T08:20:56.0224379Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T08:20:56.0225245Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T08:20:56.0226192Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T08:20:56.0227058Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36688851742,
+  "sha": "ecc2abb",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T08:18:31.6939202Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T08:18:31.6939751Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T08:18:31.6940358Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T08:18:31.6940923Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36688641330,
+  "sha": "c897a23",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T08:16:24.1225318Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T08:16:24.1225806Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T08:16:24.1226317Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T08:16:24.1226759Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36687814683,
+  "sha": "9adbcf8",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T08:08:23.6532285Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T08:08:23.6533225Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T08:08:23.6534215Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T08:08:23.6535110Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36686555993,
+  "sha": "84a0b0a",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T07:56:06.0103687Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T07:56:06.0104384Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T07:56:06.0105088Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T07:56:06.0105706Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36685023968,
+  "sha": "ec258d7",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T07:40:33.8381408Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T07:40:33.8382964Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T07:40:33.8384689Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T07:40:33.8386176Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36684813754,
+  "sha": "3926f86",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T07:38:42.1126436Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T07:38:42.1126981Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T07:38:42.1127554Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T07:38:42.1128059Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36684539071,
+  "sha": "45cc6a8",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Host key verification",
+  "ctx": "o | 2026-09-30T07:35:39.9666179Z ##[endgroup] | 2026-09-30T07:35:41.1520363Z No ED25519 host key is known for [helios.cs.ifmo.ru]:2222 and you have requested strict checking. | 2026-09-30T07:35:41.1521227Z Host key verification failed. | 2026-09-30T07:35:41.1541862Z ##[warning]Символические ссылки в public_html недоступны — схема «выгрузка в соседний каталог + mv». | 2026-09-30T07:35:41.1547857Z kind=release mode=dirswap previe"
+ },
+ {
+  "run": 36684539071,
+  "sha": "45cc6a8",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T07:35:41.1603972Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T07:35:41.1604413Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T07:35:41.1604916Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T07:35:41.1605329Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36684350474,
+  "sha": "c3e0dea",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Host key verification",
+  "ctx": "eat-helios-rsync-releases-preview-c3e0dea». | 2026-09-30T07:33:45.2126664Z No ED25519 host key is known for [helios.cs.ifmo.ru]:2222 and you have requested strict checking. | 2026-09-30T07:33:45.2127057Z Host key verification failed. | 2026-09-30T07:33:45.2145924Z ##[warning]Символические ссылки в public_html недоступны — схема «выгрузка в соседний каталог + mv». | 2026-09-30T07:33:45.2151168Z kind=preview mode=dirswap previe"
+ },
+ {
+  "run": 36684350474,
+  "sha": "c3e0dea",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T07:33:45.2199903Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T07:33:45.2200203Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T07:33:45.2200491Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T07:33:45.2200745Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36681610969,
+  "sha": "7ad471e",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T07:06:12.6331200Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T07:06:12.6331824Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T07:06:12.6332464Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T07:06:12.6333008Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36681595432,
+  "sha": "7ad471e",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T07:04:35.2215747Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T07:04:35.2217702Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T07:04:35.2219795Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T07:04:35.2221721Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36681391083,
+  "sha": "7ad471e",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-30T07:02:47.4531748Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-30T07:02:47.4532648Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-30T07:02:47.4533603Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-30T07:02:47.4534462Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36558484531,
+  "sha": "7ad471e",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-29T10:55:23.6328676Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-29T10:55:23.6330481Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-29T10:55:23.6332498Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-29T10:55:23.6334425Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ },
+ {
+  "run": 36543759566,
+  "sha": "031be0c",
+  "job": "0_Публикация на Helios.txt",
+  "pat": "Invalid format",
+  "ctx": " на runner'е.\u001b[0m | 2026-09-29T08:56:40.4333133Z \u001b[36;1m# tr -d '\\r' — защита от ключа, вставленного из редактора с Windows:\u001b[0m | 2026-09-29T08:56:40.4333597Z \u001b[36;1m# встроенные переводы CR приводят к «Invalid format» в ssh.\u001b[0m | 2026-09-29T08:56:40.4334098Z \u001b[36;1mprintf '%s\\n' \"$HELIOS_SSH_PRIVATE_KEY\" | tr -d '\\r' > ~/.ssh/id_ed25519\u001b[0m | 2026-09-29T08:56:40.4334516Z \u001b[36;1mchmod 600 ~/.ssh/id_ed25519\u001b[0m | 2026-0"
+ }
+]

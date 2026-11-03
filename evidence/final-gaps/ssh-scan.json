@@ -1,0 +1,417 @@
+{
+ "counts": {
+  "Host key verification failed": 2
+ },
+ "per_run": {
+  "Host key verification failed": [
+   [
+    "36684539071",
+    "45cc6a8",
+    1
+   ],
+   [
+    "36684350474",
+    "c3e0dea",
+    1
+   ]
+  ]
+ },
+ "ssh_ok": [
+  [
+   "36704097410",
+   "a3b161b",
+   "main",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36704097410",
+   "a3b161b",
+   "main",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36703517132",
+   "c1e4e9d",
+   "fix/debugging-verified-section",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36703517132",
+   "c1e4e9d",
+   "fix/debugging-verified-section",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36699975134",
+   "3658a9f",
+   "main",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36699975134",
+   "3658a9f",
+   "main",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36699785464",
+   "04d31b0",
+   "docs/figures",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36699785464",
+   "04d31b0",
+   "docs/figures",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36696819334",
+   "3d56073",
+   "test/interruption-throttle",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36696819334",
+   "3d56073",
+   "test/interruption-throttle",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36696371747",
+   "ce51620",
+   "test/interruption-throttle",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36696371747",
+   "ce51620",
+   "test/interruption-throttle",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36696358327",
+   "ce51620",
+   "test/interruption-throttle",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36696358327",
+   "ce51620",
+   "test/interruption-throttle",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36696142743",
+   "785edb0",
+   "main",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36696142743",
+   "785edb0",
+   "main",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36694482294",
+   "785edb0",
+   "main",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36694482294",
+   "785edb0",
+   "main",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36692373262",
+   "785edb0",
+   "main",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36692373262",
+   "785edb0",
+   "main",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36692260261",
+   "785edb0",
+   "main",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36692260261",
+   "785edb0",
+   "main",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36692147308",
+   "785edb0",
+   "main",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36692147308",
+   "785edb0",
+   "main",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36692035881",
+   "785edb0",
+   "main",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36692035881",
+   "785edb0",
+   "main",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36691926269",
+   "785edb0",
+   "main",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36691926269",
+   "785edb0",
+   "main",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36690988840",
+   "785edb0",
+   "main",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36690988840",
+   "785edb0",
+   "main",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36690831698",
+   "b10258a",
+   "ci/pages-healthcheck",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36690831698",
+   "b10258a",
+   "ci/pages-healthcheck",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36690124477",
+   "ecc2abb",
+   "main",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36690124477",
+   "ecc2abb",
+   "main",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36689761249",
+   "ecc2abb",
+   "main",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36689761249",
+   "ecc2abb",
+   "main",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36689552308",
+   "ecc2abb",
+   "main",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36689552308",
+   "ecc2abb",
+   "main",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36689080729",
+   "ecc2abb",
+   "main",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36689080729",
+   "ecc2abb",
+   "main",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36688851742",
+   "ecc2abb",
+   "main",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36688851742",
+   "ecc2abb",
+   "main",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36688641330",
+   "c897a23",
+   "feat/local-mathjax-formulas",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36688641330",
+   "c897a23",
+   "feat/local-mathjax-formulas",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36687814683",
+   "9adbcf8",
+   "main",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36687814683",
+   "9adbcf8",
+   "main",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36686555993",
+   "84a0b0a",
+   "docs/site-publishing-rsync-layout",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36686555993",
+   "84a0b0a",
+   "docs/site-publishing-rsync-layout",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36685023968",
+   "ec258d7",
+   "main",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36685023968",
+   "ec258d7",
+   "main",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36684813754",
+   "3926f86",
+   "fix/helios-scheme-probe-order",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36684813754",
+   "3926f86",
+   "fix/helios-scheme-probe-order",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36684539071",
+   "45cc6a8",
+   "main",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36684539071",
+   "45cc6a8",
+   "main",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36684350474",
+   "c3e0dea",
+   "feat/helios-rsync-releases-preview",
+   "SSH-доступ получен, хост: %s, rsync на сервере: %s\\n\" \"$(hostname -s)\" \"$(rsync --version | head -1)\"'"
+  ],
+  [
+   "36684350474",
+   "c3e0dea",
+   "feat/helios-rsync-releases-preview",
+   "SSH-доступ получен, хост: helios, rsync на сервере: rsync  version 3.4.1  protocol version 32"
+  ],
+  [
+   "36681610969",
+   "7ad471e",
+   "main",
+   "SSH-доступ получен, хост: %s\\n\" \"$(hostname -s)\"'"
+  ],
+  [
+   "36681610969",
+   "7ad471e",
+   "main",
+   "SSH-доступ получен, хост: helios"
+  ],
+  [
+   "36681595432",
+   "7ad471e",
+   "main",
+   "SSH-доступ получен, хост: %s\\n\" \"$(hostname -s)\"'"
+  ],
+  [
+   "36681595432",
+   "7ad471e",
+   "main",
+   "SSH-доступ получен, хост: helios"
+  ],
+  [
+   "36681391083",
+   "7ad471e",
+   "main",
+   "SSH-доступ получен, хост: %s\\n\" \"$(hostname -s)\"'"
+  ],
+  [
+   "36681391083",
+   "7ad471e",
+   "main",
+   "SSH-доступ получен, хост: helios"
+  ],
+  [
+   "36558484531",
+   "7ad471e",
+   "main",
+   "SSH-доступ получен, хост: %s\\n\" \"$(hostname -s)\"'"
+  ],
+  [
+   "36558484531",
+   "7ad471e",
+   "main",
+   "SSH-доступ получен, хост: helios"
+  ],
+  [
+   "36543759566",
+   "031be0c",
+   "main",
+   "SSH-доступ получен, хост: %s\\n\" \"$(hostname -s)\"'"
+  ],
+  [
+   "36543759566",
+   "031be0c",
+   "main",
+   "SSH-доступ получен, хост: helios"
+  ]
+ ]
+}

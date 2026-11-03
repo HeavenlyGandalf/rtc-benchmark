@@ -1,0 +1,38 @@
+[
+ {
+  "run": 36696819334,
+  "num": 35,
+  "created": "2026-09-30T09:32:57Z",
+  "branch": "test/interruption-throttle",
+  "sha": "3d56073",
+  "job": "Публикация на Helios",
+  "step_num": 9,
+  "step": "Выгрузить на Helios",
+  "concl": "cancelled",
+  "wf": ".github/workflows/deploy-helios.yml"
+ },
+ {
+  "run": 36691288086,
+  "num": 18,
+  "created": "2026-09-30T08:41:33Z",
+  "branch": "main",
+  "sha": "785edb0",
+  "job": "Проверка публикации",
+  "step_num": 2,
+  "step": "Проверить опубликованный сайт",
+  "concl": "failure",
+  "wf": ".github/workflows/deploy.yml"
+ },
+ {
+  "run": 36689761249,
+  "num": 21,
+  "created": "2026-09-30T08:26:56Z",
+  "branch": "main",
+  "sha": "ecc2abb",
+  "job": "Публикация на Helios",
+  "step_num": 13,
+  "step": "Проверить публикацию",
+  "concl": "failure",
+  "wf": ".github/workflows/deploy-helios.yml"
+ }
+]

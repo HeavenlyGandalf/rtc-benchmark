@@ -17,7 +17,8 @@ import os
 import shutil
 import textwrap
 
-ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ssg")
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.join(HERE, "ssg")
 
 PAGES = [
     ("Обзор проекта", "Что измеряется и зачем"),
@@ -85,10 +86,19 @@ def vendor_mathjax(root):
     текстом. Путь к файлам берётся из docs/assets/mathjax самого проекта,
     чтобы сравнение шло на тех же настройках.
     """
+    # По умолчанию берём MathJax из docs/assets/mathjax самого репозитория
+    # (evidence/t1-scripts/ -> evidence/ -> корень). MATHJAX_SRC переопределяет.
     src = os.environ.get(
         "MATHJAX_SRC",
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), "mathjax"),
+        os.path.join(HERE, os.pardir, os.pardir, "docs", "assets", "mathjax"),
     )
+    src = os.path.abspath(src)
+    if not os.path.isdir(src):
+        raise SystemExit(
+            f"Каталог MathJax не найден: {src}\n"
+            "Создайте его (нужны tex-svg.js и mathjax-config.js) или задайте\n"
+            "MATHJAX_SRC=/путь/к/mathjax. В репозитории он лежит в docs/assets/mathjax."
+        )
     dest = os.path.join(root, "docs", "assets", "mathjax")
     os.makedirs(dest, exist_ok=True)
     for name in ("tex-svg.js", "mathjax-config.js"):

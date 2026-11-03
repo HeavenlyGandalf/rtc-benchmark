@@ -40,3 +40,8 @@ __pycache__/
 
 # Служебные файлы macOS
 .DS_Store
+
+# Артефакты скриптов сравнения генераторов (evidence/t1-scripts)
+evidence/t1-scripts/ssg/
+evidence/t1-scripts/venv/
+evidence/t1-scripts/quarto/
