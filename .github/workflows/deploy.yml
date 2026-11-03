@@ -1,31 +1,9 @@
-# Публикация сайта документации на GitHub Pages.
-#
-# Официальная связка: upload-pages-artifact + deploy-pages.
-# Сборка site/ уезжает в окружение Pages, вторая ветка gh-pages не нужна.
-#
-# Обязательное ручное действие: Settings → Pages → Source = GitHub Actions.
-# Без него workflow соберёт сайт, но публикация не произойдёт.
-#
-# Права: contents: read — чтение репозитория, pages: write и id-token: write —
-# публикация и токен для API Pages. Последние две выданы только job deploy.
-#
-# Публикует только main. Строгая сборка при этом идёт по трём поводам: пуш в
-# main, pull request и ручной запуск — пуши в остальные ветки workflow не
-# запускают вовсе. Ограничение задано не только списком веток в триггере, но и
-# условием `if` у job deploy: без него ручной запуск из feature-ветки
-# опубликовал бы её как production.
-
 name: Deploy site to GitHub Pages
 
 on:
   push:
     branches: [main]
-  # Строгая сборка на pull request: битая ссылка или страница вне nav
-  # обнаруживается до merge, а не после. Публикации нет — deploy пропускается.
   pull_request:
-  # Позволяет запустить workflow вручную из интерфейса. Нужно сразу после
-  # добавления файла: до следующего push в main workflow сам не стартует.
-  # Ветку выбирать main — запуск из другой ветки соберёт сайт, но не опубликует.
   workflow_dispatch:
     inputs:
       healthcheck_marker:
@@ -34,10 +12,6 @@ on:
         default: ''
         type: string
 
-# Не отменять текущий деплой: два одновременных деплоя конкурируют за одно
-# окружение Pages, и более ранний может остаться опубликованным.
-# Группа привязана к ветке, поэтому проверки pull request не встают в очередь
-# к рабочему деплою. Для main группа всегда одна — «pages-refs/heads/main».
 concurrency:
   group: pages-${{ github.ref }}
   cancel-in-progress: false
@@ -46,14 +20,7 @@ permissions:
   contents: read
 
 env:
-  # Контрольная строка проверки опубликованного сайта: заголовок первого уровня
-  # главной страницы <h1 id="rtc-benchmark">. Это статическая часть HTML, а не
-  # динамическое значение, поэтому она меняется только вместе с переименованием
-  # проекта. ASCII-only — сравнение не зависит от кодировки терминала.
-  # Вход workflow_dispatch healthcheck_marker позволяет подставить заведомо
-  # неверную строку и убедиться, что проверка действительно падает.
   PAGES_HEALTHCHECK_MARKER: ${{ inputs.healthcheck_marker || 'id="rtc-benchmark"' }}
-  # Публикация не мгновенна: файл мог ещё не отдаться к моменту первого запроса.
   PAGES_HEALTHCHECK_ATTEMPTS: '10'
   PAGES_HEALTHCHECK_DELAY_SEC: '10'
 
@@ -61,10 +28,6 @@ jobs:
   build:
     name: Сборка сайта
     runs-on: ubuntu-latest
-    # Намеренно без configure-pages: MkDocs выводит базовый путь из site_url,
-    # а сам configure-pages падает, если Pages ещё не включён. Оставив его в
-    # этой job, мы заставили бы каждый pull request падать на проверке Pages
-    # до строгой сборки. Проверка настроек вынесена в job deploy.
     steps:
       - name: Получить исходники
         uses: actions/checkout@v7
@@ -72,8 +35,6 @@ jobs:
       - name: Установить Python
         uses: actions/setup-python@v7
         with:
-          # Та же версия, на которой сайт проверен локально: requirements.txt
-          # зафиксирован по набору пакетов, установленных в 3.14.
           python-version: '3.14'
 
       - name: Установить зависимости
@@ -82,10 +43,6 @@ jobs:
           pip install -r requirements.txt
 
       - name: Собрать сайт в строгом режиме
-        # python -m mkdocs, а не `mkdocs`: не зависит от того, попал ли каталог
-        # со скриптами в PATH.
-        # --strict превращает битые ссылки и предупреждения в ошибку сборки.
-        # Это осознанно: молча сломанная ссылка на сайте хуже красного workflow.
         run: python -m mkdocs build --strict
 
       - name: Сохранить артефакт сборки
@@ -96,16 +53,8 @@ jobs:
   deploy:
     name: Публикация
     needs: build
-    # Публикуется только main. Основное условие — ref: у pull request он
-    # всегда refs/pull/N/merge, то есть не главная ветка. Проверка event_name
-    # оставлена как страховка на случай смены формата ref.
-    # Проверка `build` выполняется раньше этой job, поэтому несостоявшийся PR
-    # не публикуется даже «с прошлой удачной сборки».
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    # Права выданы только этой job. У build их нет намеренно: она
-    # выполняет код из pull request, и токен с pages: write в её руках —
-    # лишний риск. На fork-PR права и так урезаются GitHub.
     permissions:
       contents: read
       pages: write
@@ -113,16 +62,10 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    # Адрес публикации отдаётся наружу явно. Без этого блока job outputs
-    # считается пустым объектом, и обращение из следующей job
-    # needs.deploy.outputs.page_url не разрешается — actionlint
-    # считает такое обращение ошибкой, и оно действительно не работает.
     outputs:
       page_url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Настроить GitHub Pages
-        # Последний рубеж перед публикацией: падает, если в Settings → Pages
-        # не выбран источник GitHub Actions, и называет причину.
         uses: actions/configure-pages@v6
 
       - name: Опубликовать в GitHub Pages
@@ -131,23 +74,13 @@ jobs:
 
   verify:
     name: Проверка публикации
-    # Идёт после deploy: проверять сайт до публикации незачем, а проверять
-    # неопубликованный артефакт по адресу Pages нельзя. needs: deploy
-    # заодно означает, что сбой проверки красит и публикацию, хотя deploy
-    # отработал успешно: адрес в Pages останется рабочим, красным будет
-    # выглядеть только проверка, и это вводит в заблуждение при разборе.
     needs: deploy
     runs-on: ubuntu-latest
-    # Права contents: read достаточно: проверка ходит по публичному адресу
-    # обычным HTTP и ничего не публикует.
     permissions:
       contents: read
     steps:
       - name: Проверить опубликованный сайт
         env:
-          # Адрес берётся у job deploy: он уже отработал, поэтому шаг есть.
-          # Без заглушки на случай пропуска deploy проверка не должна падать
-          # с невнятным сообщением.
           PAGES_URL: ${{ needs.deploy.outputs.page_url }}
         run: |
           set -uo pipefail
@@ -158,15 +91,6 @@ jobs:
             exit 1
           fi
 
-          # Что ищем. index.html и search/search_index.json достаточно:
-          # первый доказывает, что отдалась главная, второй — что сборка
-          # целиком, потому что индекс собирается из всех страниц.
-          #
-          # build-info.json на Pages не кладёт: этот workflow его не создаёт,
-          # и проверять там нечего. Точный SHA публикации на Pages
-          # подтверждается самим workflow — сборка запускается на том же
-          # коммите, который затем публикуется, и build-info.json добавлен
-          # только в deploy-helios.yml. Подменять им проверку здесь нельзя.
           echo "Healthcheck: $url"
           ok=0
           for attempt in $(seq 1 "$PAGES_HEALTHCHECK_ATTEMPTS"); do
