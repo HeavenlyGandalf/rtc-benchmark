@@ -1,12 +1,27 @@
 // Клиентская обёртка WebRTC: P2P-соединение с echo-сервером,
-// сигналинг — HTTP POST (offer/answer без trickle ICE).
+// сигналинг — HTTP POST. Два режима ICE:
+//   full    — ждём полного сбора кандидатов, offer уходит с ними (по умолчанию);
+//   trickle — offer уходит сразу, кандидаты досылаются POST /api/webrtc/candidate.
 import type { BenchChannel, ChannelMode } from './types.js';
 
-export async function connectWebRtc(): Promise<{
+export type IceMode = 'full' | 'trickle';
+
+/** Фазы установления соединения, мс от начала. */
+export interface RtcSetupPhases {
+  /** offer готов к отправке (full — после сбора кандидатов) */
+  offerMs: number;
+  /** answer получен и применён */
+  answerMs: number;
+  /** оба DataChannel открыты (ICE + DTLS + SCTP) */
+  openMs: number;
+}
+
+export async function connectWebRtc(iceMode: IceMode = 'full'): Promise<{
   pc: RTCPeerConnection;
   reliable: RtcChannel;
   unreliable: RtcChannel;
   setupMs: number;
+  phases: RtcSetupPhases;
 }> {
   const t0 = performance.now();
   const pc = new RTCPeerConnection({ iceServers: [] });
@@ -19,8 +34,26 @@ export async function connectWebRtc(): Promise<{
   reliableDc.binaryType = 'arraybuffer';
   unreliableDc.binaryType = 'arraybuffer';
 
+  // Trickle: кандидаты, собранные до получения id соединения, копятся в очереди.
+  let sessionId: string | null = null;
+  const pending: RTCIceCandidate[] = [];
+  const sendCandidate = (c: RTCIceCandidate) =>
+    fetch('/api/webrtc/candidate', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ id: sessionId, candidate: c.candidate, mid: c.sdpMid ?? '0' }),
+    }).catch(() => {});
+  if (iceMode === 'trickle') {
+    pc.addEventListener('icecandidate', (e) => {
+      if (!e.candidate || !e.candidate.candidate) return;
+      if (sessionId) void sendCandidate(e.candidate);
+      else pending.push(e.candidate);
+    });
+  }
+
   await pc.setLocalDescription(await pc.createOffer());
-  await waitIceComplete(pc);
+  if (iceMode === 'full') await waitIceComplete(pc);
+  const offerMs = performance.now() - t0;
 
   const res = await fetch('/api/webrtc/offer', {
     method: 'POST',
@@ -30,6 +63,9 @@ export async function connectWebRtc(): Promise<{
   if (!res.ok) throw new Error(`Сигналинг WebRTC: HTTP ${res.status}`);
   const answer = await res.json();
   await pc.setRemoteDescription({ type: 'answer', sdp: answer.sdp });
+  sessionId = answer.id;
+  for (const c of pending.splice(0)) void sendCandidate(c);
+  const answerMs = performance.now() - t0;
 
   await Promise.all([waitOpen(reliableDc), waitOpen(unreliableDc)]);
   const setupMs = performance.now() - t0;
@@ -39,6 +75,7 @@ export async function connectWebRtc(): Promise<{
     reliable: new RtcChannel(pc, reliableDc, 'rtc-reliable'),
     unreliable: new RtcChannel(pc, unreliableDc, 'rtc-unreliable'),
     setupMs,
+    phases: { offerMs, answerMs, openMs: setupMs },
   };
 }
 
@@ -51,11 +88,22 @@ function waitIceComplete(pc: RTCPeerConnection): Promise<void> {
   });
 }
 
+// Зависшее соединение должно стать ошибкой прогона (оркестратор его повторит),
+// а не бесконечным ожиданием.
+const OPEN_TIMEOUT_MS = 15_000;
+
 function waitOpen(dc: RTCDataChannel): Promise<void> {
   if (dc.readyState === 'open') return Promise.resolve();
   return new Promise((resolve, reject) => {
-    dc.onopen = () => resolve();
-    dc.onerror = (e) => reject(e);
+    const timer = setTimeout(() => reject(new Error(`DataChannel "${dc.label}" не открылся за ${OPEN_TIMEOUT_MS} мс`)), OPEN_TIMEOUT_MS);
+    dc.onopen = () => {
+      clearTimeout(timer);
+      resolve();
+    };
+    dc.onerror = (e) => {
+      clearTimeout(timer);
+      reject(e);
+    };
   });
 }
 

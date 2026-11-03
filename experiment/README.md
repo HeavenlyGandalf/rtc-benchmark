@@ -14,7 +14,35 @@
 | `../scripts/aggregate.mjs` | сводка по прогонам → `results/summary.csv` + `summary.json` |
 | `Dockerfile`, `compose.yml`, `run-all.sh` | Linux-стенд + headless Chromium + оркестрация всех профилей |
 
-## Запуск (Docker, с эмуляцией сети)
+## Основной способ: план эксперимента и `make`
+
+Целевая топология — `compose-router.yml`: клиент (`bench`), контейнер-маршрутизатор
+с `tc netem` (`router`) и стенд (`server`) в разных сетях. Эмуляция сети не стоит
+на конечных узлах, поэтому не искажает поведение транспорта.
+
+```bash
+make image          # собрать образ (за прокси: BUILD_ARGS="--build-arg HTTPS_PROXY=...")
+make verify         # калибровка → 40 прогонов по experiment/plan-verify.json → анализ → сверка с results/reference
+make experiment     # полный план experiment/plan.json
+make analyze NAME=verify
+```
+
+| Файл | Назначение |
+|---|---|
+| `plan.json`, `plan-verify.json`, `plan-smoke.json` | факторы, уровни, число прогонов, A/A-партия, сид, параметры серии |
+| `../scripts/run-plan.mjs` | калибровка, рандомизированное расписание, прогрев, прогоны, повтор упавших |
+| `../scripts/calibrate.mjs` | UDP-эхо под каждым профилем: RTT ≈ 2·delay ± 2 мс, потери ≈ 1 − (1 − p)² |
+| `../scripts/analyze.mjs` | единица анализа — прогон; бутстреп-ДИ, Манн–Уитни, Холм, A/A → `analysis.md` |
+| `../scripts/compare.mjs` | сверка с эталоном, PASS/FAIL и код выхода |
+| `netem-agent.mjs` | HTTP-управление netem в контейнере-маршрутизаторе |
+| `architecture.mmd` | диаграмма стенда (Mermaid) |
+
+Каждый прогон пишет в `results/<план>/raw/<run-id>.json` сырые выборки и
+манифест: коммит, digest образа, версию Chromium, ядро, лимиты CPU и памяти,
+профиль, сид, порядок каналов, CPU клиента и сервера и задержку event loop
+по окнам сценариев.
+
+## Пилотный запуск (Docker, netem на `lo`)
 
 ```bash
 docker compose -f experiment/compose.yml run --rm bench

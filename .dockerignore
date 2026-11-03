@@ -12,3 +12,4 @@ _bmad-output
 docs/assets
 **/*.png
 .DS_Store
+reports

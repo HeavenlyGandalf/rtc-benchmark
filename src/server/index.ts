@@ -2,6 +2,7 @@
 //  - HTTP/1.1 (порт 8080): статика клиента + REST API (сигналинг WebRTC, метаданные).
 //  - HTTP/3 / QUIC (порт 4433): WebTransport echo.
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
+import { monitorEventLoopDelay } from 'node:perf_hooks';
 import { readFileSync, existsSync, statSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { X509Certificate } from 'node:crypto';
@@ -9,7 +10,7 @@ import { join, dirname, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { quicheLoaded } from '@fails-components/webtransport';
 import { startWebTransportServer } from './webtransport.js';
-import { handleWebRtcOffer } from './webrtc.js';
+import { handleWebRtcOffer, addWebRtcCandidate } from './webrtc.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const PUBLIC_DIR = join(ROOT, 'public');
@@ -38,6 +39,39 @@ const certPem = readFileSync(CERT_PATH, 'utf8');
 const keyPem = readFileSync(KEY_PATH, 'utf8');
 // Отпечаток SHA-256 сертификата — передаётся клиенту для serverCertificateHashes.
 const certHashHex = new X509Certificate(certPem).fingerprint256.replaceAll(':', '');
+
+// --- Контроль стенда: задержка event loop и CPU процесса сервера ---
+// Раннер читает /api/metrics до и после сценария, чтобы проверить, что сервер
+// (один поток Node) не стал узким местом и не исказил измерения.
+const LOOP_RESOLUTION_MS = 10;
+const loopDelay = monitorEventLoopDelay({ resolution: LOOP_RESOLUTION_MS });
+loopDelay.enable();
+let cpuMark = process.cpuUsage();
+let wallMark = performance.now();
+
+function readMetrics(reset: boolean) {
+  const cpu = process.cpuUsage(cpuMark);
+  const wallMs = performance.now() - wallMark;
+  // гистограмма хранит интервал между срабатываниями таймера (нс), в него входит
+  // само разрешение — вычитаем его, чтобы получить задержку event loop
+  const ns = (v: number) => Math.max(0, v / 1e6 - LOOP_RESOLUTION_MS);
+  const out = {
+    windowMs: wallMs,
+    cpuPct: wallMs > 0 ? ((cpu.user + cpu.system) / 1000 / wallMs) * 100 : 0,
+    loopDelayMs: {
+      p50: ns(loopDelay.percentile(50)),
+      p99: ns(loopDelay.percentile(99)),
+      max: ns(loopDelay.max),
+    },
+    rssMb: process.memoryUsage().rss / 2 ** 20,
+  };
+  if (reset) {
+    loopDelay.reset();
+    cpuMark = process.cpuUsage();
+    wallMark = performance.now();
+  }
+  return out;
+}
 
 // --- HTTP/1.1: статика + API ---
 const MIME: Record<string, string> = {
@@ -81,6 +115,17 @@ const httpServer = createServer(async (req, res) => {
         wtUrl: `https://${wtHost}:${WT_PORT}/echo`,
         wtRelayUrl: `https://${wtHost}:${WT_PORT}/relay`,
       });
+      return;
+    }
+
+    if (url.pathname === '/api/metrics') {
+      sendJson(res, 200, readMetrics(url.searchParams.has('reset')));
+      return;
+    }
+
+    if (url.pathname === '/api/webrtc/candidate' && req.method === 'POST') {
+      const { id, candidate, mid } = JSON.parse(await readBody(req));
+      sendJson(res, addWebRtcCandidate(id, candidate, mid) ? 200 : 404, { ok: true });
       return;
     }
 

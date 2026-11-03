@@ -4,16 +4,23 @@
 import ndc, { type PeerConnection } from 'node-datachannel';
 
 const peers = new Set<PeerConnection>();
+// Соединения по id — нужны для trickle ICE: клиент досылает кандидаты
+// отдельными запросами POST /api/webrtc/candidate.
+const peersById = new Map<string, PeerConnection>();
+let nextId = 1;
 
 export interface SessionDescription {
   sdp: string;
   type: string;
+  id: string;
 }
 
 export function handleWebRtcOffer(offerSdp: string): Promise<SessionDescription> {
   return new Promise((resolve, reject) => {
     const pc = new ndc.PeerConnection('echo-server', { iceServers: [] });
+    const id = String(nextId++);
     peers.add(pc);
+    peersById.set(id, pc);
 
     const timeout = setTimeout(() => {
       peers.delete(pc);
@@ -24,17 +31,19 @@ export function handleWebRtcOffer(offerSdp: string): Promise<SessionDescription>
     pc.onStateChange((state) => {
       if (state === 'closed' || state === 'failed' || state === 'disconnected') {
         peers.delete(pc);
+        peersById.delete(id);
       }
     });
 
-    // Без trickle ICE: ждём завершения сбора кандидатов и отдаём полный answer.
+    // Свои кандидаты сервер не досылает: ждём завершения сбора и отдаём полный
+    // answer. Кандидаты клиента в режиме trickle приходят через addRemoteCandidate.
     pc.onGatheringStateChange((state) => {
       if (state === 'complete') {
         clearTimeout(timeout);
         const desc = pc.localDescription();
         if (desc) {
           console.log('[RTC]  answer готов, data channels + media echo');
-          resolve({ sdp: desc.sdp, type: desc.type });
+          resolve({ sdp: desc.sdp, type: desc.type, id });
         } else {
           reject(new Error('no local description'));
         }
@@ -71,7 +80,16 @@ export function handleWebRtcOffer(offerSdp: string): Promise<SessionDescription>
     } catch (err) {
       clearTimeout(timeout);
       peers.delete(pc);
+      peersById.delete(id);
       reject(err);
     }
   });
+}
+
+/** Trickle ICE: кандидат клиента для соединения id. false — соединения нет. */
+export function addWebRtcCandidate(id: string, candidate: string, mid: string): boolean {
+  const pc = peersById.get(id);
+  if (!pc) return false;
+  pc.addRemoteCandidate(candidate, mid);
+  return true;
 }

@@ -1,0 +1,24 @@
+{
+  "name": "smoke",
+  "description": "Дымовой план для CI: 2 профиля × 3 прогона, проверка, что стенд работает и выводы по знаку совпадают.",
+  "seed": 20261103,
+  "repsPerConfig": 3,
+  "discardFirstRun": true,
+  "pauseAfterNetemMs": 1000,
+  "calibrate": true,
+  "factors": {
+    "profile": ["lan", "4g"],
+    "rttSize": [256]
+  },
+  "aa": { "profile": "4g", "rttSize": 256, "reps": 3 },
+  "series": {
+    "REPS": 10,
+    "SETUP_WARMUP": 1,
+    "ICE_MODES": "full trickle",
+    "RTT_COUNT": 200,
+    "RTT_INTERVAL": 10,
+    "RTT_WARMUP": 20,
+    "TP_DURATION": 2,
+    "TP_SIZE": 16384
+  }
+}

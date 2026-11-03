@@ -1,0 +1,24 @@
+{
+  "name": "full",
+  "description": "Полный план E1+E2 (раздел 5.4 отчёта ПР-3): канал × профиль × размер, 10 прогонов на конфигурацию, A/A на 4g.",
+  "seed": 20261103,
+  "repsPerConfig": 10,
+  "discardFirstRun": true,
+  "pauseAfterNetemMs": 2000,
+  "calibrate": true,
+  "factors": {
+    "profile": ["lan", "wifi", "4g", "5g", "lossy", "limited"],
+    "rttSize": [256, 1024]
+  },
+  "aa": { "profile": "4g", "rttSize": 256, "reps": 10 },
+  "series": {
+    "REPS": 30,
+    "SETUP_WARMUP": 1,
+    "ICE_MODES": "full trickle",
+    "RTT_COUNT": 1000,
+    "RTT_INTERVAL": 10,
+    "RTT_WARMUP": 50,
+    "TP_DURATION": 10,
+    "TP_SIZE": 16384
+  }
+}

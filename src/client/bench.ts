@@ -9,7 +9,7 @@ import {
   WtDatagramChannel,
   type ServerInfo,
 } from './transports/webtransport.js';
-import { connectWebRtc } from './transports/webrtc.js';
+import { connectWebRtc, type IceMode, type RtcSetupPhases } from './transports/webrtc.js';
 import { buildMessage, parseMessage, computeRttStats, sleep, type RttStats } from './util.js';
 
 export interface RttParams {
@@ -22,6 +22,8 @@ export interface RttParams {
 export interface ThroughputParams {
   durationMs: number;
   size: number;
+  /** окно дренажа после отправки, мс (по умолчанию 700) */
+  drainMs?: number;
 }
 
 export interface ThroughputResult {
@@ -36,6 +38,15 @@ export interface SetupResult {
   samples: number[];
   mean: number;
   median: number;
+  /** только для WebRTC: фазы каждого замера */
+  phases?: RtcSetupPhases[];
+}
+
+export interface SetupOptions {
+  /** режим ICE для WebRTC */
+  iceMode?: IceMode;
+  /** число первых замеров, которые не входят в статистику (прогрев) */
+  warmup?: number;
 }
 
 /** Держатель открытых соединений на время серии тестов. */
@@ -95,20 +106,26 @@ export async function runSetupTest(
   kind: 'wt' | 'rtc',
   repetitions: number,
   onProgress?: (i: number) => void,
+  opts: SetupOptions = {},
 ): Promise<SetupResult> {
   const info = await fetchServerInfo();
+  const warmup = opts.warmup ?? 0;
   const samples: number[] = [];
-  for (let i = 0; i < repetitions; i++) {
+  const phases: RtcSetupPhases[] = [];
+  for (let i = 0; i < warmup + repetitions; i++) {
     if (kind === 'wt') {
       const { wt, setupMs } = await connectWebTransport(info);
-      samples.push(setupMs);
+      if (i >= warmup) samples.push(setupMs);
       wt.close();
     } else {
-      const { pc, setupMs } = await connectWebRtc();
-      samples.push(setupMs);
-      pc.close();
+      const r = await connectWebRtc(opts.iceMode);
+      if (i >= warmup) {
+        samples.push(r.setupMs);
+        phases.push(r.phases);
+      }
+      r.pc.close();
     }
-    onProgress?.(i + 1);
+    if (i >= warmup) onProgress?.(i - warmup + 1);
     await sleep(100);
   }
   const sorted = [...samples].sort((a, b) => a - b);
@@ -116,6 +133,7 @@ export async function runSetupTest(
     samples,
     mean: samples.reduce((s, v) => s + v, 0) / samples.length,
     median: sorted[Math.floor(sorted.length / 2)],
+    ...(kind === 'rtc' ? { phases } : {}),
   };
 }
 
@@ -180,7 +198,7 @@ export async function runThroughputTest(
     await ch.send(buildMessage(sentMsgs++, size));
   }
   const sendDone = performance.now();
-  await sleep(700); // дренаж очередей
+  await sleep(params.drainMs ?? 700); // дренаж очередей
   ch.onMessage(() => {});
 
   const durationMs = sendDone - t0;

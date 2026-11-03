@@ -1,0 +1,72 @@
+# Целевая топология стенда (раздел 5.1 отчёта ПР-3):
+#   bench (клиент: оркестратор + headless Chromium) ── clientnet ──┐
+#                                                                   router (tc netem на обоих интерфейсах)
+#   server (стенд: HTTP, WebTransport, WebRTC, UDP-эхо) ─ servernet ┘
+# Эмуляция сети вынесена с конечных узлов на отдельный маршрутизатор, как в
+# Kakhki et al. (IMC'17): netem на конечной точке даёт пачечный трафик и
+# мгновенную локальную обратную связь о потерях.
+#
+# Запуск — через Makefile (make verify / make experiment); вручную:
+#   PLAN=experiment/plan-verify.json docker compose -f experiment/compose-router.yml \
+#     up --abort-on-container-exit --exit-code-from bench
+x-image: &image ${IMAGE:-rtc-bench-exp}
+
+services:
+  router:
+    image: *image
+    cap_add: [NET_ADMIN]
+    sysctls:
+      net.ipv4.ip_forward: 1
+    command: node experiment/netem-agent.mjs
+    networks:
+      clientnet: { ipv4_address: 10.77.1.2 }
+      servernet: { ipv4_address: 10.77.2.2 }
+    cpus: 1
+    mem_limit: 256m
+
+  server:
+    image: *image
+    cap_add: [NET_ADMIN]   # маршрут к clientnet через router
+    command: bash experiment/server-entry.sh
+    environment:
+      ROUTE_VIA: 10.77.2.2
+      ROUTE_TO: 10.77.1.0/24
+    networks:
+      servernet: { ipv4_address: 10.77.2.10 }
+    cpus: 2
+    mem_limit: 1g
+
+  bench:
+    image: *image
+    cap_add: [NET_ADMIN]   # маршрут к servernet через router
+    depends_on: [router, server]
+    command: bash experiment/bench-entry.sh
+    environment:
+      ROUTE_VIA: 10.77.1.2
+      ROUTE_TO: 10.77.2.0/24
+      BENCH_URL: http://10.77.2.10:8080
+      NETEM_AGENT: http://10.77.1.2:9000
+      CAL_TARGET: 10.77.2.10:9999
+      TOPOLOGY: router
+      PLAN: ${PLAN:-experiment/plan-verify.json}
+      GIT_COMMIT: ${GIT_COMMIT:-unknown}
+      GIT_DIRTY: ${GIT_DIRTY:-unknown}
+      IMAGE_DIGEST: ${IMAGE_DIGEST:-unknown}
+      HOST_LABEL: ${HOST_LABEL:-unknown}
+    volumes:
+      - ../results:/app/results
+    shm_size: 1g
+    networks:
+      clientnet: { ipv4_address: 10.77.1.10 }
+    cpus: 4
+    mem_limit: 3g
+
+networks:
+  clientnet:
+    driver: bridge
+    ipam:
+      config: [{ subnet: 10.77.1.0/24 }]
+  servernet:
+    driver: bridge
+    ipam:
+      config: [{ subnet: 10.77.2.0/24 }]

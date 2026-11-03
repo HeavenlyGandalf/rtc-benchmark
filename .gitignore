@@ -45,3 +45,7 @@ __pycache__/
 evidence/t1-scripts/ssg/
 evidence/t1-scripts/venv/
 evidence/t1-scripts/quarto/
+
+# Служебные прогоны стенда (дымовой план, логи make)
+results/smoke/
+results/*.log
