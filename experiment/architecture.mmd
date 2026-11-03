@@ -1,0 +1,38 @@
+%% Архитектура экспериментального стенда rtc-benchmark (ПР-3, раздел 5.1).
+%% Целевая схема: эмуляция сети вынесена в отдельный контейнер-маршрутизатор,
+%% чтобы потери и задержка не вносились на конечных узлах (см. Kakhki et al., IMC'17).
+%% Рендер: https://mermaid.live или любой просмотрщик Markdown с Mermaid.
+flowchart LR
+  subgraph Stand["docker compose (experiment/compose-*.yml), образ rtc-bench-exp@sha256"]
+    direction LR
+    ORCH["Оркестратор<br/>run-all.sh / Makefile<br/>рандомизация порядка"]
+    subgraph Client["client: headless Chromium 156<br/>(puppeteer-core 24)"]
+      BENCH["bench.ts<br/>BenchChannel × 4<br/>performance.now()"]
+    end
+    subgraph Router["router: tc netem / tbf<br/>profiles.json"]
+      NETEM(("netem"))
+    end
+    subgraph Server["server: Node 22, tsx"]
+      SIG["HTTP :8080<br/>/api/info, /api/webrtc/offer"]
+      WT["WebTransport echo<br/>@fails-components/webtransport<br/>(quiche)"]
+      RTC["WebRTC DataChannel echo<br/>node-datachannel 0.33"]
+    end
+    MON["Монитор ресурсов<br/>docker stats / pidstat<br/>CPU клиента и сервера"]
+  end
+
+  ORCH -->|"PROFILE, REPS, SEED"| Client
+  ORCH -->|"apply / clear"| NETEM
+  BENCH -->|"QUIC/HTTP3 (UDP)"| NETEM
+  BENCH -->|"DTLS/SCTP (UDP)"| NETEM
+  NETEM --> WT
+  NETEM --> RTC
+  BENCH -.->|"SDP offer"| SIG
+  MON -.-> Client
+  MON -.-> Server
+
+  BENCH -->|"JSON на прогон"| RAW[("results/raw/*.json<br/>+ manifest.json")]
+  MON -->|"CSV"| RAW
+  RAW --> AGG["scripts/aggregate.mjs<br/>единица анализа = прогон"]
+  AGG --> SUM[("results/summary.csv / .json")]
+  SUM --> AN["analysis/stats.py<br/>бутстреп-ДИ, Mann–Whitney, Holm"]
+  AN --> REP["таблицы H1–H4, графики,<br/>сравнение с эталоном (verify)"]
