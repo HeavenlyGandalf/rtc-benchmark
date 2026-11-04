@@ -11,9 +11,21 @@ const AGENT = process.env.NETEM_AGENT;
 
 export const profiles = JSON.parse(readFileSync(join(ROOT, 'experiment', 'profiles.json'), 'utf8'));
 
-/** Задержка (мс), джиттер (мс) и доля потерь одного прохода профиля. */
+const RATE_UNITS = { bit: 1, kbit: 1e3, mbit: 1e6, gbit: 1e9 };
+
+/** Полоса netem (`5mbit`, `1gbit`) в бит/с; null — без ограничения. */
+export function parseRate(rate) {
+  const m = String(rate ?? '').trim().toLowerCase().match(/^([\d.]+)\s*(bit|kbit|mbit|gbit)$/);
+  return m ? Number(m[1]) * RATE_UNITS[m[2]] : null;
+}
+
+/**
+ * Задержка (мс), джиттер (мс) и доля потерь одного прохода профиля.
+ * noReorder — джиттер без переупорядочивания: с `rate` netem не даёт пакету
+ * обогнать предыдущий, задержка пакета становится не меньше задержки соседа.
+ */
 export function profileNumbers(name) {
-  if (name === 'none') return { delayMs: 0, jitterMs: 0, loss: 0, rate: null }; // сеть не эмулируется
+  if (name === 'none') return { delayMs: 0, jitterMs: 0, loss: 0, rate: null, rateBps: null, noReorder: false }; // сеть не эмулируется
   const p = profiles[name];
   if (!p) throw new Error(`неизвестный профиль: ${name}`);
   const [delay = '0', jitter = '0'] = String(p.delay ?? '0').trim().split(/\s+/);
@@ -22,6 +34,8 @@ export function profileNumbers(name) {
     jitterMs: parseFloat(jitter) || 0,
     loss: (parseFloat(String(p.loss ?? '0')) || 0) / 100,
     rate: p.rate || null,
+    rateBps: parseRate(p.rate),
+    noReorder: p.reorder === false,
   };
 }
 

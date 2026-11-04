@@ -5,7 +5,7 @@
 #   make calibrate      только калибровка сети на топологии с маршрутизатором
 #   make verify         сокращённый план + сравнение с эталоном results/reference
 #   make verify-smoke   дымовой план для CI (2 профиля × 3 прогона, мягкие проверки)
-#   make experiment     полный план E1+E2 (experiment/plan.json, 260 прогонов, ~7 ч)
+#   make experiment     полный план E1+E2 (experiment/plan.json, 300 прогонов, ~8 ч)
 #   make resume PLAN=experiment/plan-verify.json   дозапустить прерванную серию
 #   make analyze NAME=verify   пересчитать анализ по сохранённым сырым данным
 #   make reference      сделать текущий results/verify эталоном (для автора)
@@ -51,9 +51,11 @@ define run_plan
 	status=$$?; $(COMPOSE_ROUTER) down --remove-orphans >/dev/null 2>&1; exit $$status
 endef
 
+# Перед калибровкой — ожидание готовности сервера и пауза: при старте он
+# компилирует TypeScript, и первые секунды UDP-эхо теряет пакеты даже на lan.
 calibrate:
-	IMAGE_DIGEST=$(IMAGE_DIGEST) $(COMPOSE_ROUTER) run --rm -e PROFILES="lan wifi 4g 5g lossy limited" -e OUT_DIR=results/calibration \
-	  bench bash -c 'ip route replace $$ROUTE_TO via $$ROUTE_VIA && node scripts/calibrate.mjs; s=$$?; chown -R $$HOST_UID:$$HOST_GID results/calibration; exit $$s'; \
+	IMAGE_DIGEST=$(IMAGE_DIGEST) $(COMPOSE_ROUTER) run --rm -e PROFILES="lan wifi 4g 5g lossy limited 4g-noreorder" -e OUT_DIR=results/calibration \
+	  bench bash -c 'ip route replace $$ROUTE_TO via $$ROUTE_VIA && for _ in $$(seq 60); do curl -sf $$BENCH_URL/api/info >/dev/null && break; sleep 1; done && sleep 5 && node scripts/calibrate.mjs; s=$$?; chown -R $$HOST_UID:$$HOST_GID results/calibration; exit $$s'; \
 	status=$$?; $(COMPOSE_ROUTER) down --remove-orphans >/dev/null 2>&1; exit $$status
 
 verify:

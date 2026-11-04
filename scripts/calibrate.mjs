@@ -1,8 +1,13 @@
 // Калибровка эмуляции сети (раздел 5.5 отчёта ПР-3): под каждым профилем
 // гоняет UDP-эхо без QUIC и SCTP и сверяет измеренное с заданным:
 //   медиана RTT ≈ 2 × delay (задержка ставится на каждом проходе), допуск ±2 мс;
+//   при ограничении полосы (rate) — плюс сериализация кадра на каждом проходе;
 //   потери ≈ 1 − (1 − p)² (потеря возможна и на запросе, и на эхе),
 //   допуск — 3σ биномиальной оценки + 0,2 п.п.
+// Профиль без переупорядочивания ("reorder": false, джиттер + rate): пакет ждёт
+// предыдущий, поэтому задержка прохода — максимум из задержек соседей, и её
+// медиана лежит между delay и delay + jitter. Критерий: медиана RTT в
+// [2·delay; 2·(delay + jitter)] и переупорядочено не больше 0,5 %.
 // Если хоть один профиль не прошёл, код выхода 1: основную серию запускать нельзя.
 //
 // env: PROFILES (через пробел), CAL_PACKETS (10000), CAL_INTERVAL_US (1000),
@@ -19,6 +24,10 @@ const PACKETS = Number(process.env.CAL_PACKETS ?? 10_000);
 const INTERVAL_US = Number(process.env.CAL_INTERVAL_US ?? 1000);
 const OUT_DIR = process.env.OUT_DIR ?? 'results';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const PAYLOAD_BYTES = 64;
+// Кадр на проводе: полезная нагрузка + UDP (8) + IPv4 (20) + Ethernet (14) —
+// netem rate считает длину пакета вместе с заголовком канального уровня
+const FRAME_BYTES = PAYLOAD_BYTES + 8 + 20 + 14;
 
 let echo = null;
 let [host, port] = (process.env.CAL_TARGET ?? '').split(':');
@@ -47,7 +56,7 @@ async function measure() {
     }
   });
   await new Promise((r) => sock.bind(0, r));
-  const buf = Buffer.alloc(64);
+  const buf = Buffer.alloc(PAYLOAD_BYTES);
   const t0 = process.hrtime.bigint();
   for (let i = 0; i < PACKETS; i++) {
     // равномерный график отправки по монотонным часам, без накопления дрейфа
@@ -67,31 +76,40 @@ try {
   for (const name of PROFILES) {
     await applyProfile(name);
     await sleep(2000);
-    const { delayMs, loss } = profileNumbers(name);
+    const { delayMs, jitterMs, loss, rateBps, noReorder } = profileNumbers(name);
     const m = await measure();
     const lossMeasured = 1 - m.received / PACKETS;
     const lossExpected = 1 - (1 - loss) ** 2;
     const lossTol = 3 * Math.sqrt((lossExpected * (1 - lossExpected)) / PACKETS) + 0.002;
-    const rttExpected = 2 * delayMs;
-    const rttOk = Math.abs(m.median - rttExpected) <= 2;
+    // при ограничении полосы к задержке добавляется сериализация кадра на каждом проходе
+    const serializationMs = rateBps ? (FRAME_BYTES * 8 * 1000) / rateBps : 0;
+    const round2 = (v) => Math.round(v * 100) / 100;
+    const rttExpected = round2(2 * (delayMs + serializationMs));
+    const [rttLow, rttHigh] = noReorder ? [rttExpected, round2(2 * (delayMs + jitterMs + serializationMs))] : [rttExpected - 2, rttExpected + 2];
+    const rttOk = m.median >= rttLow && m.median <= rttHigh;
     const lossOk = Math.abs(lossMeasured - lossExpected) <= lossTol;
+    const reorderedPct = m.received ? (m.reordered / m.received) * 100 : 0;
+    const reorderOk = !noReorder || reorderedPct <= 0.5;
     const row = {
       profile: name,
       rttMedianMs: m.median,
       rttP95Ms: m.p95,
       rttExpectedMs: rttExpected,
+      rttLowMs: rttLow,
+      rttHighMs: rttHigh,
       lossPct: lossMeasured * 100,
       lossExpectedPct: lossExpected * 100,
       lossTolPct: lossTol * 100,
-      // переупорядочивание не критерий прохождения, а характеристика профиля:
-      // надёжные каналы (SCTP, QUIC-поток) реагируют на него иначе, чем на потери
-      reorderedPct: m.received ? (m.reordered / m.received) * 100 : 0,
-      pass: rttOk && lossOk,
+      // переупорядочивание — характеристика профиля (надёжные каналы реагируют на
+      // него иначе, чем на потери); критерий — только для профиля "reorder": false
+      reorderedPct,
+      pass: rttOk && lossOk && reorderOk,
     };
     results.push(row);
     console.log(
-      `[calibrate] ${name.padEnd(8)} RTT медиана ${m.median.toFixed(2)} мс (ожид. ${rttExpected} ± 2) ${rttOk ? 'OK' : 'FAIL'}; ` +
-        `потери ${(lossMeasured * 100).toFixed(2)} % (ожид. ${(lossExpected * 100).toFixed(2)} ± ${(lossTol * 100).toFixed(2)}) ${lossOk ? 'OK' : 'FAIL'}; переупорядочено ${row.reorderedPct.toFixed(2)} %`,
+      `[calibrate] ${name.padEnd(8)} RTT медиана ${m.median.toFixed(2)} мс (ожид. ${rttLow}…${rttHigh}) ${rttOk ? 'OK' : 'FAIL'}; ` +
+        `потери ${(lossMeasured * 100).toFixed(2)} % (ожид. ${(lossExpected * 100).toFixed(2)} ± ${(lossTol * 100).toFixed(2)}) ${lossOk ? 'OK' : 'FAIL'}; ` +
+        `переупорядочено ${reorderedPct.toFixed(2)} %${noReorder ? ` (≤ 0,5) ${reorderOk ? 'OK' : 'FAIL'}` : ''}`,
     );
   }
 } finally {

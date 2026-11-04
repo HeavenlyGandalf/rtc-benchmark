@@ -233,7 +233,7 @@ if (baseline?.server) {
 }
 if (calibration) {
   md.push('## Калибровка сети', '', '| Профиль | Медиана RTT, мс | Ожидание, мс | Потери, % | Ожидание, % | Переупорядочено, % | Итог |', '|---|---|---|---|---|---|---|');
-  for (const c of calibration.results) md.push(`| ${c.profile} | ${f(c.rttMedianMs, 2)} | ${c.rttExpectedMs} ± 2 | ${f(c.lossPct, 2)} | ${f(c.lossExpectedPct, 2)} ± ${f(c.lossTolPct, 2)} | ${f(c.reorderedPct, 2)} | ${c.pass ? 'OK' : 'FAIL'} |`);
+  for (const c of calibration.results) md.push(`| ${c.profile} | ${f(c.rttMedianMs, 2)} | ${c.rttLowMs != null ? `${c.rttLowMs}…${c.rttHighMs}` : `${c.rttExpectedMs} ± 2`} | ${f(c.lossPct, 2)} | ${f(c.lossExpectedPct, 2)} ± ${f(c.lossTolPct, 2)} | ${f(c.reorderedPct, 2)} | ${c.pass ? 'OK' : 'FAIL'} |`);
   md.push('');
 }
 md.push(`## Медианы по прогонам (размер сообщения ${baseSize} Б), 95 % бутстреп-ДИ`, '');
