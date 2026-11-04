@@ -53,6 +53,8 @@ services:
       GIT_DIRTY: ${GIT_DIRTY:-unknown}
       IMAGE_DIGEST: ${IMAGE_DIGEST:-unknown}
       HOST_LABEL: ${HOST_LABEL:-unknown}
+      HOST_UID: ${HOST_UID:-}
+      HOST_GID: ${HOST_GID:-}
     volumes:
       - ../results:/app/results
     shm_size: 1g

@@ -20,13 +20,21 @@ GIT_COMMIT ?= $(shell git rev-parse HEAD 2>/dev/null || echo unknown)
 # Только отслеживаемые файлы: результаты серии в results/ сами по себе не «пачкают» код
 GIT_DIRTY ?= $(shell test -z "$$(git status --porcelain --untracked-files=no 2>/dev/null)" && echo no || echo yes)
 HOST_LABEL ?= $(shell uname -sm)
+# Id локального образа (для образа из реестра — его digest); пишется в манифест
 IMAGE_DIGEST = $(shell docker image inspect $(IMAGE) --format '{{.Id}}' 2>/dev/null || echo unknown)
 NAME ?= verify
 # Доп. аргументы сборки, например прокси хоста для Docker Desktop:
 #   make image BUILD_ARGS="--build-arg HTTPS_PROXY=http://host.docker.internal:10809"
 BUILD_ARGS ?=
 
-export IMAGE GIT_COMMIT GIT_DIRTY HOST_LABEL
+# Каталоги, которые контейнер мог оставить за root (прерванный прогон на Linux),
+# удаляются изнутри контейнера с тем же томом.
+clean_results = docker run --rm -v "$(CURDIR)/results:/r" $(IMAGE) rm -rf $(addprefix /r/,$(1))
+
+HOST_UID ?= $(shell id -u)
+HOST_GID ?= $(shell id -g)
+
+export IMAGE GIT_COMMIT GIT_DIRTY HOST_LABEL HOST_UID HOST_GID
 
 .PHONY: image test calibrate verify verify-smoke experiment resume analyze reference h1 pilot clean
 
@@ -45,16 +53,16 @@ endef
 
 calibrate:
 	IMAGE_DIGEST=$(IMAGE_DIGEST) $(COMPOSE_ROUTER) run --rm -e PROFILES="lan wifi 4g 5g lossy limited" -e OUT_DIR=results/calibration \
-	  bench bash -c 'ip route replace $$ROUTE_TO via $$ROUTE_VIA && node scripts/calibrate.mjs'; \
+	  bench bash -c 'ip route replace $$ROUTE_TO via $$ROUTE_VIA && node scripts/calibrate.mjs; s=$$?; chown -R $$HOST_UID:$$HOST_GID results/calibration; exit $$s'; \
 	status=$$?; $(COMPOSE_ROUTER) down --remove-orphans >/dev/null 2>&1; exit $$status
 
 verify:
-	rm -rf results/verify
+	$(call clean_results,verify)
 	$(call run_plan,experiment/plan-verify.json)
 	node scripts/compare.mjs results/verify results/reference
 
 verify-smoke:
-	rm -rf results/smoke
+	$(call clean_results,smoke)
 	$(call run_plan,experiment/plan-smoke.json)
 	COMPARE_MODE=smoke node scripts/compare.mjs results/smoke
 
@@ -70,10 +78,10 @@ resume:
 analyze:
 	node scripts/analyze.mjs results/$(NAME)
 
+# Эталон — вся серия целиком (с сырыми данными), чтобы его анализ можно было пересчитать
 reference:
-	rm -rf results/reference && mkdir -p results/reference
-	cp results/verify/analysis.json results/verify/analysis.md results/verify/summary.csv \
-	   results/verify/runs.csv results/verify/calibration.json results/verify/schedule.json results/reference/
+	rm -rf results/reference
+	cp -R results/verify results/reference
 
 h1:
 	for p in lan wifi 4g lossy; do \
@@ -86,4 +94,4 @@ pilot:
 
 clean:
 	$(COMPOSE_ROUTER) down --remove-orphans
-	rm -rf results/smoke results/verify
+	$(call clean_results,smoke verify)

@@ -16,6 +16,9 @@ curl -sf "$NETEM_AGENT/health" >/dev/null || { echo "[bench] router не отв�
 curl -sf "$BENCH_URL/api/info" >/dev/null || { echo "[bench] стенд не отвечает"; exit 1; }
 
 NAME="$(node -p "require('./$PLAN').name")"
+# Файлы результатов — владельцу каталога на хосте (на Linux контейнер пишет
+# в смонтированный results/ от root, и следующий make verify не смог бы их удалить)
+trap 'if [ -n "${HOST_UID:-}" ]; then chown -R "$HOST_UID:${HOST_GID:-$HOST_UID}" "results/$NAME" 2>/dev/null || true; fi' EXIT
 status=0
 yarn node scripts/run-plan.mjs || status=$?  # yarn node: PnP-резолвер наследуют дочерние раннеры
 # анализ — даже если часть прогонов упала: по сводке видно, каких данных нет
