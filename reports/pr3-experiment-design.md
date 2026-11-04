@@ -5,7 +5,7 @@
 **Артефакт:** репозиторий `rtc-benchmark`
 (<https://github.com/HeavenlyGandalf/rtc-benchmark>), ветка
 `docs/pr3-experiment-design`, тег `pr3`.
-**Дата:** 03.11.2026.
+**Дата:** 04.11.2026.
 
 ---
 
@@ -337,7 +337,7 @@ make verify
 маршрутизатор, где стоит `tc netem`.
 
 ```mermaid
-flowchart LR
+flowchart TB
   subgraph Bench["bench (cpus 4, 3 ГБ)"]
     direction TB
     ORCH["run-plan.mjs<br/>план, сид, рандомизация,<br/>калибровка"]
