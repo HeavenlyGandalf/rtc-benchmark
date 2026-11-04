@@ -9,8 +9,11 @@
 //   0. серия получена одним коммитом и одним образом (предупреждение, не FAIL);
 //   4. решения по гипотезам (H₀ отвергнута / нет) совпадают с эталоном;
 //   5. направление отношений A/B совпадает, а их 95 % ДИ пересекаются;
-//   6. медианы RTT в профилях с задержкой — в пределах ±10 % от эталона
-//      (на lan не сравниваются: там RTT определяется CPU, а не сетью).
+//   6. медианы RTT в профилях с задержкой — в пределах ±10 % от эталона или
+//      с пересекающимися 95 % ДИ (на lan не сравниваются: там RTT определяется
+//      CPU, а не сетью). ДИ нужен для надёжных каналов под потерями: в эталоне
+//      половина ширины ДИ их медианы — 6–11 %, и фиксированный допуск ±10 %
+//      ложно браковал бы обычную межпрогонную изменчивость.
 // COMPARE_MODE=smoke (CI): только 1–3 и знак отношений для H2 — машина другая,
 // число прогонов мало, поэтому строгие допуски не применяются.
 import { readFileSync, existsSync } from 'node:fs';
@@ -75,7 +78,9 @@ if (SMOKE) {
   for (const rs of ref.summary.filter((s) => /^rtt\..*\.median$/.test(s.metric) && s.profile !== 'lan')) {
     const cs = cur.summary.find((s) => s.profile === rs.profile && s.rttSize === rs.rttSize && s.metric === rs.metric);
     const dev = cs ? cs.median / rs.median - 1 : NaN;
-    check(`${rs.profile} ${rs.metric}`, Math.abs(dev) <= 0.1, cs ? `${f(cs.median)} мс против ${f(rs.median)} мс (${dev >= 0 ? '+' : ''}${f(dev * 100, 1)} %)` : 'нет в текущей серии');
+    const ciOverlap = cs ? cs.ciLow <= rs.ciHigh && rs.ciLow <= cs.ciHigh : false;
+    const how = Math.abs(dev) <= 0.1 ? '±10 %' : ciOverlap ? 'ДИ пересекаются' : '';
+    check(`${rs.profile} ${rs.metric}`, Math.abs(dev) <= 0.1 || ciOverlap, cs ? `${f(cs.median)} мс против ${f(rs.median)} мс (${dev >= 0 ? '+' : ''}${f(dev * 100, 1)} %${how ? `, ${how}` : ''})` : 'нет в текущей серии');
   }
 }
 
