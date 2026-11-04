@@ -6,6 +6,7 @@
 #   make verify         сокращённый план + сравнение с эталоном results/reference
 #   make verify-smoke   дымовой план для CI (2 профиля × 3 прогона, мягкие проверки)
 #   make experiment     полный план E1+E2 (experiment/plan.json, ~4 ч)
+#   make resume PLAN=experiment/plan-verify.json   дозапустить прерванную серию
 #   make analyze NAME=verify   пересчитать анализ по сохранённым сырым данным
 #   make reference      сделать текущий results/verify эталоном (для автора)
 #   make h1             серия H1: P2P против relay (compose-multihost.yml)
@@ -16,7 +17,8 @@
 IMAGE ?= rtc-bench-exp
 COMPOSE_ROUTER = docker compose -f experiment/compose-router.yml
 GIT_COMMIT ?= $(shell git rev-parse HEAD 2>/dev/null || echo unknown)
-GIT_DIRTY ?= $(shell test -z "$$(git status --porcelain 2>/dev/null)" && echo no || echo yes)
+# Только отслеживаемые файлы: результаты серии в results/ сами по себе не «пачкают» код
+GIT_DIRTY ?= $(shell test -z "$$(git status --porcelain --untracked-files=no 2>/dev/null)" && echo no || echo yes)
 HOST_LABEL ?= $(shell uname -sm)
 IMAGE_DIGEST = $(shell docker image inspect $(IMAGE) --format '{{.Id}}' 2>/dev/null || echo unknown)
 NAME ?= verify
@@ -26,7 +28,7 @@ BUILD_ARGS ?=
 
 export IMAGE GIT_COMMIT GIT_DIRTY HOST_LABEL
 
-.PHONY: image test calibrate verify verify-smoke experiment analyze reference h1 pilot clean
+.PHONY: image test calibrate verify verify-smoke experiment resume analyze reference h1 pilot clean
 
 image:
 	docker build $(BUILD_ARGS) -f experiment/Dockerfile -t $(IMAGE) .
@@ -58,6 +60,12 @@ verify-smoke:
 
 experiment:
 	$(call run_plan,experiment/plan.json)
+
+# Дозапуск прерванной серии: готовые прогоны (raw/<run-id>.json) пропускаются,
+# фон и калибровка снимаются заново перед продолжением.
+PLAN ?= experiment/plan-verify.json
+resume:
+	$(call run_plan,$(PLAN))
 
 analyze:
 	node scripts/analyze.mjs results/$(NAME)
