@@ -1,0 +1,1582 @@
+{
+  "dir": "results/reference",
+  "generatedAt": "2026-11-04T10:22:23.424Z",
+  "chromium": "Chrome/156.0.8078.73",
+  "manifest": {
+    "gitCommit": "c4e09110dd51171886fc4936fd46ee5e96f84309",
+    "gitDirty": "no",
+    "imageDigest": "sha256:455aecc3cc391a43aa3cacb4e56f623a52dd96aa4937de3f9aa05ec7651a248a",
+    "hostLabel": "Darwin arm64",
+    "node": "v22.23.4",
+    "os": "linux arm64 6.10.14-linuxkit",
+    "cpuModel": "unknown",
+    "cpuCount": 12,
+    "cpuLimitCores": 4,
+    "memTotalMb": 7837,
+    "memLimitMb": 3072,
+    "netem": {
+      "name": "lossy",
+      "label": "Потери 5%",
+      "delay": "40ms",
+      "loss": "5%",
+      "rate": ""
+    },
+    "topology": "router"
+  },
+  "thresholds": {
+    "alpha": 0.05,
+    "frameMs": 16.7,
+    "cpuLimitPct": 70,
+    "topProcLimitPct": 90,
+    "loopP99LimitMs": 16.7
+  },
+  "mixedManifest": [],
+  "validity": {
+    "total": 40,
+    "valid": 40,
+    "invalid": [],
+    "clientCpuP95Max": 5.7533640322232,
+    "clientTopProcP95Max": null,
+    "serverCpuMax": 12.74532065135289,
+    "loopP99Max": 6.744447000000001
+  },
+  "baseline": {
+    "server": {
+      "windowMs": 10018.576338,
+      "cpuPct": 1.4371003937346052,
+      "loopDelayMs": {
+        "p50": 2.2879989999999992,
+        "p99": 3.9509749999999997,
+        "max": 6.343039000000001
+      },
+      "rssMb": 156.578125
+    }
+  },
+  "calibration": {
+    "packets": 10000,
+    "intervalUs": 1000,
+    "target": "10.77.2.10:9999",
+    "results": [
+      {
+        "profile": "lan",
+        "rttMedianMs": 0.060625,
+        "rttP95Ms": 0.15,
+        "rttExpectedMs": 0,
+        "lossPct": 0.019999999999997797,
+        "lossExpectedPct": 0,
+        "lossTolPct": 0.2,
+        "pass": true
+      },
+      {
+        "profile": "4g",
+        "rttMedianMs": 101.064125,
+        "rttP95Ms": 121.401708,
+        "rttExpectedMs": 100,
+        "lossPct": 2.070000000000005,
+        "lossExpectedPct": 1.9900000000000029,
+        "lossTolPct": 0.618970058596077,
+        "pass": true
+      },
+      {
+        "profile": "lossy",
+        "rttMedianMs": 81.044709,
+        "rttP95Ms": 81.999542,
+        "rttExpectedMs": 80,
+        "lossPct": 9.840000000000003,
+        "lossExpectedPct": 9.750000000000004,
+        "lossTolPct": 1.089912214771772,
+        "pass": true
+      }
+    ]
+  },
+  "aa": {
+    "profile": "4g",
+    "rttSize": 256,
+    "checks": [
+      {
+        "metric": "rtt.wt-datagram.median",
+        "nA": 10,
+        "nB": 10,
+        "ratio": 0.997620180865849,
+        "ratioCi": [
+          0.9847546454081091,
+          1.00525561434966
+        ],
+        "p": 0.42683324263160916,
+        "pass": true
+      },
+      {
+        "metric": "rtt.rtc-reliable.median",
+        "nA": 10,
+        "nB": 10,
+        "ratio": 1.014242554822987,
+        "ratioCi": [
+          0.9836277466112426,
+          1.0499782705840592
+        ],
+        "p": 0.34434116922993807,
+        "pass": true
+      },
+      {
+        "metric": "rtt.wt-stream.p95",
+        "nA": 10,
+        "nB": 10,
+        "ratio": 1.011306230569686,
+        "ratioCi": [
+          0.8987583572564811,
+          1.0592500001192093
+        ],
+        "p": 0.9698498563122434,
+        "pass": true
+      },
+      {
+        "metric": "setup.wt",
+        "nA": 10,
+        "nB": 10,
+        "ratio": 1.0084728033098715,
+        "ratioCi": [
+          0.9857054071341858,
+          1.0259384226322863
+        ],
+        "p": 0.7337301295569307,
+        "pass": true
+      },
+      {
+        "metric": "setup.rtc-trickle",
+        "nA": 10,
+        "nB": 10,
+        "ratio": 1.0172203048732213,
+        "ratioCi": [
+          0.9939043952646189,
+          1.0369382680674926
+        ],
+        "p": 0.10410987355245749,
+        "pass": true
+      }
+    ],
+    "pass": true
+  },
+  "tests": [
+    {
+      "id": "H2-trickle",
+      "label": "H2: установление WT < RTC (trickle ICE)",
+      "profile": "lossy",
+      "a": "wt",
+      "b": "rtc-trickle",
+      "alternative": "less",
+      "nA": 10,
+      "nB": 10,
+      "medianA": 186.49999998509884,
+      "medianB": 604.8500000089407,
+      "diffMs": -418.35000002384186,
+      "ratio": 0.308340910940468,
+      "ratioCi": [
+        0.2971456061319592,
+        0.3148262672038358
+      ],
+      "p": 0.00009136369872492223,
+      "cliffsDelta": -1,
+      "minRatio": 0.75,
+      "minDiffMs": 80,
+      "practical": true,
+      "pHolm": 0.00027103497701502777,
+      "significant": true,
+      "rejectH0": true
+    },
+    {
+      "id": "H2-full",
+      "label": "H2: установление WT < RTC (full ICE)",
+      "profile": "lossy",
+      "a": "wt",
+      "b": "rtc-full",
+      "alternative": "less",
+      "nA": 10,
+      "nB": 10,
+      "medianA": 186.49999998509884,
+      "medianB": 602.4249999821186,
+      "diffMs": -415.92499999701977,
+      "ratio": 0.3095821056407596,
+      "ratioCi": [
+        0.2919866573435693,
+        0.3152164810383044
+      ],
+      "p": 0.00009136369872492223,
+      "cliffsDelta": -1,
+      "minRatio": 0.75,
+      "minDiffMs": 80,
+      "practical": true,
+      "pHolm": 0.00027103497701502777,
+      "significant": true,
+      "rejectH0": true
+    },
+    {
+      "id": "H3-wt-datagram",
+      "label": "H3: p95 RTC reliable > wt-datagram",
+      "profile": "lossy",
+      "a": "rtc-reliable",
+      "b": "wt-datagram",
+      "alternative": "greater",
+      "nA": 10,
+      "nB": 10,
+      "medianA": 282.09999999403954,
+      "medianB": 89.35000002384186,
+      "diffMs": 192.74999997019768,
+      "ratio": 3.1572467814075535,
+      "ratioCi": [
+        3.040808069136165,
+        3.4127994209128873
+      ],
+      "p": 0.0000908532905707915,
+      "cliffsDelta": 1,
+      "minRatio": 1.2,
+      "minDiffMs": 16.7,
+      "practical": true,
+      "pHolm": 0.000181706581141583,
+      "significant": true,
+      "rejectH0": true
+    },
+    {
+      "id": "H3-rtc-unreliable",
+      "label": "H3: p95 RTC reliable > rtc-unreliable",
+      "profile": "lossy",
+      "a": "rtc-reliable",
+      "b": "rtc-unreliable",
+      "alternative": "greater",
+      "nA": 10,
+      "nB": 10,
+      "medianA": 282.09999999403954,
+      "medianB": 89.15000000596046,
+      "diffMs": 192.94999998807907,
+      "ratio": 3.1643297809891044,
+      "ratioCi": [
+        3.047672461804975,
+        3.4223219293712086
+      ],
+      "p": 0.0000908532905707915,
+      "cliffsDelta": 1,
+      "minRatio": 1.2,
+      "minDiffMs": 16.7,
+      "practical": true,
+      "pHolm": 0.000181706581141583,
+      "significant": true,
+      "rejectH0": true
+    },
+    {
+      "id": "H4",
+      "label": "H4: p95 WT-поток ≠ RTC reliable",
+      "profile": "lossy",
+      "a": "wt-stream",
+      "b": "rtc-reliable",
+      "alternative": "two-sided",
+      "nA": 10,
+      "nB": 10,
+      "medianA": 227.59999999403954,
+      "medianB": 282.09999999403954,
+      "diffMs": -54.5,
+      "ratio": 0.8068060971245958,
+      "ratioCi": [
+        0.7385086822777046,
+        0.9507299459359718
+      ],
+      "p": 0.0010080945602845004,
+      "cliffsDelta": -0.88,
+      "minRatio": 1.2,
+      "minDiffMs": 16.7,
+      "practical": true,
+      "pHolm": 0.002016189120569001,
+      "significant": true,
+      "rejectH0": true
+    },
+    {
+      "id": "H2-trickle",
+      "label": "H2: установление WT < RTC (trickle ICE)",
+      "profile": "lan",
+      "a": "wt",
+      "b": "rtc-trickle",
+      "alternative": "less",
+      "nA": 10,
+      "nB": 10,
+      "medianA": 8.325000017881393,
+      "medianB": 71.40000000596046,
+      "diffMs": -63.07499998807907,
+      "ratio": 0.11659663889616839,
+      "ratioCi": [
+        0.10174127410338905,
+        0.12044817959557326
+      ],
+      "p": 0.00009034499233834259,
+      "cliffsDelta": -1,
+      "minRatio": 0.75,
+      "minDiffMs": 1,
+      "practical": true,
+      "pHolm": 0.00027103497701502777,
+      "significant": true,
+      "rejectH0": true
+    },
+    {
+      "id": "H2-full",
+      "label": "H2: установление WT < RTC (full ICE)",
+      "profile": "lan",
+      "a": "wt",
+      "b": "rtc-full",
+      "alternative": "less",
+      "nA": 10,
+      "nB": 10,
+      "medianA": 8.325000017881393,
+      "medianB": 144.24999997019768,
+      "diffMs": -135.92499995231628,
+      "ratio": 0.05771230516188114,
+      "ratioCi": [
+        0.050440490464116465,
+        0.059639389919072174
+      ],
+      "p": 0.00009034499233834259,
+      "cliffsDelta": -1,
+      "minRatio": 0.75,
+      "minDiffMs": 1,
+      "practical": true,
+      "pHolm": 0.00027103497701502777,
+      "significant": true,
+      "rejectH0": true
+    },
+    {
+      "id": "H2-trickle",
+      "label": "H2: установление WT < RTC (trickle ICE)",
+      "profile": "4g",
+      "a": "wt",
+      "b": "rtc-trickle",
+      "alternative": "less",
+      "nA": 10,
+      "nB": 10,
+      "medianA": 241.0249999910593,
+      "medianB": 707.3750000149012,
+      "diffMs": -466.35000002384186,
+      "ratio": 0.34073157799750065,
+      "ratioCi": [
+        0.3323773546133816,
+        0.34828477104830335
+      ],
+      "p": 0.00009136369872492223,
+      "cliffsDelta": -1,
+      "minRatio": 0.75,
+      "minDiffMs": 100,
+      "practical": true,
+      "pHolm": 0.00027103497701502777,
+      "significant": true,
+      "rejectH0": true
+    },
+    {
+      "id": "H2-full",
+      "label": "H2: установление WT < RTC (full ICE)",
+      "profile": "4g",
+      "a": "wt",
+      "b": "rtc-full",
+      "alternative": "less",
+      "nA": 10,
+      "nB": 10,
+      "medianA": 241.0249999910593,
+      "medianB": 693.7250000089407,
+      "diffMs": -452.7000000178814,
+      "ratio": 0.3474359436202429,
+      "ratioCi": [
+        0.3420018034437092,
+        0.35184648804885926
+      ],
+      "p": 0.00009136369872492223,
+      "cliffsDelta": -1,
+      "minRatio": 0.75,
+      "minDiffMs": 100,
+      "practical": true,
+      "pHolm": 0.00027103497701502777,
+      "significant": true,
+      "rejectH0": true
+    },
+    {
+      "id": "H3-wt-datagram",
+      "label": "H3: p95 RTC reliable > wt-datagram",
+      "profile": "4g",
+      "a": "rtc-reliable",
+      "b": "wt-datagram",
+      "alternative": "greater",
+      "nA": 10,
+      "nB": 10,
+      "medianA": 241.15000000596046,
+      "medianB": 125.7999999821186,
+      "diffMs": 115.35000002384186,
+      "ratio": 1.9169316378397288,
+      "ratioCi": [
+        1.8668261557199093,
+        2.0818759930222583
+      ],
+      "p": 0.0000908532905707915,
+      "cliffsDelta": 1,
+      "minRatio": 1.2,
+      "minDiffMs": 16.7,
+      "practical": true,
+      "pHolm": 0.000181706581141583,
+      "significant": true,
+      "rejectH0": true
+    },
+    {
+      "id": "H3-rtc-unreliable",
+      "label": "H3: p95 RTC reliable > rtc-unreliable",
+      "profile": "4g",
+      "a": "rtc-reliable",
+      "b": "rtc-unreliable",
+      "alternative": "greater",
+      "nA": 10,
+      "nB": 10,
+      "medianA": 241.15000000596046,
+      "medianB": 126,
+      "diffMs": 115.15000000596046,
+      "ratio": 1.9138888889361942,
+      "ratioCi": [
+        1.8616302186404734,
+        2.0769230765776587
+      ],
+      "p": 0.0000908532905707915,
+      "cliffsDelta": 1,
+      "minRatio": 1.2,
+      "minDiffMs": 16.7,
+      "practical": true,
+      "pHolm": 0.000181706581141583,
+      "significant": true,
+      "rejectH0": true
+    },
+    {
+      "id": "H4",
+      "label": "H4: p95 WT-поток ≠ RTC reliable",
+      "profile": "4g",
+      "a": "wt-stream",
+      "b": "rtc-reliable",
+      "alternative": "two-sided",
+      "nA": 10,
+      "nB": 10,
+      "medianA": 210.2000000178814,
+      "medianB": 241.15000000596046,
+      "diffMs": -30.94999998807907,
+      "ratio": 0.8716566452941568,
+      "ratioCi": [
+        0.7508439053456227,
+        0.9003399916699583
+      ],
+      "p": 0.0022023577164514974,
+      "cliffsDelta": -0.82,
+      "minRatio": 1.2,
+      "minDiffMs": 16.7,
+      "practical": false,
+      "pHolm": 0.0022023577164514974,
+      "significant": true,
+      "rejectH0": false
+    }
+  ],
+  "summary": [
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "ctl.clientCpuP95",
+      "median": 4.482389287868814,
+      "ciLow": 4.000604923469251,
+      "ciHigh": 5.224225629827018,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "ctl.loopP99",
+      "median": 6.535551,
+      "ciLow": 6.490494999999999,
+      "ciHigh": 6.605183,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "ctl.serverCpu",
+      "median": 9.795817853316482,
+      "ciLow": 7.623223268132061,
+      "ciHigh": 10.245892276463692,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "ctl.tpClientCpuP95",
+      "median": 3.4883026852634176,
+      "ciLow": 3.4702977322247097,
+      "ciHigh": 3.8499239618642087,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "rtt.rtc-reliable.jitter",
+      "median": 17.04674316329752,
+      "ciLow": 11.941870672235002,
+      "ciHigh": 22.856138259381787,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "rtt.rtc-reliable.loss",
+      "median": 0,
+      "ciLow": 0,
+      "ciHigh": 0,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "rtt.rtc-reliable.median",
+      "median": 156.55000001192093,
+      "ciLow": 146.90000000596046,
+      "ciHigh": 166.80000001192093,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "rtt.rtc-reliable.p95",
+      "median": 282.09999999403954,
+      "ciLow": 271.69999998807907,
+      "ciHigh": 305.10000002384186,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "rtt.rtc-reliable.p99",
+      "median": 324.30000001192093,
+      "ciLow": 309.8499999642372,
+      "ciHigh": 383.9000000357628,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "rtt.rtc-unreliable.jitter",
+      "median": 1.790711352372666,
+      "ciLow": 1.407861203924492,
+      "ciHigh": 2.2575203020309442,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "rtt.rtc-unreliable.loss",
+      "median": 9.5,
+      "ciLow": 9.2,
+      "ciHigh": 10.9,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "rtt.rtc-unreliable.median",
+      "median": 85.20000004768372,
+      "ciLow": 84.80000001192093,
+      "ciHigh": 85.39999997615814,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "rtt.rtc-unreliable.p95",
+      "median": 89.15000000596046,
+      "ciLow": 88.80000001192093,
+      "ciHigh": 89.30000001192093,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "rtt.rtc-unreliable.p99",
+      "median": 91.84999999403954,
+      "ciLow": 91.05000001192093,
+      "ciHigh": 92.5,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "rtt.wt-datagram.jitter",
+      "median": 2.1003698510440225,
+      "ciLow": 1.70300324164922,
+      "ciHigh": 2.7012564357137765,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "rtt.wt-datagram.loss",
+      "median": 10.3,
+      "ciLow": 8.6,
+      "ciHigh": 11.8,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "rtt.wt-datagram.median",
+      "median": 85.30000001192093,
+      "ciLow": 85,
+      "ciHigh": 85.40000000596046,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "rtt.wt-datagram.p95",
+      "median": 89.35000002384186,
+      "ciLow": 88.89999997615814,
+      "ciHigh": 89.7000000178814,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "rtt.wt-datagram.p99",
+      "median": 91.75,
+      "ciLow": 90.75000002980232,
+      "ciHigh": 92.40000000596046,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "rtt.wt-stream.jitter",
+      "median": 14.9656470407005,
+      "ciLow": 12.16401173450981,
+      "ciHigh": 17.90834551878154,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "rtt.wt-stream.loss",
+      "median": 0,
+      "ciLow": 0,
+      "ciHigh": 0,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "rtt.wt-stream.median",
+      "median": 127.60000002384186,
+      "ciLow": 116.25,
+      "ciHigh": 132.65000000596046,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "rtt.wt-stream.p95",
+      "median": 227.59999999403954,
+      "ciLow": 215.69999998807907,
+      "ciHigh": 267.19999998807907,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "rtt.wt-stream.p99",
+      "median": 292.80000001192093,
+      "ciLow": 288.10000002384186,
+      "ciHigh": 306.09999999403954,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "setup.rtc-full",
+      "median": 602.4249999821186,
+      "ciLow": 595.4000000059605,
+      "ciHigh": 631.6500000059605,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "setup.rtc-full.connect",
+      "median": 363.8500000089407,
+      "ciLow": 359.67499999701977,
+      "ciHigh": 370.15000000596046,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "setup.rtc-full.offer",
+      "median": 130.6499999910593,
+      "ciLow": 129.75,
+      "ciHigh": 131.84999999403954,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "setup.rtc-full.signal",
+      "median": 100.77500000596046,
+      "ciLow": 98.32500000298023,
+      "ciHigh": 103.65000000596046,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "setup.rtc-trickle",
+      "median": 604.8500000089407,
+      "ciLow": 596.0999999940395,
+      "ciHigh": 617.3750000149012,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "setup.rtc-trickle.connect",
+      "median": 497.5,
+      "ciLow": 493.875,
+      "ciHigh": 501.54999999701977,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "setup.rtc-trickle.offer",
+      "median": 4.750000014901161,
+      "ciLow": 4.450000017881393,
+      "ciHigh": 4.899999976158142,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "setup.rtc-trickle.signal",
+      "median": 97.90000000596046,
+      "ciLow": 97.10000002384186,
+      "ciHigh": 99.34999999403954,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "setup.wt",
+      "median": 186.49999998509884,
+      "ciLow": 180.14999997615814,
+      "ciHigh": 188.30000001192093,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "tp.rtc-reliable.loss",
+      "median": 43.93939393939394,
+      "ciLow": 42.42424242424242,
+      "ciHigh": 48.484848484848484,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "tp.rtc-reliable.mbps",
+      "median": 0.534657991110368,
+      "ciLow": 0.4606581844746982,
+      "ciHigh": 0.5665612836502453,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "tp.rtc-unreliable.loss",
+      "median": 90.9090909090909,
+      "ciLow": 89.39393939393939,
+      "ciHigh": 90.9090909090909,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "tp.rtc-unreliable.mbps",
+      "median": 0.10410909265009322,
+      "ciLow": 0.06377682264212149,
+      "ciHigh": 0.12511063503432723,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "tp.wt-datagram.loss",
+      "median": 13.210611601700709,
+      "ciLow": 11.54572940287226,
+      "ciHigh": 18.66226146084668,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "tp.wt-datagram.mbps",
+      "median": 1.096629010758181,
+      "ciLow": 1.0236908884103606,
+      "ciHigh": 1.6896362123481443,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "tp.wt-stream.loss",
+      "median": 14.84375,
+      "ciLow": 4.166666666666666,
+      "ciHigh": 25.44642857142857,
+      "n": 10
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "metric": "tp.wt-stream.mbps",
+      "median": 1.7136805512815827,
+      "ciLow": 1.3505416862882418,
+      "ciHigh": 1.9393793337773206,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "ctl.clientCpuP95",
+      "median": 5.355954251019083,
+      "ciLow": 5.2275037843135514,
+      "ciHigh": 5.4861085717746745,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "ctl.loopP99",
+      "median": 6.543742999999999,
+      "ciLow": 6.449534999999999,
+      "ciHigh": 6.5724149999999995,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "ctl.serverCpu",
+      "median": 9.71961245058034,
+      "ciLow": 8.468996077449475,
+      "ciHigh": 11.2214365748355,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "ctl.tpClientCpuP95",
+      "median": 55.16636516723428,
+      "ciLow": 53.3971525987337,
+      "ciHigh": 55.694372905896664,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "rtt.rtc-reliable.jitter",
+      "median": 0.5360079308901139,
+      "ciLow": 0.38795522798867577,
+      "ciHigh": 0.8318926505693865,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "rtt.rtc-reliable.loss",
+      "median": 0,
+      "ciLow": 0,
+      "ciHigh": 0,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "rtt.rtc-reliable.median",
+      "median": 2.350000023841858,
+      "ciLow": 2.050000011920929,
+      "ciHigh": 2.899999976158142,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "rtt.rtc-reliable.p95",
+      "median": 3.850000023841858,
+      "ciLow": 3.099999964237213,
+      "ciHigh": 4.300000011920929,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "rtt.rtc-reliable.p99",
+      "median": 5.549999982118607,
+      "ciLow": 5,
+      "ciHigh": 6,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "rtt.rtc-unreliable.jitter",
+      "median": 0.5486998887133204,
+      "ciLow": 0.33073545181066205,
+      "ciHigh": 0.8565839955667167,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "rtt.rtc-unreliable.loss",
+      "median": 0,
+      "ciLow": 0,
+      "ciHigh": 0,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "rtt.rtc-unreliable.median",
+      "median": 2.3499999940395355,
+      "ciLow": 2,
+      "ciHigh": 2.900000035762787,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "rtt.rtc-unreliable.p95",
+      "median": 3.949999988079071,
+      "ciLow": 3.199999988079071,
+      "ciHigh": 4.449999988079071,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "rtt.rtc-unreliable.p99",
+      "median": 5.949999988079071,
+      "ciLow": 4.649999976158142,
+      "ciHigh": 6.75,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "rtt.wt-datagram.jitter",
+      "median": 0.4818187249903656,
+      "ciLow": 0.4403710773223295,
+      "ciHigh": 0.6346414051939238,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "rtt.wt-datagram.loss",
+      "median": 0,
+      "ciLow": 0,
+      "ciHigh": 0,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "rtt.wt-datagram.median",
+      "median": 1.9000000059604645,
+      "ciLow": 1.75,
+      "ciHigh": 2,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "rtt.wt-datagram.p95",
+      "median": 3.25,
+      "ciLow": 2.800000011920929,
+      "ciHigh": 3.350000023841858,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "rtt.wt-datagram.p99",
+      "median": 4.550000011920929,
+      "ciLow": 4.050000011920929,
+      "ciHigh": 5.250000029802322,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "rtt.wt-stream.jitter",
+      "median": 0.5564591724357434,
+      "ciLow": 0.41510565698000623,
+      "ciHigh": 0.8106235845278256,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "rtt.wt-stream.loss",
+      "median": 0,
+      "ciLow": 0,
+      "ciHigh": 0,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "rtt.wt-stream.median",
+      "median": 1.7999999821186066,
+      "ciLow": 1.699999988079071,
+      "ciHigh": 1.899999976158142,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "rtt.wt-stream.p95",
+      "median": 3.300000011920929,
+      "ciLow": 2.800000011920929,
+      "ciHigh": 3.400000035762787,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "rtt.wt-stream.p99",
+      "median": 5.300000011920929,
+      "ciLow": 3.899999976158142,
+      "ciHigh": 5.900000035762787,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "setup.rtc-full",
+      "median": 144.24999997019768,
+      "ciLow": 142.80000001192093,
+      "ciHigh": 144.94999998807907,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "setup.rtc-full.connect",
+      "median": 3.125000014901161,
+      "ciLow": 2.999999985098839,
+      "ciHigh": 3.399999976158142,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "setup.rtc-full.offer",
+      "median": 131.4750000089407,
+      "ciLow": 130.07500003278255,
+      "ciHigh": 132.44999995827675,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "setup.rtc-full.signal",
+      "median": 9.250000014901161,
+      "ciLow": 8.424999997019768,
+      "ciHigh": 9.800000011920929,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "setup.rtc-trickle",
+      "median": 71.40000000596046,
+      "ciLow": 70.82500000298023,
+      "ciHigh": 71.89999997615814,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "setup.rtc-trickle.connect",
+      "median": 58.70000000298023,
+      "ciLow": 58.39999997615814,
+      "ciHigh": 59.125,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "setup.rtc-trickle.offer",
+      "median": 4.700000002980232,
+      "ciLow": 4.4000000059604645,
+      "ciHigh": 4.900000035762787,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "setup.rtc-trickle.signal",
+      "median": 7.350000008940697,
+      "ciLow": 6.850000023841858,
+      "ciHigh": 7.849999979138374,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "setup.wt",
+      "median": 8.325000017881393,
+      "ciLow": 7.299999982118607,
+      "ciHigh": 8.600000023841858,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "tp.rtc-reliable.loss",
+      "median": 0,
+      "ciLow": 0,
+      "ciHigh": 0,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "tp.rtc-reliable.mbps",
+      "median": 211.78834960749558,
+      "ciLow": 203.19687421413025,
+      "ciHigh": 227.57791902665105,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "tp.rtc-unreliable.loss",
+      "median": 0.7825612421894453,
+      "ciLow": 0.09543806069860661,
+      "ciHigh": 1.5706988341895296,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "tp.rtc-unreliable.mbps",
+      "median": 227.2499812972314,
+      "ciLow": 219.30518613165492,
+      "ciHigh": 252.30786372381368,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "tp.wt-datagram.loss",
+      "median": 0,
+      "ciLow": 0,
+      "ciHigh": 0,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "tp.wt-datagram.mbps",
+      "median": 75.01454739523294,
+      "ciLow": 73.63202933333334,
+      "ciHigh": 76.336596,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "tp.wt-stream.loss",
+      "median": 0,
+      "ciLow": 0,
+      "ciHigh": 0,
+      "n": 10
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "metric": "tp.wt-stream.mbps",
+      "median": 258.2699640819624,
+      "ciLow": 250.59078129652084,
+      "ciHigh": 262.91689707925747,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "ctl.clientCpuP95",
+      "median": 3.995549613756457,
+      "ciLow": 3.746138196041029,
+      "ciHigh": 4.61209075265157,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "ctl.loopP99",
+      "median": 6.568318999999999,
+      "ciLow": 6.523263,
+      "ciHigh": 6.5806070000000005,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "ctl.serverCpu",
+      "median": 9.732241618813873,
+      "ciLow": 8.153691870211151,
+      "ciHigh": 11.379404839589911,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "ctl.tpClientCpuP95",
+      "median": 3.724827281682233,
+      "ciLow": 3.466690168046906,
+      "ciHigh": 4.100252902529982,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "rtt.rtc-reliable.jitter",
+      "median": 11.932419621089993,
+      "ciLow": 10.802819228386163,
+      "ciHigh": 14.598991044859602,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "rtt.rtc-reliable.loss",
+      "median": 0,
+      "ciLow": 0,
+      "ciHigh": 0,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "rtt.rtc-reliable.median",
+      "median": 117.49999997019768,
+      "ciLow": 114.30000001192093,
+      "ciHigh": 120.80000001192093,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "rtt.rtc-reliable.p95",
+      "median": 241.15000000596046,
+      "ciLow": 235.2999999821186,
+      "ciHigh": 261.90000000596046,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "rtt.rtc-reliable.p99",
+      "median": 284.34999999403954,
+      "ciLow": 271.7000000178814,
+      "ciHigh": 372.60000002384186,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "rtt.rtc-unreliable.jitter",
+      "median": 14.555235834833974,
+      "ciLow": 11.617762721686594,
+      "ciHigh": 16.782751904021442,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "rtt.rtc-unreliable.loss",
+      "median": 1.8,
+      "ciLow": 1.5,
+      "ciHigh": 2.1999999999999997,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "rtt.rtc-unreliable.median",
+      "median": 105.7999999821186,
+      "ciLow": 105.30000001192093,
+      "ciHigh": 106.09999999403954,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "rtt.rtc-unreliable.p95",
+      "median": 126,
+      "ciLow": 125.4500000178814,
+      "ciHigh": 127.10000002384186,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "rtt.rtc-unreliable.p99",
+      "median": 132.44999998807907,
+      "ciLow": 130.7999999821186,
+      "ciHigh": 133.7000000178814,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "rtt.wt-datagram.jitter",
+      "median": 14.453979567077305,
+      "ciLow": 13.40698744228124,
+      "ciHigh": 16.28235448274384,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "rtt.wt-datagram.loss",
+      "median": 1.8,
+      "ciLow": 1.2000000000000002,
+      "ciHigh": 2.2,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "rtt.wt-datagram.median",
+      "median": 104.7999999821186,
+      "ciLow": 103.65000000596046,
+      "ciHigh": 105.59999996423721,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "rtt.wt-datagram.p95",
+      "median": 125.7999999821186,
+      "ciLow": 124.80000001192093,
+      "ciHigh": 126.2999999821186,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "rtt.wt-datagram.p99",
+      "median": 131.59999999403954,
+      "ciLow": 131.19874998852612,
+      "ciHigh": 132.69999998807907,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "rtt.wt-stream.jitter",
+      "median": 13.581094090588424,
+      "ciLow": 11.563755577624487,
+      "ciHigh": 15.436463577852152,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "rtt.wt-stream.loss",
+      "median": 0,
+      "ciLow": 0,
+      "ciHigh": 0,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "rtt.wt-stream.median",
+      "median": 111.15000000596046,
+      "ciLow": 109.80000001192093,
+      "ciHigh": 112.5,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "rtt.wt-stream.p95",
+      "median": 210.2000000178814,
+      "ciLow": 188.19999998807907,
+      "ciHigh": 214.19999998807907,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "rtt.wt-stream.p99",
+      "median": 236.5999999642372,
+      "ciLow": 226.19999998807907,
+      "ciHigh": 242.10000002384186,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "setup.rtc-full",
+      "median": 693.7250000089407,
+      "ciLow": 687.9000000059605,
+      "ciHigh": 697.3000000119209,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "setup.rtc-full.connect",
+      "median": 440.29999999701977,
+      "ciLow": 435.69999998807907,
+      "ciHigh": 443.90000000596046,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "setup.rtc-full.offer",
+      "median": 130.625,
+      "ciLow": 128.7000000178814,
+      "ciHigh": 131.8500000089407,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "setup.rtc-full.signal",
+      "median": 120.15000000596046,
+      "ciLow": 116.875,
+      "ciHigh": 122.59999999403954,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "setup.rtc-trickle",
+      "median": 707.3750000149012,
+      "ciLow": 695.4749999791384,
+      "ciHigh": 719.3500000089407,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "setup.rtc-trickle.connect",
+      "median": 580.9500000029802,
+      "ciLow": 569.6249999850988,
+      "ciHigh": 592.3500000238419,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "setup.rtc-trickle.offer",
+      "median": 4.674999997019768,
+      "ciLow": 4.299999982118607,
+      "ciHigh": 5.074999988079071,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "setup.rtc-trickle.signal",
+      "median": 118.99999998509884,
+      "ciLow": 115.39999997615814,
+      "ciHigh": 121.84999999403954,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "setup.wt",
+      "median": 241.0249999910593,
+      "ciLow": 237.88875000588607,
+      "ciHigh": 243.25,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "tp.rtc-reliable.loss",
+      "median": 43.93939393939394,
+      "ciLow": 41.66666666666667,
+      "ciHigh": 50,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "tp.rtc-reliable.mbps",
+      "median": 0.5995052517340328,
+      "ciLow": 0.43096845468398304,
+      "ciHigh": 0.638912834756087,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "tp.rtc-unreliable.loss",
+      "median": 69.6969696969697,
+      "ciLow": 65.15151515151516,
+      "ciHigh": 74.24242424242425,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "tp.rtc-unreliable.mbps",
+      "median": 0.29696265475806916,
+      "ciLow": 0.19521869363071595,
+      "ciHigh": 0.40414188808880547,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "tp.wt-datagram.loss",
+      "median": 4.925274421543078,
+      "ciLow": 1.8943497645735239,
+      "ciHigh": 9.676193371845546,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "tp.wt-datagram.mbps",
+      "median": 1.3758496378663903,
+      "ciLow": 0.9706703947844921,
+      "ciHigh": 1.4274698912747015,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "tp.wt-stream.loss",
+      "median": 16.145833333333332,
+      "ciLow": 11.309523809523808,
+      "ciHigh": 18.75,
+      "n": 10
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "metric": "tp.wt-stream.mbps",
+      "median": 1.0062711992941753,
+      "ciLow": 0.9662668675167292,
+      "ciHigh": 1.2446695365962388,
+      "n": 10
+    }
+  ]
+}

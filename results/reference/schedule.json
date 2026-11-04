@@ -1,0 +1,397 @@
+{
+  "plan": "experiment/plan-verify.json",
+  "name": "verify",
+  "description": "Сокращённый план для проверяющего (раздел 4.2 отчёта ПР-3): 3 профиля × 10 прогонов + A/A-партия на 4g.",
+  "seed": 20261103,
+  "repsPerConfig": 10,
+  "discardFirstRun": true,
+  "pauseAfterNetemMs": 2000,
+  "calibrate": true,
+  "factors": {
+    "profile": [
+      "lan",
+      "4g",
+      "lossy"
+    ],
+    "rttSize": [
+      256
+    ]
+  },
+  "aa": {
+    "profile": "4g",
+    "rttSize": 256,
+    "reps": 10
+  },
+  "series": {
+    "REPS": 20,
+    "SETUP_WARMUP": 1,
+    "ICE_MODES": "full trickle",
+    "RTT_COUNT": 500,
+    "RTT_INTERVAL": 10,
+    "RTT_WARMUP": 50,
+    "TP_DURATION": 3,
+    "TP_SIZE": 16384
+  },
+  "schedule": [
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 7,
+      "index": 1,
+      "seed": 3786063352,
+      "runId": "001-lossy-256-A7"
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "batch": "B",
+      "rep": 2,
+      "index": 2,
+      "seed": 2145531825,
+      "runId": "002-4g-256-B2"
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 2,
+      "index": 3,
+      "seed": 505000298,
+      "runId": "003-lan-256-A2"
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "batch": "B",
+      "rep": 7,
+      "index": 4,
+      "seed": 3159436067,
+      "runId": "004-4g-256-B7"
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 4,
+      "index": 5,
+      "seed": 1518904540,
+      "runId": "005-lan-256-A4"
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "batch": "B",
+      "rep": 6,
+      "index": 6,
+      "seed": 4173340309,
+      "runId": "006-4g-256-B6"
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 2,
+      "index": 7,
+      "seed": 2532808782,
+      "runId": "007-4g-256-A2"
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "batch": "B",
+      "rep": 5,
+      "index": 8,
+      "seed": 892277255,
+      "runId": "008-4g-256-B5"
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "batch": "B",
+      "rep": 3,
+      "index": 9,
+      "seed": 3546713024,
+      "runId": "009-4g-256-B3"
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 7,
+      "index": 10,
+      "seed": 1906181497,
+      "runId": "010-4g-256-A7"
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 8,
+      "index": 11,
+      "seed": 265649970,
+      "runId": "011-lan-256-A8"
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 9,
+      "index": 12,
+      "seed": 2920085739,
+      "runId": "012-lan-256-A9"
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 4,
+      "index": 13,
+      "seed": 1279554212,
+      "runId": "013-4g-256-A4"
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 6,
+      "index": 14,
+      "seed": 3933989981,
+      "runId": "014-lossy-256-A6"
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 4,
+      "index": 15,
+      "seed": 2293458454,
+      "runId": "015-lossy-256-A4"
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 5,
+      "index": 16,
+      "seed": 652926927,
+      "runId": "016-lan-256-A5"
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 9,
+      "index": 17,
+      "seed": 3307362696,
+      "runId": "017-lossy-256-A9"
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 1,
+      "index": 18,
+      "seed": 1666831169,
+      "runId": "018-lossy-256-A1"
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 7,
+      "index": 19,
+      "seed": 26299642,
+      "runId": "019-lan-256-A7"
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "batch": "B",
+      "rep": 10,
+      "index": 20,
+      "seed": 2680735411,
+      "runId": "020-4g-256-B10"
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "batch": "B",
+      "rep": 8,
+      "index": 21,
+      "seed": 1040203884,
+      "runId": "021-4g-256-B8"
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 1,
+      "index": 22,
+      "seed": 3694639653,
+      "runId": "022-4g-256-A1"
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 3,
+      "index": 23,
+      "seed": 2054108126,
+      "runId": "023-lossy-256-A3"
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "batch": "B",
+      "rep": 4,
+      "index": 24,
+      "seed": 413576599,
+      "runId": "024-4g-256-B4"
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 10,
+      "index": 25,
+      "seed": 3068012368,
+      "runId": "025-4g-256-A10"
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 6,
+      "index": 26,
+      "seed": 1427480841,
+      "runId": "026-lan-256-A6"
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "batch": "B",
+      "rep": 9,
+      "index": 27,
+      "seed": 4081916610,
+      "runId": "027-4g-256-B9"
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 3,
+      "index": 28,
+      "seed": 2441385083,
+      "runId": "028-4g-256-A3"
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 1,
+      "index": 29,
+      "seed": 800853556,
+      "runId": "029-lan-256-A1"
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 8,
+      "index": 30,
+      "seed": 3455289325,
+      "runId": "030-lossy-256-A8"
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 6,
+      "index": 31,
+      "seed": 1814757798,
+      "runId": "031-4g-256-A6"
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 5,
+      "index": 32,
+      "seed": 174226271,
+      "runId": "032-4g-256-A5"
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 5,
+      "index": 33,
+      "seed": 2828662040,
+      "runId": "033-lossy-256-A5"
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 3,
+      "index": 34,
+      "seed": 1188130513,
+      "runId": "034-lan-256-A3"
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "batch": "B",
+      "rep": 1,
+      "index": 35,
+      "seed": 3842566282,
+      "runId": "035-4g-256-B1"
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 8,
+      "index": 36,
+      "seed": 2202034755,
+      "runId": "036-4g-256-A8"
+    },
+    {
+      "profile": "4g",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 9,
+      "index": 37,
+      "seed": 561503228,
+      "runId": "037-4g-256-A9"
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 10,
+      "index": 38,
+      "seed": 3215938997,
+      "runId": "038-lossy-256-A10"
+    },
+    {
+      "profile": "lossy",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 2,
+      "index": 39,
+      "seed": 1575407470,
+      "runId": "039-lossy-256-A2"
+    },
+    {
+      "profile": "lan",
+      "rttSize": 256,
+      "batch": "A",
+      "rep": 10,
+      "index": 40,
+      "seed": 4229843239,
+      "runId": "040-lan-256-A10"
+    }
+  ]
+}
