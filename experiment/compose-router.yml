@@ -53,6 +53,10 @@ services:
       GIT_DIRTY: ${GIT_DIRTY:-unknown}
       IMAGE_DIGEST: ${IMAGE_DIGEST:-unknown}
       HOST_LABEL: ${HOST_LABEL:-unknown}
+      HOST_CPU: ${HOST_CPU:-unknown}
+      HOST_OS: ${HOST_OS:-unknown}
+      HOST_MEM_MB: ${HOST_MEM_MB:-}
+      DOCKER_VERSION: ${DOCKER_VERSION:-unknown}
       HOST_UID: ${HOST_UID:-}
       HOST_GID: ${HOST_GID:-}
     volumes:

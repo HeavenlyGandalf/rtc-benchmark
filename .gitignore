@@ -49,3 +49,7 @@ evidence/t1-scripts/quarto/
 # Служебные прогоны стенда (дымовой план, логи make)
 results/smoke/
 results/*.log
+
+# Дымовая проверка стенда (make smoke)
+results/smoke-check/
+results/calibration/

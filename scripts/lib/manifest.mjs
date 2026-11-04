@@ -31,6 +31,13 @@ export function environmentManifest(extra = {}) {
     gitDirty: process.env.GIT_DIRTY ?? 'unknown',
     imageDigest: process.env.IMAGE_DIGEST ?? 'unknown',
     hostLabel: process.env.HOST_LABEL ?? hostname(),
+    // машина, на которой запущен Docker (передаётся из Makefile)
+    host: {
+      cpu: process.env.HOST_CPU || 'unknown',
+      os: process.env.HOST_OS || 'unknown',
+      memMb: process.env.HOST_MEM_MB ? Number(process.env.HOST_MEM_MB) : null,
+      docker: process.env.DOCKER_VERSION || 'unknown',
+    },
     node: process.version,
     os: `${platform()} ${arch()} ${release()}`,
     cpuModel: cpu[0]?.model ?? 'unknown',

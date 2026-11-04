@@ -2,6 +2,7 @@
 #
 #   make image          собрать образ стенда (rtc-bench-exp)
 #   make test           typecheck + модульные тесты статистики (на хосте)
+#   make smoke          дымовая проверка стенда: сервисы, SUT, netem, метрики (~2 мин)
 #   make calibrate      только калибровка сети на топологии с маршрутизатором
 #   make verify         сокращённый план + сравнение с эталоном results/reference
 #   make verify-smoke   дымовой план для CI (2 профиля × 3 прогона, мягкие проверки)
@@ -20,6 +21,12 @@ GIT_COMMIT ?= $(shell git rev-parse HEAD 2>/dev/null || echo unknown)
 # Только отслеживаемые файлы: результаты серии в results/ сами по себе не «пачкают» код
 GIT_DIRTY ?= $(shell test -z "$$(git status --porcelain --untracked-files=no 2>/dev/null)" && echo no || echo yes)
 HOST_LABEL ?= $(shell uname -sm)
+# Характеристики хоста для манифеста: изнутри контейнера их не видно (на arm64
+# модель CPU не читается, а ОС там — VM Docker Desktop, а не macOS)
+HOST_CPU ?= $(shell sysctl -n machdep.cpu.brand_string 2>/dev/null || lscpu 2>/dev/null | sed -n 's/^Model name: *//p')
+HOST_OS ?= $(shell if command -v sw_vers >/dev/null; then echo "macOS $$(sw_vers -productVersion)"; else uname -sr; fi)
+HOST_MEM_MB ?= $(shell (sysctl -n hw.memsize 2>/dev/null || awk '/MemTotal/ {print $$2 * 1024}' /proc/meminfo) | awk '{printf "%d", $$1 / 1048576}')
+DOCKER_VERSION ?= $(shell docker version --format '{{.Server.Version}}' 2>/dev/null || echo unknown)
 # Id локального образа (для образа из реестра — его digest); пишется в манифест
 IMAGE_DIGEST = $(shell docker image inspect $(IMAGE) --format '{{.Id}}' 2>/dev/null || echo unknown)
 NAME ?= verify
@@ -34,9 +41,9 @@ clean_results = docker run --rm -v "$(CURDIR)/results:/r" $(IMAGE) rm -rf $(addp
 HOST_UID ?= $(shell id -u)
 HOST_GID ?= $(shell id -g)
 
-export IMAGE GIT_COMMIT GIT_DIRTY HOST_LABEL HOST_UID HOST_GID
+export IMAGE GIT_COMMIT GIT_DIRTY HOST_LABEL HOST_CPU HOST_OS HOST_MEM_MB DOCKER_VERSION HOST_UID HOST_GID
 
-.PHONY: image test calibrate verify verify-smoke experiment resume analyze reference h1 pilot clean
+.PHONY: image test smoke calibrate verify verify-smoke experiment resume analyze reference h1 pilot clean
 
 image:
 	docker build $(BUILD_ARGS) -f experiment/Dockerfile -t $(IMAGE) .
@@ -50,6 +57,10 @@ define run_plan
 	IMAGE_DIGEST=$(IMAGE_DIGEST) PLAN=$(1) $(COMPOSE_ROUTER) up --abort-on-container-exit --exit-code-from bench; \
 	status=$$?; $(COMPOSE_ROUTER) down --remove-orphans >/dev/null 2>&1; exit $$status
 endef
+
+smoke:
+	IMAGE_DIGEST=$(IMAGE_DIGEST) $(COMPOSE_ROUTER) run --rm bench bash experiment/smoke-entry.sh; \
+	status=$$?; $(COMPOSE_ROUTER) down --remove-orphans >/dev/null 2>&1; exit $$status
 
 # Перед калибровкой — ожидание готовности сервера и пауза: при старте он
 # компилирует TypeScript, и первые секунды UDP-эхо теряет пакеты даже на lan.
