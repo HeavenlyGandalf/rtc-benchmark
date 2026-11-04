@@ -97,6 +97,9 @@ function runSeries(s, outDir, batch) {
 }
 
 const failures = [];
+// Прогоны, упавшие с первой попытки: в анализ попадает только повтор, поэтому
+// их число — данные о надёжности и о возможном смещении отбора.
+const retried = [];
 try {
   if (plan.discardFirstRun) {
     const first = schedule[0];
@@ -116,6 +119,7 @@ try {
     let ok = runSeries(s, RAW, s.batch);
     if (!ok) {
       console.warn(`[plan] ${s.runId} упал — повтор`);
+      retried.push(s.runId);
       ok = runSeries(s, RAW, s.batch);
     }
     if (!ok) failures.push(s.runId);
@@ -124,7 +128,7 @@ try {
   await clearProfile();
 }
 
-writeFileSync(join(OUT, 'failures.json'), JSON.stringify(failures, null, 2));
+writeFileSync(join(OUT, 'failures.json'), JSON.stringify({ failed: failures, retried }, null, 2));
 console.log(`[plan] готово: ${schedule.length - failures.length}/${schedule.length} прогонов в ${RAW}`);
 if (failures.length) {
   console.error(`[plan] не удались: ${failures.join(', ')}`);
