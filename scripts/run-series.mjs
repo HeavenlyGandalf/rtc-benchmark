@@ -10,7 +10,7 @@
 //   REPS, SETUP_WARMUP, ICE_MODES, RTT_COUNT, RTT_SIZE, RTT_INTERVAL, RTT_WARMUP,
 //   TP_DURATION, TP_SIZE, TP_DRAIN, SEED, RUN_ID, OUT_DIR, BATCH, PLAN_INDEX
 import puppeteer from 'puppeteer-core';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, renameSync } from 'node:fs';
 import { join } from 'node:path';
 import { mulberry32, shuffle } from './lib/rng.mjs';
 import { startCpuMonitor } from './lib/monitor.mjs';
@@ -195,7 +195,10 @@ try {
 
   mkdirSync(OUT_DIR, { recursive: true });
   const file = join(OUT_DIR, `${RUN_ID}.json`);
-  writeFileSync(file, JSON.stringify(record, null, 2));
+  // атомарно: прогон, убитый во время записи, не оставит обрезанный JSON,
+  // который дозапуск счёл бы готовым, а анализ не смог бы прочитать
+  writeFileSync(`${file}.tmp`, JSON.stringify(record, null, 2));
+  renameSync(`${file}.tmp`, file);
   console.log(`[series] сохранено: ${file}`);
 } finally {
   await browser.close();

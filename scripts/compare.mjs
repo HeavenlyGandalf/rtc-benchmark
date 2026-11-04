@@ -3,8 +3,10 @@
 // Проверки (PASS/FAIL, код выхода 1 при любом FAIL):
 //   1. калибровка сети пройдена по всем профилям;
 //   2. ≥ 90 % прогонов валидны (в сценариях 1–2 CPU клиента и сервера < 70 %,
+//      самый загруженный процесс Chromium < 90 % ядра,
 //      p99 задержки event loop сервера < 16,7 мс);
 //   3. A/A-тест пройден;
+//   0. серия получена одним коммитом и одним образом (предупреждение, не FAIL);
 //   4. решения по гипотезам (H₀ отвергнута / нет) совпадают с эталоном;
 //   5. направление отношений A/B совпадает, а их 95 % ДИ пересекаются;
 //   6. медианы RTT в профилях с задержкой — в пределах ±10 % от эталона
@@ -28,6 +30,8 @@ const rows = [];
 const check = (name, pass, detail = '') => rows.push({ name, pass, detail });
 const f = (v, d = 2) => (Number.isFinite(v) ? v.toFixed(d) : '—');
 
+if (cur.mixedManifest?.length) console.warn(`[compare] ВНИМАНИЕ: серия смешивает ${cur.mixedManifest.join(', ')}`);
+
 // 1. Калибровка
 const cal = cur.calibration?.results ?? [];
 check('Калибровка сети', cal.length > 0 && cal.every((c) => c.pass), cal.map((c) => `${c.profile}:${c.pass ? 'ok' : 'fail'}`).join(' '));
@@ -38,8 +42,10 @@ check('Валидные прогоны ≥ 90 %', v.valid / v.total >= 0.9, `${v
 
 // 3. A/A
 if (cur.aa) {
-  const loose = SMOKE ? cur.aa.checks.every((c) => c.p > 0.01) : cur.aa.pass;
-  check(SMOKE ? 'A/A (p > 0,01)' : 'A/A-тест', loose, cur.aa.checks.map((c) => `${c.metric}=${f(c.ratio, 3)}`).join(' '));
+  // smoke: 3 против 3 прогонов — p-value здесь бессодержателен (минимум ≈ 0,08),
+  // поэтому проверяется только, что партии не расходятся грубо: отношение медиан в [0,8; 1,25]
+  const loose = SMOKE ? cur.aa.checks.every((c) => c.ratio >= 0.8 && c.ratio <= 1.25) : cur.aa.pass;
+  check(SMOKE ? 'A/A (отношение в [0,8; 1,25])' : 'A/A-тест', loose, cur.aa.checks.map((c) => `${c.metric}=${f(c.ratio, 3)}`).join(' '));
 }
 
 if (SMOKE) {

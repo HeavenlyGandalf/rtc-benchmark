@@ -93,13 +93,17 @@ export function cliffsDelta(a, b) {
   return (gt - lt) / (a.length * b.length || 1);
 }
 
-/** Поправка Холма–Бонферрони: возвращает скорректированные p в исходном порядке. */
+/**
+ * Поправка Холма–Бонферрони: возвращает скорректированные p в исходном порядке.
+ * Нечисловые p (нет данных по профилю) в семейство не входят и остаются NaN —
+ * иначе NaN ломал бы сортировку и обнулял решения по остальным профилям.
+ */
 export function holm(ps) {
-  const idx = ps.map((p, i) => [p, i]).sort((x, y) => x[0] - y[0]);
-  const out = new Array(ps.length);
+  const out = ps.map(() => NaN);
+  const idx = ps.map((p, i) => [p, i]).filter(([p]) => Number.isFinite(p)).sort((x, y) => x[0] - y[0]);
   let running = 0;
   idx.forEach(([p, i], k) => {
-    running = Math.max(running, Math.min(1, (ps.length - k) * p));
+    running = Math.max(running, Math.min(1, (idx.length - k) * p));
     out[i] = running;
   });
   return out;

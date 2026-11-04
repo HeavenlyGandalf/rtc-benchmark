@@ -17,6 +17,9 @@ const RAW = join(DIR, 'raw');
 const ALPHA = 0.05;
 const FRAME_MS = 16.7; // один кадр при 60 Гц — порог практической значимости
 const CPU_LIMIT_PCT = 70;
+// Самый загруженный процесс Chromium, % одного ядра: близко к 100 % — поток
+// рендерера насыщен, и отметки performance.now() запаздывают.
+const TOP_PROC_LIMIT_PCT = 90;
 // Порог задержки event loop сервера — один кадр 60 Гц. Фон простоя в VM Docker
 // Desktop (пробуждение таймера) даёт p99 ≈ 6–7 мс при CPU < 10 %, поэтому порог
 // ниже этого фона браковал бы исправные прогоны; см. baseline.json серии.
@@ -46,7 +49,7 @@ const runs = records.map((r) => {
   };
   for (const [key, s] of Object.entries(r.setup)) {
     if (key === 'order' || key === 'rtc' || !s?.samples) continue;
-    row[`setup.${key}`] = s.median;
+    row[`setup.${key}`] = median(s.samples); // честная медиана (в стенде — верхняя при чётном n)
     if (s.phases?.length) {
       row[`setup.${key}.offer`] = median(s.phases.map((p) => p.offerMs));
       row[`setup.${key}.signal`] = median(s.phases.map((p) => p.answerMs - p.offerMs));
@@ -72,12 +75,14 @@ const runs = records.map((r) => {
   row['ctl.clientCpuP95'] = cpuWin.length ? Math.max(...cpuWin.map((c) => c.client.p95)) : NaN;
   // сервер — один поток Node: его загрузка считается в % одного ядра по
   // process.cpuUsage (одинаково для обеих топологий), среднее за окно сценария
+  row['ctl.clientTopProcP95'] = cpuWin.some((c) => c.clientTopProc) ? Math.max(...cpuWin.filter((c) => c.clientTopProc).map((c) => c.clientTopProc.p95)) : NaN;
   row['ctl.serverCpu'] = srvWin.length ? Math.max(...srvWin.map((m) => m.cpuPct)) : NaN;
   row['ctl.loopP99'] = srvWin.length ? Math.max(...srvWin.map((m) => m.loopDelayMs.p99)) : NaN;
   const tpCpu = r.monitor?.cpu?.throughput;
   row['ctl.tpClientCpuP95'] = tpCpu?.available ? tpCpu.client.p95 : NaN;
   const reasons = [];
   if (row['ctl.clientCpuP95'] > CPU_LIMIT_PCT) reasons.push('CPU клиента');
+  if (row['ctl.clientTopProcP95'] > TOP_PROC_LIMIT_PCT) reasons.push('процесс Chromium');
   if (row['ctl.serverCpu'] > CPU_LIMIT_PCT) reasons.push('CPU сервера');
   if (row['ctl.loopP99'] > LOOP_P99_LIMIT_MS) reasons.push('event loop');
   row.valid = reasons.length === 0;
@@ -118,8 +123,9 @@ writeFileSync(
 );
 
 // --- Гипотезы ---
-function compare({ id, profile, a, b, alternative, minRatio, minDiffMs, aKey, bKey, label }) {
-  const rows = group(profile, baseSize);
+function compare({ id, profile, a, b, alternative, minRatio, minDiffMs, aKey, bKey, label, size = baseSize }) {
+  // size = null — все размеры сообщения (время установления от размера не зависит)
+  const rows = group(profile, size);
   const va = values(rows, aKey);
   const vb = values(rows, bKey);
   const { ratio, ci } = ratioOfMedians(va, vb);
@@ -138,7 +144,7 @@ for (const profile of profilesSeen) {
   const rttMs = 2 * delayMs;
   // H2: WT устанавливает соединение быстрее RTC (основное сравнение — trickle ICE)
   for (const ice of ['trickle', 'full']) {
-    tests.push(compare({ id: `H2-${ice}`, label: `H2: установление WT < RTC (${ice} ICE)`, profile, a: 'wt', b: `rtc-${ice}`, aKey: 'setup.wt', bKey: `setup.rtc-${ice}`, alternative: 'less', minRatio: 0.75, minDiffMs: Math.max(rttMs, 1) }));
+    tests.push(compare({ id: `H2-${ice}`, label: `H2: установление WT < RTC (${ice} ICE)`, profile, a: 'wt', b: `rtc-${ice}`, aKey: 'setup.wt', bKey: `setup.rtc-${ice}`, alternative: 'less', minRatio: 0.75, minDiffMs: Math.max(rttMs, 1), size: null }));
   }
   if (loss > 0) {
     // H3: при потерях p95 надёжного упорядоченного RTC больше, чем у ненадёжных каналов
@@ -188,16 +194,22 @@ const validity = {
   valid: runs.filter((r) => r.valid).length,
   invalid: runs.filter((r) => !r.valid).map((r) => ({ runId: r.runId, reason: r.invalidReason })),
   clientCpuP95Max: Math.max(...values(runs, 'ctl.clientCpuP95')),
+  clientTopProcP95Max: Math.max(...values(runs, 'ctl.clientTopProcP95')),
   serverCpuMax: Math.max(...values(runs, 'ctl.serverCpu')),
   loopP99Max: Math.max(...values(runs, 'ctl.loopP99')),
 };
 const manifest = records[0].manifest ?? {};
+// Серия должна быть получена одним кодом и одним образом (дозапуск это сохраняет)
+const distinct = (k) => [...new Set(records.map((r) => r.manifest?.[k] ?? 'unknown'))];
+const mixed = ['gitCommit', 'imageDigest', 'gitDirty'].filter((k) => distinct(k).length > 1);
+for (const k of mixed) console.warn(`[analyze] ВНИМАНИЕ: в серии разные ${k}: ${distinct(k).join(', ')}`);
 const analysis = {
   dir: DIR,
   generatedAt: new Date().toISOString(),
   chromium: records[0].env.chromium ?? null,
   manifest,
-  thresholds: { alpha: ALPHA, frameMs: FRAME_MS, cpuLimitPct: CPU_LIMIT_PCT, loopP99LimitMs: LOOP_P99_LIMIT_MS },
+  thresholds: { alpha: ALPHA, frameMs: FRAME_MS, cpuLimitPct: CPU_LIMIT_PCT, topProcLimitPct: TOP_PROC_LIMIT_PCT, loopP99LimitMs: LOOP_P99_LIMIT_MS },
+  mixedManifest: mixed,
   validity,
   baseline,
   calibration,
@@ -214,14 +226,14 @@ const pStr = (p) => (p < 0.001 ? '< 0,001' : f(p, 3));
 const md = [];
 md.push(`# Результаты серии \`${DIR}\``, '');
 md.push(`Chromium ${analysis.chromium}, коммит \`${manifest.gitCommit ?? '?'}\`, образ \`${String(manifest.imageDigest ?? '?').slice(0, 19)}\`, топология ${manifest.topology ?? '?'}.`, '');
-md.push(`Прогонов: ${validity.total}, валидных: ${validity.valid}. Максимум p95 CPU клиента ${f(validity.clientCpuP95Max)} %, сервера (среднее за окно, % ядра) ${f(validity.serverCpuMax)} %, p99 задержки event loop ${f(validity.loopP99Max, 2)} мс.`, '');
+md.push(`Прогонов: ${validity.total}, валидных: ${validity.valid}. Максимум p95 CPU клиента ${f(validity.clientCpuP95Max)} % лимита (самый загруженный процесс Chromium ${f(validity.clientTopProcP95Max)} % ядра), сервера ${f(validity.serverCpuMax)} % ядра (все потоки процесса, среднее за окно), p99 задержки event loop ${f(validity.loopP99Max, 2)} мс.`, '');
 if (baseline?.server) {
   const b = baseline.server;
   md.push(`Фон сервера в простое (${(b.windowMs / 1000).toFixed(0)} с без нагрузки): CPU ${f(b.cpuPct)} %, задержка event loop p50 ${f(b.loopDelayMs.p50, 2)} мс, p99 ${f(b.loopDelayMs.p99, 2)} мс.`, '');
 }
 if (calibration) {
-  md.push('## Калибровка сети', '', '| Профиль | Медиана RTT, мс | Ожидание, мс | Потери, % | Ожидание, % | Итог |', '|---|---|---|---|---|---|');
-  for (const c of calibration.results) md.push(`| ${c.profile} | ${f(c.rttMedianMs, 2)} | ${c.rttExpectedMs} ± 2 | ${f(c.lossPct, 2)} | ${f(c.lossExpectedPct, 2)} ± ${f(c.lossTolPct, 2)} | ${c.pass ? 'OK' : 'FAIL'} |`);
+  md.push('## Калибровка сети', '', '| Профиль | Медиана RTT, мс | Ожидание, мс | Потери, % | Ожидание, % | Переупорядочено, % | Итог |', '|---|---|---|---|---|---|---|');
+  for (const c of calibration.results) md.push(`| ${c.profile} | ${f(c.rttMedianMs, 2)} | ${c.rttExpectedMs} ± 2 | ${f(c.lossPct, 2)} | ${f(c.lossExpectedPct, 2)} ± ${f(c.lossTolPct, 2)} | ${f(c.reorderedPct, 2)} | ${c.pass ? 'OK' : 'FAIL'} |`);
   md.push('');
 }
 md.push(`## Медианы по прогонам (размер сообщения ${baseSize} Б), 95 % бутстреп-ДИ`, '');

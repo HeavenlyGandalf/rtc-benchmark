@@ -28,8 +28,9 @@ function groupOf(pid) {
   return null;
 }
 
+/** Тики CPU (utime + stime) по PID процессов стенда: pid → { group, ticks }. */
 function snapshot() {
-  const ticks = { client: 0, server: 0 };
+  const procs = new Map();
   for (const name of readdirSync('/proc')) {
     if (!/^\d+$/.test(name)) continue;
     const group = groupOf(name);
@@ -38,40 +39,62 @@ function snapshot() {
       // поля 14 и 15 (utime, stime) после закрывающей скобки имени процесса
       const stat = readFileSync(`/proc/${name}/stat`, 'utf8');
       const fields = stat.slice(stat.lastIndexOf(')') + 2).split(' ');
-      ticks[group] += Number(fields[11]) + Number(fields[12]);
+      procs.set(name, { group, ticks: Number(fields[11]) + Number(fields[12]) });
     } catch {
       /* процесс завершился между readdir и read */
     }
   }
-  return { t: performance.now(), ticks };
+  return { t: performance.now(), procs };
 }
 
 const pct = (sorted, p) => (sorted.length ? sorted[Math.min(sorted.length - 1, Math.floor((p / 100) * sorted.length))] : null);
+const summarize = (xs) => {
+  const s = [...xs].sort((a, b) => a - b);
+  return { p50: pct(s, 50), p95: pct(s, 95), max: s.at(-1) ?? null };
+};
 
-/** Запускает выборку; stop() возвращает сводку в % от лимита контейнера. */
+/**
+ * Запускает выборку раз в intervalMs; stop() возвращает сводку:
+ *   client/server — суммарная загрузка группы, % от лимита контейнера;
+ *   clientTopProc — самый загруженный процесс Chromium, % одного ядра
+ *   (насыщенный поток рендерера искажает performance.now(), а в сумме по
+ *   группе на 4 ядрах он выглядел бы как 25 %).
+ * Дельты считаются только по PID, которые есть в обоих снимках: процесс,
+ * появившийся посреди окна, не добавляет в выборку весь свой прошлый CPU.
+ */
 export function startCpuMonitor(intervalMs = 1000) {
   if (!existsSync('/proc/self/stat')) return { stop: () => ({ available: false }) };
   const limit = cpuLimitCores();
-  const series = { client: [], server: [] };
+  const series = { client: [], server: [], clientTopProc: [] };
   let prev = snapshot();
   const timer = setInterval(() => {
     const cur = snapshot();
     const sec = (cur.t - prev.t) / 1000;
-    for (const g of ['client', 'server']) {
-      const used = (cur.ticks[g] - prev.ticks[g]) / CLK_TCK;
-      series[g].push(Math.max(0, (used / sec / limit) * 100));
+    const sum = { client: 0, server: 0 };
+    let top = 0;
+    for (const [pid, { group, ticks }] of cur.procs) {
+      const before = prev.procs.get(pid);
+      if (!before) continue;
+      const cores = Math.max(0, ticks - before.ticks) / CLK_TCK / sec;
+      sum[group] += cores;
+      if (group === 'client') top = Math.max(top, cores);
     }
+    series.client.push((sum.client / limit) * 100);
+    series.server.push((sum.server / limit) * 100);
+    series.clientTopProc.push(top * 100);
     prev = cur;
   }, intervalMs);
   return {
     stop() {
       clearInterval(timer);
-      const out = { available: true, limitCores: limit, samples: series.client.length };
-      for (const g of ['client', 'server']) {
-        const s = [...series[g]].sort((a, b) => a - b);
-        out[g] = { p50: pct(s, 50), p95: pct(s, 95), max: s.at(-1) ?? null };
-      }
-      return out;
+      return {
+        available: true,
+        limitCores: limit,
+        samples: series.client.length,
+        client: summarize(series.client),
+        server: summarize(series.server),
+        clientTopProc: summarize(series.clientTopProc),
+      };
     },
   };
 }

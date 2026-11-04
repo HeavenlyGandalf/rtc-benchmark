@@ -20,6 +20,10 @@ close(cliffsDelta([6, 7, 8], [1, 2, 3]), 1);
 close(cliffsDelta([1, 2], [1, 2]), 0);
 
 assert.deepEqual(holm([0.01, 0.04, 0.03]).map((p) => +p.toFixed(4)), [0.03, 0.06, 0.06]);
+// NaN (нет данных по профилю) не портит поправку для остальных
+const h = holm([0.01, NaN, 0.03]);
+assert.ok(Number.isNaN(h[1]));
+assert.deepEqual([h[0], h[2]].map((p) => +p.toFixed(4)), [0.02, 0.03]);
 
 const { ratio, ci } = ratioOfMedians([10, 11, 12, 10, 11], [5, 5.5, 6, 5, 5.5]);
 close(ratio, 2);

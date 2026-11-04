@@ -33,8 +33,13 @@ async function measure() {
   const sock = createSocket('udp4');
   const sent = new Map();
   const rtts = [];
+  let lastSeq = -1;
+  let reordered = 0;
   sock.on('message', (msg) => {
     const seq = msg.readUInt32BE(0);
+    // эхо с номером меньше уже полученного — пакет обогнали (джиттер netem)
+    if (seq < lastSeq) reordered++;
+    else lastSeq = seq;
     const t = sent.get(seq);
     if (t !== undefined) {
       rtts.push(Number(process.hrtime.bigint() - t) / 1e6);
@@ -54,7 +59,7 @@ async function measure() {
   await sleep(1500); // хвост эха
   sock.close();
   rtts.sort((a, b) => a - b);
-  return { received: rtts.length, median: rtts[Math.floor(rtts.length / 2)], p95: rtts[Math.floor(rtts.length * 0.95)] };
+  return { received: rtts.length, reordered, median: rtts[Math.floor(rtts.length / 2)], p95: rtts[Math.floor(rtts.length * 0.95)] };
 }
 
 const results = [];
@@ -78,12 +83,15 @@ try {
       lossPct: lossMeasured * 100,
       lossExpectedPct: lossExpected * 100,
       lossTolPct: lossTol * 100,
+      // переупорядочивание не критерий прохождения, а характеристика профиля:
+      // надёжные каналы (SCTP, QUIC-поток) реагируют на него иначе, чем на потери
+      reorderedPct: m.received ? (m.reordered / m.received) * 100 : 0,
       pass: rttOk && lossOk,
     };
     results.push(row);
     console.log(
       `[calibrate] ${name.padEnd(8)} RTT медиана ${m.median.toFixed(2)} мс (ожид. ${rttExpected} ± 2) ${rttOk ? 'OK' : 'FAIL'}; ` +
-        `потери ${(lossMeasured * 100).toFixed(2)} % (ожид. ${(lossExpected * 100).toFixed(2)} ± ${(lossTol * 100).toFixed(2)}) ${lossOk ? 'OK' : 'FAIL'}`,
+        `потери ${(lossMeasured * 100).toFixed(2)} % (ожид. ${(lossExpected * 100).toFixed(2)} ± ${(lossTol * 100).toFixed(2)}) ${lossOk ? 'OK' : 'FAIL'}; переупорядочено ${row.reorderedPct.toFixed(2)} %`,
     );
   }
 } finally {
