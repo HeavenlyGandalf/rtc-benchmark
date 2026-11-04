@@ -24,6 +24,7 @@ export function handleWebRtcOffer(offerSdp: string): Promise<SessionDescription>
 
     const timeout = setTimeout(() => {
       peers.delete(pc);
+      peersById.delete(id);
       pc.close();
       reject(new Error('ICE gathering timeout'));
     }, 10_000);
@@ -32,6 +33,8 @@ export function handleWebRtcOffer(offerSdp: string): Promise<SessionDescription>
       if (state === 'closed' || state === 'failed' || state === 'disconnected') {
         peers.delete(pc);
         peersById.delete(id);
+        // эхо-серверу незачем ждать восстановления: клиент откроет новое соединение
+        if (state !== 'closed') pc.close();
       }
     });
 

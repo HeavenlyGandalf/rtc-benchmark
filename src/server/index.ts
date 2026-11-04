@@ -125,7 +125,8 @@ const httpServer = createServer(async (req, res) => {
 
     if (url.pathname === '/api/webrtc/candidate' && req.method === 'POST') {
       const { id, candidate, mid } = JSON.parse(await readBody(req));
-      sendJson(res, addWebRtcCandidate(id, candidate, mid) ? 200 : 404, { ok: true });
+      const ok = addWebRtcCandidate(id, candidate, mid);
+      sendJson(res, ok ? 200 : 404, { ok });
       return;
     }
 
