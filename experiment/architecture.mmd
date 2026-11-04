@@ -3,7 +3,7 @@
 %% контейнер-маршрутизатор, чтобы потери и задержка не вносились на конечных
 %% узлах (см. Kakhki et al., IMC'17). Рендер: https://mermaid.live или любой
 %% просмотрщик Markdown с поддержкой Mermaid.
-flowchart LR
+flowchart TB
   subgraph Bench["bench (cpus 4, 3 ГБ)"]
     direction TB
     ORCH["run-plan.mjs<br/>план, сид, рандомизация,<br/>калибровка"]
