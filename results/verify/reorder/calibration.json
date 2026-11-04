@@ -1,0 +1,40 @@
+{
+  "packets": 10000,
+  "intervalUs": 1000,
+  "target": "10.77.2.10:9999",
+  "results": [
+    {
+      "profile": "lan",
+      "rttMedianMs": 0.054917,
+      "rttP95Ms": 0.09925,
+      "rttExpectedMs": 0,
+      "lossPct": 0.029999999999996696,
+      "lossExpectedPct": 0,
+      "lossTolPct": 0.2,
+      "reorderedPct": 0,
+      "pass": true
+    },
+    {
+      "profile": "4g",
+      "rttMedianMs": 100.902167,
+      "rttP95Ms": 121.649292,
+      "rttExpectedMs": 100,
+      "lossPct": 1.8299999999999983,
+      "lossExpectedPct": 1.9900000000000029,
+      "lossTolPct": 0.618970058596077,
+      "reorderedPct": 84.33329937862891,
+      "pass": true
+    },
+    {
+      "profile": "lossy",
+      "rttMedianMs": 81.0365,
+      "rttP95Ms": 81.950709,
+      "rttExpectedMs": 80,
+      "lossPct": 9.870000000000001,
+      "lossExpectedPct": 9.750000000000004,
+      "lossTolPct": 1.089912214771772,
+      "reorderedPct": 0,
+      "pass": true
+    }
+  ]
+}
