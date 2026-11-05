@@ -6,7 +6,7 @@
 #   make calibrate      только калибровка сети на топологии с маршрутизатором
 #   make verify         сокращённый план + сравнение с эталоном results/reference
 #   make verify-smoke   дымовой план для CI (2 профиля × 3 прогона, мягкие проверки)
-#   make experiment     полный план E1+E2 (experiment/plan.json, 300 прогонов, ~8 ч)
+#   make experiment     полный план E1+E2 (experiment/plan.json, 300 прогонов, ~14 ч)
 #   make resume PLAN=experiment/plan-verify.json   дозапустить прерванную серию
 #   make analyze NAME=verify   пересчитать анализ и графики по сохранённым сырым данным
 #   make plots NAME=full       только графики (SVG) в results/<NAME>/plots
