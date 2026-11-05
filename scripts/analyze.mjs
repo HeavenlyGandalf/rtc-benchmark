@@ -2,14 +2,15 @@
 //   вход:  results/<name>/raw/*.json (по одному файлу на прогон)
 //   выход: results/<name>/runs.csv      — одна строка на прогон (единица анализа)
 //          results/<name>/summary.csv   — медиана по прогонам и 95 % бутстреп-ДИ
-//          results/<name>/analysis.json — гипотезы H2–H4, A/A-тест, валидность прогонов
+//          results/<name>/analysis.json — гипотезы H2–H4, A/A-тест, валидность прогонов,
+//                                         стабильность во времени (тренд по номеру прогона)
 //          results/<name>/analysis.md   — те же таблицы для отчёта
 // Партия B (A/A) в сводку конфигураций и в гипотезы не входит.
 //
 // Запуск: node scripts/analyze.mjs results/verify
 import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { median, bootstrapMedianCi, ratioOfMedians, mannWhitney, cliffsDelta, holm } from './lib/stats.mjs';
+import { median, quantile, bootstrapMedianCi, ratioOfMedians, mannWhitney, cliffsDelta, holm, spearman } from './lib/stats.mjs';
 import { profileNumbers } from './lib/netem-control.mjs';
 
 const DIR = process.argv[2] ?? 'results/verify';
@@ -45,6 +46,7 @@ const runs = records.map((r) => {
     profile: r.profile,
     rttSize: r.params.rtt.size,
     batch: r.batch,
+    planIndex: r.planIndex ?? (Number.parseInt(r.runId, 10) || NaN),
     chromium: r.env.chromium ?? '',
   };
   for (const [key, s] of Object.entries(r.setup)) {
@@ -92,7 +94,7 @@ const runs = records.map((r) => {
 
 const metricKeys = [...new Set(runs.flatMap((r) => Object.keys(r)))].filter((k) => /^(setup|rtt|tp|ctl)\./.test(k)).sort();
 const csvCell = (v) => (typeof v === 'number' ? (Number.isFinite(v) ? v.toFixed(3) : '') : String(v ?? ''));
-const runCols = ['runId', 'profile', 'rttSize', 'batch', 'valid', 'invalidReason', 'chromium', ...metricKeys];
+const runCols = ['runId', 'planIndex', 'profile', 'rttSize', 'batch', 'valid', 'invalidReason', 'chromium', ...metricKeys];
 writeFileSync(join(DIR, 'runs.csv'), '﻿' + [runCols.join(';'), ...runs.map((r) => runCols.map((c) => csvCell(r[c])).join(';'))].join('\n') + '\n');
 
 // Анализируются только валидные прогоны основной партии.
@@ -185,6 +187,43 @@ if (batchB.length) {
   aa = { profile, rttSize: size, checks, pass: checks.every((c) => c.pass) };
 }
 
+// --- Стабильность во времени: нет систематического тренда от первого прогона к последнему ---
+// Каждая метрика прогона нормируется на медиану своей конфигурации (профиль × размер),
+// чтобы прогоны разных конфигураций были сравнимы; затем по всем валидным прогонам
+// (включая A/A-партию) — ρ Спирмена с номером прогона в плане (перестановочный p,
+// поправка Холма по метрикам) и дрейф: медиана последней трети плана относительно
+// первой. Тренд считается найденным, если p_Holm < 0,05 и |дрейф| ≥ 5 %.
+const TREND_KEYS = ['setup.wt', 'setup.rtc-trickle', ...['wt-stream', 'wt-datagram', 'rtc-reliable', 'rtc-unreliable'].flatMap((m) => [`rtt.${m}.median`, `rtt.${m}.p95`])];
+const DRIFT_LIMIT = 0.05;
+const validRuns = runs.filter((r) => r.valid && Number.isFinite(r.planIndex));
+const configMedian = new Map();
+const configKey = (r, key) => `${r.profile}|${r.rttSize}|${key}`;
+for (const key of TREND_KEYS) {
+  for (const r of validRuns) {
+    const k = configKey(r, key);
+    if (!configMedian.has(k)) configMedian.set(k, median(values(validRuns.filter((x) => x.profile === r.profile && x.rttSize === r.rttSize), key)));
+  }
+}
+let stability = null;
+if (validRuns.length >= 6) {
+  const maxIndex = Math.max(...validRuns.map((r) => r.planIndex));
+  const trends = TREND_KEYS.map((key) => {
+    const pts = validRuns
+      .map((r) => ({ x: r.planIndex, y: r[key] / configMedian.get(configKey(r, key)) }))
+      .filter((p) => Number.isFinite(p.y));
+    const { rho, p, n } = spearman(pts.map((q) => q.x), pts.map((q) => q.y));
+    const first = pts.filter((q) => q.x <= maxIndex / 3).map((q) => q.y);
+    const last = pts.filter((q) => q.x > (2 * maxIndex) / 3).map((q) => q.y);
+    return { metric: key, n, rho, p, drift: median(last) / median(first) - 1, spreadIqr: quantile(pts.map((q) => q.y), 0.75) - quantile(pts.map((q) => q.y), 0.25) };
+  });
+  const adj = holm(trends.map((t) => t.p));
+  trends.forEach((t, i) => {
+    t.pHolm = adj[i];
+    t.trend = t.pHolm < ALPHA && Math.abs(t.drift) >= DRIFT_LIMIT;
+  });
+  stability = { driftLimit: DRIFT_LIMIT, trends, pass: trends.every((t) => !t.trend) };
+}
+
 const baselineFile = join(DIR, 'baseline.json');
 const baseline = existsSync(baselineFile) ? JSON.parse(readFileSync(baselineFile, 'utf8')) : null;
 const calibrationFile = join(DIR, 'calibration.json');
@@ -214,6 +253,7 @@ const analysis = {
   baseline,
   calibration,
   aa,
+  stability,
   tests,
   summary,
 };
@@ -259,6 +299,10 @@ if (aa) {
   md.push('', `## A/A-тест (${aa.profile}, партии A и B): ${aa.pass ? 'пройден' : '**не пройден**'}`, '', '| Метрика | A/B [95 % ДИ] | p | Итог |', '|---|---|---|---|');
   for (const c of aa.checks) md.push(`| \`${c.metric}\` | ${f(c.ratio, 3)} ${ciStr(c.ratioCi, 3)} | ${pStr(c.p)} | ${c.pass ? 'OK' : 'FAIL'} |`);
 }
+if (stability) {
+  md.push('', `## Стабильность во времени: ${stability.pass ? 'тренда нет' : '**найден тренд**'}`, '', `Метрика прогона, делённая на медиану своей конфигурации, против номера прогона в плане; ρ Спирмена (перестановочный p, поправка Холма), дрейф — медиана последней трети плана к первой. Тренд — p_Holm < 0,05 и |дрейф| ≥ ${stability.driftLimit * 100} %.`, '', '| Метрика | n | ρ | p (Холм) | Дрейф, % | IQR нормированной метрики | Тренд |', '|---|---|---|---|---|---|---|');
+  for (const t of stability.trends) md.push(`| \`${t.metric}\` | ${t.n} | ${f(t.rho, 3)} | ${pStr(t.pHolm)} | ${f(t.drift * 100, 1)} | ${f(t.spreadIqr, 3)} | ${t.trend ? '**да**' : 'нет'} |`);
+}
 if (validity.invalid.length) {
   md.push('', '## Невалидные прогоны', '', ...validity.invalid.map((i) => `- ${i.runId}: ${i.reason}`));
 }
@@ -266,3 +310,4 @@ writeFileSync(join(DIR, 'analysis.md'), md.join('\n') + '\n');
 console.log(`[analyze] ${records.length} прогонов → ${DIR}/{runs.csv,summary.csv,analysis.json,analysis.md}`);
 for (const t of tests) console.log(`  ${t.id.padEnd(18)} ${t.profile.padEnd(7)} A/B=${f(t.ratio, 2)} ${ciStr(t.ratioCi)} p_Holm=${pStr(t.pHolm)} → H₀ ${t.rejectH0 ? 'отвергнута' : 'не отвергнута'}`);
 if (aa) console.log(`  A/A ${aa.profile}: ${aa.pass ? 'пройден' : 'НЕ ПРОЙДЕН'}`);
+if (stability) console.log(`  стабильность: ${stability.pass ? 'тренда нет' : 'НАЙДЕН ТРЕНД: ' + stability.trends.filter((t) => t.trend).map((t) => t.metric).join(', ')}`);

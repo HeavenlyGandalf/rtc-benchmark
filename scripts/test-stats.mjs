@@ -1,6 +1,6 @@
 // Модульные тесты статистики (scripts/lib/stats.mjs) на значениях, посчитанных вручную.
 import assert from 'node:assert/strict';
-import { median, quantile, mannWhitney, cliffsDelta, holm, ratioOfMedians, bootstrapMedianCi } from './lib/stats.mjs';
+import { median, quantile, mannWhitney, cliffsDelta, holm, ratioOfMedians, bootstrapMedianCi, ranks, spearman } from './lib/stats.mjs';
 
 const close = (a, b, eps = 1e-3) => assert.ok(Math.abs(a - b) < eps, `${a} ≉ ${b}`);
 
@@ -32,5 +32,16 @@ const [lo, hi] = bootstrapMedianCi([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 assert.ok(lo <= 5.5 && hi >= 5.5 && lo >= 1 && hi <= 10);
 // одинаковый сид — одинаковый ДИ (воспроизводимость анализа)
 assert.deepEqual(bootstrapMedianCi([1, 2, 3, 4, 5]), bootstrapMedianCi([1, 2, 3, 4, 5]));
+
+// ранги со связями: [10, 20, 20, 30] → [1, 2,5, 2,5, 4]
+assert.deepEqual(ranks([10, 20, 20, 30]), [1, 2.5, 2.5, 4]);
+// монотонная зависимость — ρ = 1, двусторонний перестановочный p мал (2/n! для n = 8 ≈ 5e-5)
+const sp = spearman([1, 2, 3, 4, 5, 6, 7, 8], [2, 4, 9, 16, 30, 31, 50, 70]);
+close(sp.rho, 1);
+assert.ok(sp.p < 0.001);
+close(spearman([1, 2, 3, 4, 5], [5, 4, 3, 2, 1]).rho, -1);
+// ρ по ручному расчёту: d = (−1, 1, −1, −1, 2), Σd² = 8 при n = 5 → 1 − 6·8/120 = 0,6
+close(spearman([1, 2, 3, 4, 5], [2, 1, 4, 5, 3]).rho, 0.6);
+assert.ok(spearman([1, 2, 3, 4, 5], [2, 1, 4, 5, 3]).p > 0.2);
 
 console.log('stats: все проверки пройдены');

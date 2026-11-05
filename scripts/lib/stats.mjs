@@ -108,3 +108,55 @@ export function holm(ps) {
   });
   return out;
 }
+
+/** Ранги с усреднением для связей (1..n). */
+export function ranks(xs) {
+  const idx = xs.map((v, i) => [v, i]).sort((a, b) => a[0] - b[0]);
+  const out = new Array(xs.length);
+  for (let i = 0; i < idx.length; ) {
+    let j = i;
+    while (j + 1 < idx.length && idx[j + 1][0] === idx[i][0]) j++;
+    for (let k = i; k <= j; k++) out[idx[k][1]] = (i + j) / 2 + 1;
+    i = j + 1;
+  }
+  return out;
+}
+
+function pearson(x, y) {
+  const n = x.length;
+  const mx = x.reduce((s, v) => s + v, 0) / n;
+  const my = y.reduce((s, v) => s + v, 0) / n;
+  let sxy = 0;
+  let sxx = 0;
+  let syy = 0;
+  for (let i = 0; i < n; i++) {
+    sxy += (x[i] - mx) * (y[i] - my);
+    sxx += (x[i] - mx) ** 2;
+    syy += (y[i] - my) ** 2;
+  }
+  return sxx && syy ? sxy / Math.sqrt(sxx * syy) : 0;
+}
+
+/**
+ * Ранговая корреляция Спирмена и двусторонний перестановочный p-value
+ * (доля перестановок y с |ρ| не меньше наблюдаемого, с поправкой +1).
+ * Используется для проверки тренда «метрика ~ порядковый номер прогона».
+ */
+export function spearman(x, y, { iters = 10_000, seed = 20261103 } = {}) {
+  const pairs = x.map((v, i) => [v, y[i]]).filter(([a, b]) => Number.isFinite(a) && Number.isFinite(b));
+  if (pairs.length < 3) return { rho: NaN, p: NaN, n: pairs.length };
+  const rx = ranks(pairs.map((p) => p[0]));
+  const ry = ranks(pairs.map((p) => p[1]));
+  const rho = pearson(rx, ry);
+  const rand = mulberry32(seed);
+  const perm = [...ry];
+  let extreme = 0;
+  for (let it = 0; it < iters; it++) {
+    for (let i = perm.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1));
+      [perm[i], perm[j]] = [perm[j], perm[i]];
+    }
+    if (Math.abs(pearson(rx, perm)) >= Math.abs(rho) - 1e-12) extreme++;
+  }
+  return { rho, p: (extreme + 1) / (iters + 1), n: pairs.length };
+}
