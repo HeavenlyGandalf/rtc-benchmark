@@ -15,8 +15,12 @@ const RATE_UNITS = { bit: 1, kbit: 1e3, mbit: 1e6, gbit: 1e9 };
 
 /** Полоса netem (`5mbit`, `1gbit`) в бит/с; null — без ограничения. */
 export function parseRate(rate) {
-  const m = String(rate ?? '').trim().toLowerCase().match(/^([\d.]+)\s*(bit|kbit|mbit|gbit)$/);
-  return m ? Number(m[1]) * RATE_UNITS[m[2]] : null;
+  const s = String(rate ?? '').trim().toLowerCase();
+  if (!s) return null;
+  const m = s.match(/^([\d.]+)\s*(bit|kbit|mbit|gbit)$/);
+  // другие единицы tc (mbps — байты/с, kibit, …) молча дали бы неверное ожидание калибровки
+  if (!m) throw new Error(`неподдерживаемая единица полосы в профиле: ${rate} (допустимы bit, kbit, mbit, gbit)`);
+  return Number(m[1]) * RATE_UNITS[m[2]];
 }
 
 /**

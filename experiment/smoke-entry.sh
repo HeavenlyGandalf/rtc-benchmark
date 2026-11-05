@@ -10,5 +10,8 @@ for _ in $(seq 1 60); do
   if curl -sf "$NETEM_AGENT/health" >/dev/null 2>&1 && curl -sf "$BENCH_URL/api/info" >/dev/null 2>&1; then break; fi
   sleep 1
 done
+# как в make calibrate: первые секунды после старта сервер компилирует TypeScript,
+# и UDP-эхо теряет пакеты даже на lan — калибровка в smoke не должна это ловить
+sleep 5
 trap 'if [ -n "${HOST_UID:-}" ]; then chown -R "$HOST_UID:${HOST_GID:-$HOST_UID}" results/smoke-check 2>/dev/null || true; fi' EXIT
 yarn node scripts/smoke.mjs  # yarn node: PnP-резолвер наследует run-series.mjs
