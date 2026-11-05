@@ -1,0 +1,46 @@
+IMAGE_DIGEST=sha256:256196b6ac2691f04dde24f6c2f54bef15447f78986e86e4c4fb4914f4fd963c docker compose -f experiment/compose-router.yml run --rm bench bash experiment/smoke-entry.sh; \
+	status=$?; docker compose -f experiment/compose-router.yml down --remove-orphans >/dev/null 2>&1; exit $status
+ Network experiment_servernet  Creating
+ Network experiment_servernet  Created
+ Network experiment_clientnet  Creating
+ Network experiment_clientnet  Created
+ Container experiment-server-1  Creating
+ Container experiment-router-1  Creating
+ Container experiment-server-1  Created
+ Container experiment-router-1  Created
+ Container experiment-server-1  Starting
+ Container experiment-router-1  Starting
+ Container experiment-server-1  Started
+ Container experiment-router-1  Started
+[smoke] PASS  router: netem-agent /health
+[smoke] PASS  server: /api/info — https://10.77.2.10:4433/echo
+[smoke] PASS  server: /api/metrics — CPU 13.2 %, event loop p99 3.93 мс
+[netem] eth0: lan → нейтральный профиль (ограничения сняты)
+[netem] eth1: lan → нейтральный профиль (ограничения сняты)
+[calibrate] lan      RTT медиана 0.05 мс (ожид. -2…2) OK; потери 0.12 % (ожид. 0.00 ± 0.20) OK; переупорядочено 0.00 %
+[netem] eth0: 4g → delay 50ms 15ms loss 1%
+[netem] eth1: 4g → delay 50ms 15ms loss 1%
+[calibrate] 4g       RTT медиана 100.88 мс (ожид. 98…102) OK; потери 1.89 % (ожид. 1.99 ± 0.62) OK; переупорядочено 84.43 %
+[calibrate] все профили откалиброваны
+[smoke] PASS  netem: калибровка lan и 4g через маршрутизатор
+[series] smoke: профиль=lan, сид=1, REPS=3, RTT=100×256Б
+[series] 1 — установление rtc-trickle: медиана 66.10 мс
+[series] 1 — установление wt: медиана 8.20 мс
+[series] 1 — установление rtc-full: медиана 143.20 мс
+[series] 2 — RTT wt-stream: медиана 2.70 мс, p95 5.20 мс, потери 0.00%
+[series] 2 — RTT wt-datagram: медиана 2.80 мс, p95 5.00 мс, потери 0.00%
+[series] 2 — RTT rtc-unreliable: медиана 2.00 мс, p95 4.50 мс, потери 0.00%
+[series] 2 — RTT rtc-reliable: медиана 1.60 мс, p95 4.80 мс, потери 0.00%
+[series] 3 — throughput wt-stream: 308.65 Мбит/с, потери 0.00%
+[series] 3 — throughput rtc-reliable: 231.35 Мбит/с, потери 0.00%
+[series] 3 — throughput rtc-unreliable: 312.61 Мбит/с, потери 0.00%
+[series] 3 — throughput wt-datagram: 80.38 Мбит/с, потери 0.00%
+[series] сохранено: results/smoke-check/smoke.json
+[smoke] PASS  прогон: run-series завершился
+[smoke] PASS  прогон: RTT по 4 каналам — wt-stream, wt-datagram, rtc-unreliable, rtc-reliable
+[smoke] PASS  прогон: время установления WT и RTC
+[smoke] PASS  прогон: пропускная способность
+[smoke] PASS  метрики: CPU клиента (монитор /proc) — p95 5.3 % лимита
+[smoke] PASS  метрики: CPU и event loop сервера по окнам
+[smoke] PASS  манифест: коммит, образ, хост, лимиты — 88e8dcd, sha256:256196b6ac26, Apple M4 Pro / macOS 26.4.1 / Docker 28.4.0, лимит 4 CPU 3072 МБ
+[smoke] 11/11 проверок пройдено

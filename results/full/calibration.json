@@ -1,0 +1,98 @@
+{
+  "packets": 10000,
+  "intervalUs": 1000,
+  "target": "10.77.2.10:9999",
+  "results": [
+    {
+      "profile": "lan",
+      "rttMedianMs": 0.039333,
+      "rttP95Ms": 0.072583,
+      "rttExpectedMs": 0,
+      "rttLowMs": -2,
+      "rttHighMs": 2,
+      "lossPct": 0.019999999999997797,
+      "lossExpectedPct": 0,
+      "lossTolPct": 0.2,
+      "reorderedPct": 0,
+      "pass": true
+    },
+    {
+      "profile": "wifi",
+      "rttMedianMs": 31.03525,
+      "rttP95Ms": 37.539875,
+      "rttExpectedMs": 30,
+      "rttLowMs": 28,
+      "rttHighMs": 32,
+      "lossPct": 0.9700000000000042,
+      "lossExpectedPct": 0.9974999999999956,
+      "lossTolPct": 0.49812664150491415,
+      "reorderedPct": 67.42401292537615,
+      "pass": true
+    },
+    {
+      "profile": "4g",
+      "rttMedianMs": 100.941791,
+      "rttP95Ms": 121.775208,
+      "rttExpectedMs": 100,
+      "rttLowMs": 98,
+      "rttHighMs": 102,
+      "lossPct": 2.059999999999995,
+      "lossExpectedPct": 1.9900000000000029,
+      "lossTolPct": 0.618970058596077,
+      "reorderedPct": 83.45926077190117,
+      "pass": true
+    },
+    {
+      "profile": "5g",
+      "rttMedianMs": 50.931959,
+      "rttP95Ms": 62.032125,
+      "rttExpectedMs": 50,
+      "rttLowMs": 48,
+      "rttHighMs": 52,
+      "lossPct": 0.33999999999999586,
+      "lossExpectedPct": 0.39959999999999996,
+      "lossTolPct": 0.3892624840162466,
+      "reorderedPct": 76.2592815572948,
+      "pass": true
+    },
+    {
+      "profile": "lossy",
+      "rttMedianMs": 80.39725,
+      "rttP95Ms": 81.355458,
+      "rttExpectedMs": 80,
+      "rttLowMs": 78,
+      "rttHighMs": 82,
+      "lossPct": 9.58,
+      "lossExpectedPct": 9.750000000000004,
+      "lossTolPct": 1.089912214771772,
+      "reorderedPct": 0,
+      "pass": true
+    },
+    {
+      "profile": "limited",
+      "rttMedianMs": 41.364791,
+      "rttP95Ms": 41.398375,
+      "rttExpectedMs": 40.34,
+      "rttLowMs": 38.34,
+      "rttHighMs": 42.34,
+      "lossPct": 0.009999999999998899,
+      "lossExpectedPct": 0,
+      "lossTolPct": 0.2,
+      "reorderedPct": 0,
+      "pass": true
+    },
+    {
+      "profile": "4g-noreorder",
+      "rttMedianMs": 120.004083,
+      "rttP95Ms": 126.407541,
+      "rttExpectedMs": 100,
+      "rttLowMs": 100,
+      "rttHighMs": 130,
+      "lossPct": 2.210000000000001,
+      "lossExpectedPct": 1.9900000000000029,
+      "lossTolPct": 0.618970058596077,
+      "reorderedPct": 0,
+      "pass": true
+    }
+  ]
+}

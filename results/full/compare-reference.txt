@@ -1,0 +1,37 @@
+PASS  Калибровка сети                     lan:ok wifi:ok 4g:ok 5g:ok lossy:ok limited:ok 4g-noreorder:ok
+PASS  Валидные прогоны ≥ 90 %             300/300; CPU клиента p95 ≤ 9 %, сервера ≤ 17 %, event loop p99 ≤ 7.63 мс
+PASS  A/A-тест                            rtt.wt-datagram.median=1.001 rtt.rtc-reliable.median=1.014 rtt.wt-stream.p95=1.000 setup.wt=1.001 setup.rtc-trickle=1.014
+PASS  H2-trickle lossy: решение           сейчас отвергнута, эталон отвергнута
+PASS  H2-trickle lossy: отношение         0.31 [0.31; 0.31] против 0.31 [0.30; 0.31]
+PASS  H2-full lossy: решение              сейчас отвергнута, эталон отвергнута
+PASS  H2-full lossy: отношение            0.31 [0.31; 0.31] против 0.31 [0.29; 0.32]
+PASS  H3-wt-datagram lossy: решение       сейчас отвергнута, эталон отвергнута
+PASS  H3-wt-datagram lossy: отношение     3.27 [3.13; 3.38] против 3.16 [3.04; 3.41]
+PASS  H3-rtc-unreliable lossy: решение    сейчас отвергнута, эталон отвергнута
+PASS  H3-rtc-unreliable lossy: отношение  3.27 [3.13; 3.38] против 3.16 [3.05; 3.42]
+FAIL  H4 lossy: решение                   сейчас не отвергнута, эталон отвергнута
+PASS  H4 lossy: отношение                 0.86 [0.82; 0.93] против 0.81 [0.74; 0.95]
+PASS  H2-trickle lan: решение             сейчас отвергнута, эталон отвергнута
+FAIL  H2-trickle lan: отношение           0.09 [0.09; 0.09] против 0.12 [0.10; 0.12]
+PASS  H2-full lan: решение                сейчас отвергнута, эталон отвергнута
+FAIL  H2-full lan: отношение              0.04 [0.04; 0.05] против 0.06 [0.05; 0.06]
+PASS  H2-trickle 4g: решение              сейчас отвергнута, эталон отвергнута
+PASS  H2-trickle 4g: отношение            0.34 [0.33; 0.34] против 0.34 [0.33; 0.35]
+PASS  H2-full 4g: решение                 сейчас отвергнута, эталон отвергнута
+PASS  H2-full 4g: отношение               0.34 [0.34; 0.34] против 0.35 [0.34; 0.35]
+PASS  H3-wt-datagram 4g: решение          сейчас отвергнута, эталон отвергнута
+PASS  H3-wt-datagram 4g: отношение        1.95 [1.92; 1.98] против 1.92 [1.87; 2.08]
+PASS  H3-rtc-unreliable 4g: решение       сейчас отвергнута, эталон отвергнута
+PASS  H3-rtc-unreliable 4g: отношение     1.93 [1.90; 1.97] против 1.91 [1.86; 2.08]
+FAIL  H4 4g: решение                      сейчас отвергнута, эталон не отвергнута
+PASS  H4 4g: отношение                    0.83 [0.79; 0.86] против 0.87 [0.75; 0.90]
+PASS  lossy rtt.rtc-reliable.median       155.75 мс против 156.55 мс (-0.5 %, ±10 %)
+PASS  lossy rtt.rtc-unreliable.median     85.00 мс против 85.20 мс (-0.2 %, ±10 %)
+PASS  lossy rtt.wt-datagram.median        84.40 мс против 85.30 мс (-1.1 %, ±10 %)
+PASS  lossy rtt.wt-stream.median          120.40 мс против 127.60 мс (-5.6 %, ±10 %)
+PASS  4g rtt.rtc-reliable.median          116.90 мс против 117.50 мс (-0.5 %, ±10 %)
+PASS  4g rtt.rtc-unreliable.median        105.20 мс против 105.80 мс (-0.6 %, ±10 %)
+PASS  4g rtt.wt-datagram.median           104.15 мс против 104.80 мс (-0.6 %, ±10 %)
+PASS  4g rtt.wt-stream.median             109.30 мс против 111.15 мс (-1.7 %, ±10 %)
+
+31/35 проверок пройдено
