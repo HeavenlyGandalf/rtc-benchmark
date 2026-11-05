@@ -8,7 +8,8 @@
 #   make verify-smoke   дымовой план для CI (2 профиля × 3 прогона, мягкие проверки)
 #   make experiment     полный план E1+E2 (experiment/plan.json, 300 прогонов, ~8 ч)
 #   make resume PLAN=experiment/plan-verify.json   дозапустить прерванную серию
-#   make analyze NAME=verify   пересчитать анализ по сохранённым сырым данным
+#   make analyze NAME=verify   пересчитать анализ и графики по сохранённым сырым данным
+#   make plots NAME=full       только графики (SVG) в results/<NAME>/plots
 #   make reference      сделать текущий results/verify эталоном (для автора)
 #   make h1             серия H1: P2P против relay (compose-multihost.yml)
 #   make pilot          пилотный одноузловой прогон (netem на lo, compose.yml)
@@ -43,7 +44,7 @@ HOST_GID ?= $(shell id -g)
 
 export IMAGE GIT_COMMIT GIT_DIRTY HOST_LABEL HOST_CPU HOST_OS HOST_MEM_MB DOCKER_VERSION HOST_UID HOST_GID
 
-.PHONY: image test smoke calibrate verify verify-smoke experiment resume analyze reference h1 pilot clean
+.PHONY: image test smoke plots calibrate verify verify-smoke experiment resume analyze reference h1 pilot clean
 
 image:
 	docker build $(BUILD_ARGS) -f experiment/Dockerfile -t $(IMAGE) .
@@ -72,15 +73,21 @@ calibrate:
 verify:
 	$(call clean_results,verify)
 	$(call run_plan,experiment/plan-verify.json)
+	-node scripts/plots.mjs results/verify
 	node scripts/compare.mjs results/verify results/reference
 
 verify-smoke:
 	$(call clean_results,smoke)
 	$(call run_plan,experiment/plan-smoke.json)
+	-node scripts/plots.mjs results/smoke
 	COMPARE_MODE=smoke node scripts/compare.mjs results/smoke
 
+# Анализ выполняется в контейнере сразу после серии (тот же образ, что и прогоны);
+# на хосте строятся только графики. Графики не обязательны: их сбой (префикс -)
+# не прерывает сверку с эталоном в verify.
 experiment:
 	$(call run_plan,experiment/plan.json)
+	-node scripts/plots.mjs results/full
 
 # Дозапуск прерванной серии: готовые прогоны (raw/<run-id>.json) пропускаются,
 # фон и калибровка снимаются заново перед продолжением.
@@ -90,6 +97,10 @@ resume:
 
 analyze:
 	node scripts/analyze.mjs results/$(NAME)
+	node scripts/plots.mjs results/$(NAME)
+
+plots:
+	node scripts/plots.mjs results/$(NAME)
 
 # Эталон — вся серия целиком (с сырыми данными), чтобы его анализ можно было пересчитать
 reference:
